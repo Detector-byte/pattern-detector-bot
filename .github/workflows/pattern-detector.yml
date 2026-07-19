@@ -1,51 +1,61 @@
-name: Pattern Detector Bot - 5 Minute Execution
+name: Pattern Detector Bot
 
 on:
-  schedule:
-    # Run every 5 minutes
-    - cron: '*/5 * * * *'
-  
-  # Allow manual trigger
   workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pattern-detector
+  cancel-in-progress: false
 
 jobs:
   pattern-detection:
+    name: Run Pattern Detection
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Run Pattern Detection Bot
-        run: node index.js
-      
-      - name: Commit and push updates
-        run: |
-          git config --global user.email "bot@detector-byte.com"
-          git config --global user.name "Pattern Bot"
-          
-          # Check if there are changes
-          if [[ `git status --porcelain` ]]; then
-            git add -A
-            git commit -m "🤖 Pattern signals updated - $(date +'%Y-%m-%d %H:%M:%S')"
-            git push
-          else
-            echo "No changes to commit"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    timeout-minutes: 4
 
-      - name: Log execution
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Pattern Detector
+        run: node index.js
+
+      - name: Commit & Push Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "🤖 Pattern Detector Update - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git push origin HEAD
+          else
+            echo "✅ No changes detected."
+          fi
+
+      - name: Execution Log
         if: always()
         run: |
-          echo "✅ Bot execution completed at $(date)"
+          echo "========================================"
+          echo "✅ Pattern Detector Execution Complete"
+          echo "Time: $(date -u)"
           echo "Repository: ${{ github.repository }}"
-          echo "Workflow: Pattern Detector Bot"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "========================================"
