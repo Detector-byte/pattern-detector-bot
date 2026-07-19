@@ -1,35 +1,38 @@
-name: Pattern Detector Bot
+name: Pattern Detector Bot - 5 Minute Execution
 
 on:
+  schedule:
+    # Run every 5 minutes
+    - cron: '*/5 * * * *'
+  
+  # Allow manual trigger
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   pattern-detection:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@v3
+      
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
-
+      
       - name: Install dependencies
         run: npm install
-
+      
       - name: Run Pattern Detection Bot
         run: node index.js
-
+      
       - name: Commit and push updates
         run: |
           git config --global user.email "bot@detector-byte.com"
           git config --global user.name "Pattern Bot"
-
+          
+          # Check if there are changes
           if [[ `git status --porcelain` ]]; then
             git add -A
             git commit -m "🤖 Pattern signals updated - $(date +'%Y-%m-%d %H:%M:%S')"
@@ -37,6 +40,8 @@ jobs:
           else
             echo "No changes to commit"
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log execution
         if: always()
