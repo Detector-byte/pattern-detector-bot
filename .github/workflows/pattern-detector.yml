@@ -6,56 +6,41 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: pattern-detector
-  cancel-in-progress: false
-
 jobs:
   pattern-detection:
-    name: Run Pattern Detection
     runs-on: ubuntu-latest
-    timeout-minutes: 4
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
-          cache: "npm"
+          node-version: '18'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: Run Pattern Detector
+      - name: Run Pattern Detection Bot
         run: node index.js
 
-      - name: Commit & Push Changes
+      - name: Commit and push updates
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "bot@detector-byte.com"
+          git config --global user.name "Pattern Bot"
 
-          if [ -n "$(git status --porcelain)" ]; then
+          if [[ `git status --porcelain` ]]; then
             git add -A
-            git commit -m "🤖 Pattern Detector Update - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
-            git push origin HEAD
+            git commit -m "🤖 Pattern signals updated - $(date +'%Y-%m-%d %H:%M:%S')"
+            git push
           else
-            echo "✅ No changes detected."
+            echo "No changes to commit"
           fi
 
-      - name: Execution Log
+      - name: Log execution
         if: always()
         run: |
-          echo "========================================"
-          echo "✅ Pattern Detector Execution Complete"
-          echo "Time: $(date -u)"
+          echo "✅ Bot execution completed at $(date)"
           echo "Repository: ${{ github.repository }}"
-          echo "Workflow: ${{ github.workflow }}"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Run ID: ${{ github.run_id }}"
-          echo "========================================"
+          echo "Workflow: Pattern Detector Bot"
