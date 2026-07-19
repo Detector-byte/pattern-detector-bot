@@ -7,9 +7,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const PatternAnalyzer = require('./src/analyzer');
-const LearningSystem = require('./src/learner');
-const SignalGenerator = require('./src/signals');
+const PatternAnalyzer = require('./analyzer');
+const LearningSystem = require('./learner');
+const SignalGenerator = require('./signals');
 
 const DATA_DIR = path.join(__dirname, 'data');
 const SIGNALS_FILE = path.join(DATA_DIR, 'pattern-signals.json');
