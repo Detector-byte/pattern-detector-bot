@@ -129,6 +129,7 @@ async function runBot() {
     console.log("🧠 Updating learning outcomes...");
     await resolvePendingSignals(
       learner,
+      resolver,
       data.signals.signals,
       candles
     );
