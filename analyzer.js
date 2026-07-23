@@ -56,7 +56,8 @@ class PatternAnalyzer {
         H1: 1.5,
         H4: 2
     };
-
+    // Pattern Conflict Engine
+    this.conflictThreshold = 5;
     // --- New professional-grade config ---
     this.atrPeriod = 14;
     this.minATRPercent = 0.003;   // reject dead/low-volatility markets
