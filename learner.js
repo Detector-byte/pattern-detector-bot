@@ -816,13 +816,21 @@ class LearningSystem {
     if (!this.data.history) this.data.history = [];
     if (!this.data.stats) this.data.stats = {};
 
-    // Add signals to history
+    // Add signals to history (avoid duplicates)
     for (const signal of newSignals) {
+
+      const exists = this.data.history.find(s =>
+        s.timestamp === signal.timestamp
+      );
+
+      if (exists) continue;
+
       this.data.history.push({
         ...signal,
         addedAt: new Date().toISOString(),
-        outcome: null // Will be filled later
+        outcome: signal.outcome || null
       });
+
     }
 
     // Keep last 5000 signals (updated from 2000)
@@ -990,6 +998,68 @@ class LearningSystem {
     };
 
     return descriptions[patternName] || 'Pattern detected with confirmed signal.';
+  }
+
+  /**
+   * Pattern Quality Score
+   */
+  getPatternQuality(pattern, pair, timeframe) {
+
+    const key = `${pattern}_${pair}_${timeframe}`;
+
+    const stat = this.data.stats[key];
+
+    if (!stat) {
+      return {
+        qualityScore: 60,
+        grade: "C",
+        recommendation: "Insufficient Data"
+      };
+    }
+
+    const winRate = stat.accuracy || 60;
+    const sampleSize = Math.min(100, stat.total * 5);
+
+    let trendScore = 60;
+
+    if (stat.trend === "improving")
+      trendScore = 90;
+
+    else if (stat.trend === "stable")
+      trendScore = 70;
+
+    else if (stat.trend === "declining")
+      trendScore = 40;
+
+    const confidence = Math.min(95, winRate);
+
+    const quality =
+      (winRate * 0.40) +
+      (confidence * 0.20) +
+      (trendScore * 0.20) +
+      (sampleSize * 0.20);
+
+    let grade = "F";
+
+    if (quality >= 90) grade = "A+";
+    else if (quality >= 80) grade = "A";
+    else if (quality >= 70) grade = "B";
+    else if (quality >= 60) grade = "C";
+    else if (quality >= 50) grade = "D";
+
+    return {
+      qualityScore: Math.round(quality),
+      grade,
+      recommendation:
+        grade === "A+" || grade === "A"
+          ? "Excellent"
+          : grade === "B"
+          ? "Good"
+          : grade === "C"
+          ? "Average"
+          : "Avoid"
+    };
+
   }
 
   // Get risk:reward suggestion
