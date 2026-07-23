@@ -136,8 +136,11 @@ async function runBot() {
     // Update learning system with new signals
     learner.updateHistory(newSignals);
 
+    // Existing signals now contain resolved WIN/LOSS outcomes
+    const updatedSignals = data.signals.signals;
+
     // Save all data
-    saveData(newSignals, data.signals.signals, learner.getConfidenceData(), learner.getLearningData());
+    saveData(newSignals, updatedSignals, learner.getConfidenceData(), learner.getLearningData());
 
     console.log(`\n✨ Bot execution complete`);
     console.log(`📈 Signals generated: ${newSignals.length}`);
