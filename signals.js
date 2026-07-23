@@ -13,6 +13,19 @@ class SignalGenerator {
   generateSignal(pair, timeframe, pattern, confidence, lastCandle) {
     if (!pattern || !lastCandle) return null;
 
+    const tradeDecision =
+      this.learner.shouldTrade({
+        pattern: pattern.name,
+        pair,
+        timeframe,
+        strength: pattern.strength,
+        confirmationScore: pattern.confirmationScore
+      });
+
+    if (!tradeDecision.execute) {
+      return null;
+    }
+
     // Calculate entry, stop, and take profit
     const entry = lastCandle.close;
     const { stop, target1, target2, target3, risk } = this.calculateLevels(
@@ -22,13 +35,28 @@ class SignalGenerator {
     );
 
     // Risk:Reward calculation
-    const rr = risk > 0 ? Math.abs(target1 - entry) / Math.abs(entry - stop) : 0;
+    const rrData =
+      this.learner.getRiskRewardData(
+        pattern.name,
+        entry,
+        stop,
+        target1
+      );
+
+    const rr = Number(rrData.ratio);
 
     // Get pattern description
     const description = this.learner.getPatternDescription(pattern.name);
 
     // Get timeframe-specific context
     const tfContext = this.getTimeframeContext(timeframe);
+
+    const quality =
+      this.learner.getPatternQuality(
+        pattern.name,
+        pair,
+        timeframe
+      );
 
     // Generate signal object
     return {
@@ -44,6 +72,15 @@ class SignalGenerator {
       takeProfit2: Number(target2.toFixed(4)),
       takeProfit3: Number(target3.toFixed(4)),
       riskReward: Number(rr.toFixed(2)),
+      riskRewardDetails: rrData,
+      qualityScore: quality.qualityScore,
+      grade: quality.grade,
+      qualityRecommendation: quality.recommendation,
+      tradeDecision: {
+        confidence: tradeDecision.confidence,
+        execute: tradeDecision.execute,
+        reason: tradeDecision.reason
+      },
       status: 'CONFIRMED',
       description,
       psychology: this.getPatternPsychology(pattern.name),
@@ -60,7 +97,17 @@ class SignalGenerator {
       strength: pattern.strength,
       confirmationScore: pattern.confirmationScore,
       executionNotes: this.getExecutionNotes(pattern.name, timeframe),
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(
+        Date.now() +
+        (
+          timeframe === "5m" ? 30 :
+          timeframe === "15m" ? 60 :
+          timeframe === "30m" ? 120 :
+          timeframe === "1H" ? 360 :
+          1440
+        ) * 60000
+      ).toISOString()
     };
   }
 
