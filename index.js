@@ -59,7 +59,7 @@ async function runBot() {
     const analyzer = new PatternAnalyzer();
     const learner = new LearningSystem(data.learning, data.confidence);
     const signalGen = new SignalGenerator();
-    const resolver = new SignalResolver();
+
     // Fetch candle data for both pairs
     console.log('📊 Fetching candle data...');
     const candles = await analyzer.fetchCandles();
@@ -129,7 +129,6 @@ async function runBot() {
     console.log("🧠 Updating learning outcomes...");
     await resolvePendingSignals(
       learner,
-      resolver,
       data.signals.signals,
       candles
     );
@@ -238,7 +237,6 @@ function updateStaleness(reason) {
  */
 async function resolvePendingSignals(
   learner,
-  resolver,
   existingSignals,
   candles
 ) {
@@ -259,21 +257,42 @@ async function resolvePendingSignals(
     if (!latest)
       continue;
 
-    // Use professional Signal Resolver
-    const outcome =
-      resolver.resolve(signal, latest);
+    let outcome = null;
 
-    if (!outcome)
-      continue;
+    if (signal.direction === "BUY") {
 
-    learner.resolveSignal(
-      signal.timestamp,
-      outcome
-    );
+      if (latest.high >= signal.takeProfit)
+        outcome = "WIN";
 
-    console.log(
-      `🎯 ${signal.pattern} ${signal.pair} ${signal.timeframe} → ${outcome}`
-    );
+      else if (latest.low <= signal.stopLoss)
+        outcome = "LOSS";
+
+    }
+
+    else if (signal.direction === "SELL") {
+
+      if (latest.low <= signal.takeProfit)
+        outcome = "WIN";
+
+      else if (latest.high >= signal.stopLoss)
+        outcome = "LOSS";
+
+    }
+
+    if (outcome) {
+
+      learner.resolveSignal(
+        signal.timestamp,
+        outcome
+      );
+
+      signal.outcome = outcome;
+
+      console.log(
+        `🎯 ${signal.pattern} ${signal.pair} ${signal.timeframe} → ${outcome}`
+      );
+
+    }
 
   }
 
