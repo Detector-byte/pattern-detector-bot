@@ -100,7 +100,31 @@ class PatternAnalyzer {
     const closes = candles.map(c => c.close);
     const highs = candles.map(c => c.high);
     const lows = candles.map(c => c.low);
+    // Strong breakout confirmation
+    isStrongBreakout(candles, level, direction, atr) {
+        if (!candles || candles.length < 3) return false;
 
+        const last = candles[candles.length - 1];
+        const prev = candles[candles.length - 2];
+
+        const body = Math.abs(last.close - last.open);
+        const minBody = atr * 0.30;
+
+        if (direction === "BUY") {
+            return (
+                last.close > level &&
+                prev.close <= level &&
+                body >= minBody
+            );
+        }
+
+        return (
+            last.close < level &&
+            prev.close >= level &&
+            body >= minBody
+        );
+    }
+    
     // Shared context computed once per call (EMA / trend / RSI / volume / ATR%)
     // EMA20/EMA50 and trend are computed a single time here and reused by
     // every detector instead of each one recalculating them.
