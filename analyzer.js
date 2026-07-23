@@ -25,6 +25,24 @@ class PatternAnalyzer {
       'Bullish Engulfing',
       'Bearish Engulfing'
     ];
+
+    // Config used by the Step 3 swing-based detectors
+    this.minSwingDistance = 3;         // min candles between two swing points
+    this.priceTolerance = 0.02;        // 2% tolerance for peak/valley similarity
+    this.breakoutConfirmationCandles = 2; // candles required to confirm a breakout
+
+    // Step 5 configuration
+    this.triangleLookback = 30;
+    this.wedgeLookback = 30;
+    this.regressionThreshold = 0.0005;
+
+    // Step 9 configuration
+    this.timeframeWeights = {
+        M5: 1,
+        M15: 1.25,
+        H1: 1.5,
+        H4: 2
+    };
   }
 
   // Fetch candle data from GitHub
@@ -40,7 +58,7 @@ class PatternAnalyzer {
   }
 
   // Detect all patterns in candles
-  detectAllPatterns(candles) {
+  detectAllPatterns(candles, timeframe = "M5") {
     if (!candles || candles.length < 30) return [];
 
     const detectedPatterns = [];
@@ -111,265 +129,447 @@ class PatternAnalyzer {
     const bearEngulf = this.detectBearishEngulfing(candles);
     if (bearEngulf) detectedPatterns.push(bearEngulf);
 
-    return detectedPatterns;
+    // Tag every detected pattern with the timeframe it was found on
+    detectedPatterns.forEach(pattern => {
+      pattern.timeframe = timeframe;
+    });
+
+    // Remove duplicate patterns
+    const uniquePatterns = detectedPatterns.filter(
+      (pattern, index, self) =>
+        index === self.findIndex(
+          p =>
+            p.name === pattern.name &&
+            p.timeframe === pattern.timeframe
+        )
+    );
+
+    // Rank by confirmation first, then strength
+    uniquePatterns.sort((a, b) => {
+      if (b.confirmationScore !== a.confirmationScore) {
+        return b.confirmationScore - a.confirmationScore;
+      }
+      return b.strength - a.strength;
+    });
+
+    // Keep only the best 5 patterns
+    const ranked =
+        this.calculateMultiTimeframeConfidence(
+            uniquePatterns
+        );
+    return ranked
+        .sort((a,b)=>b.weightedScore-a.weightedScore)
+        .slice(0,5);
   }
 
+  // --- Step 3: swing-based Double Top / Double Bottom ---
+
   detectDoubleTop(candles, highs) {
-    const n = candles.length;
-    if (n < 20) return null;
+    const swings = this.findSwingHighs(highs);
+    if (swings.length < 2) return null;
 
-    const recent = highs.slice(n - 20);
-    const peak1Idx = recent.indexOf(Math.max(...recent.slice(0, 10)));
-    const peak2Idx = recent.indexOf(Math.max(...recent.slice(10)));
+    const peak1 = swings[swings.length - 2];
+    const peak2 = swings[swings.length - 1];
 
-    if (peak1Idx < 0 || peak2Idx <= peak1Idx) return null;
+    // Peaks should not be too close together
+    if (peak2.index - peak1.index < this.minSwingDistance) return null;
 
-    const similarity = Math.abs(recent[peak1Idx] - recent[peak2Idx]) / recent[peak1Idx];
-    if (similarity > 0.02) return null; // Peaks too different
+    // Peaks must be similar in price
+    const similarity = Math.abs(peak1.value - peak2.value) / Math.max(peak1.value, peak2.value);
+    if (similarity > this.priceTolerance) return null;
 
-    const valley = Math.min(...recent.slice(peak1Idx + 1, peak2Idx));
-    const strength = ((recent[peak1Idx] - valley) / valley) * 100;
+    // Neckline = lowest low between the two peaks
+    const valley = Math.min(
+      ...candles
+        .slice(peak1.index, peak2.index + 1)
+        .map(c => c.low)
+    );
+
+    // Breakout confirmation below the neckline
+    if (!this.isBreakoutConfirmed(candles, valley, 'SELL')) return null;
+
+    const strength = ((peak1.value - valley) / valley) * 100;
+    const confirmationScore = this.calculatePatternQuality(strength, 88);
 
     return {
       name: 'Double Top',
       direction: 'SELL',
-      strength: Math.min(strength, 100),
-      confirmationScore: 85 - (similarity * 100)
+      strength: Math.round(strength),
+      confirmationScore,
+      reliability: this.getReliability(confirmationScore)
     };
   }
 
   detectDoubleBottom(candles, lows) {
-    const n = candles.length;
-    if (n < 20) return null;
+    const swings = this.findSwingLows(lows);
+    if (swings.length < 2) return null;
 
-    const recent = lows.slice(n - 20);
-    const valley1Idx = recent.indexOf(Math.min(...recent.slice(0, 10)));
-    const valley2Idx = recent.indexOf(Math.min(...recent.slice(10)));
+    const low1 = swings[swings.length - 2];
+    const low2 = swings[swings.length - 1];
 
-    if (valley1Idx < 0 || valley2Idx <= valley1Idx) return null;
+    if (low2.index - low1.index < this.minSwingDistance) return null;
 
-    const similarity = Math.abs(recent[valley1Idx] - recent[valley2Idx]) / recent[valley2Idx];
-    if (similarity > 0.02) return null;
+    const similarity = Math.abs(low1.value - low2.value) / Math.max(low1.value, low2.value);
+    if (similarity > this.priceTolerance) return null;
 
-    const peak = Math.max(...recent.slice(valley1Idx + 1, valley2Idx));
-    const strength = ((peak - recent[valley1Idx]) / recent[valley1Idx]) * 100;
+    // Neckline = highest high between the two lows
+    const neckline = Math.max(
+      ...candles
+        .slice(low1.index, low2.index + 1)
+        .map(c => c.high)
+    );
+
+    if (!this.isBreakoutConfirmed(candles, neckline, 'BUY')) return null;
+
+    const strength = ((neckline - low1.value) / low1.value) * 100;
+    const confirmationScore = this.calculatePatternQuality(strength, 88);
 
     return {
       name: 'Double Bottom',
       direction: 'BUY',
-      strength: Math.min(strength, 100),
-      confirmationScore: 85 - (similarity * 100)
+      strength: Math.round(strength),
+      confirmationScore,
+      reliability: this.getReliability(confirmationScore)
     };
   }
 
-  detectHeadShoulders(candles, highs) {
-    const n = candles.length;
-    if (n < 25) return null;
+  detectHeadShoulders(candles) {
+    const swings = this.findSwingHighs(candles.map(c => c.high));
+    if (swings.length < 3) return null;
 
-    const recent = highs.slice(n - 25);
-    const maxIdx = recent.indexOf(Math.max(...recent));
+    // Last three swing highs
+    const left = swings[swings.length - 3];
+    const head = swings[swings.length - 2];
+    const right = swings[swings.length - 1];
 
-    if (maxIdx < 5 || maxIdx > recent.length - 6) return null;
+    // Head must be highest
+    if (!(head.value > left.value && head.value > right.value))
+      return null;
 
-    const leftShoulder = Math.max(...recent.slice(0, maxIdx - 3));
-    const head = recent[maxIdx];
-    const rightShoulder = Math.max(...recent.slice(maxIdx + 3));
+    // Shoulders should be similar
+    const shoulderDiff =
+      Math.abs(left.value - right.value) /
+      Math.max(left.value, right.value);
+    if (shoulderDiff > 0.03)
+      return null;
 
-    const shoulderSimilarity = Math.abs(leftShoulder - rightShoulder) / leftShoulder;
-    if (shoulderSimilarity > 0.05) return null;
+    // Minimum spacing
+    if (
+      head.index - left.index < this.minSwingDistance ||
+      right.index - head.index < this.minSwingDistance
+    )
+      return null;
 
-    const neckline = Math.min(...recent.slice(maxIdx - 3, maxIdx + 3));
-    const strength = ((head - neckline) / neckline) * 100;
+    // Neckline
+    const leftValley = Math.min(
+      ...candles
+        .slice(left.index, head.index + 1)
+        .map(c => c.low)
+    );
+    const rightValley = Math.min(
+      ...candles
+        .slice(head.index, right.index + 1)
+        .map(c => c.low)
+    );
+    const neckline = (leftValley + rightValley) / 2;
+
+    // Breakout confirmation
+    if (!this.isBreakoutConfirmed(candles, neckline, 'SELL'))
+      return null;
+
+    const strength =
+      ((head.value - neckline) / neckline) * 100;
+    const confirmationScore = this.calculatePatternQuality(
+      strength,
+      90
+    );
 
     return {
       name: 'Head and Shoulders',
       direction: 'SELL',
-      strength: Math.min(strength, 100),
-      confirmationScore: 88
+      strength: Math.round(strength),
+      confirmationScore,
+      reliability: this.getReliability(confirmationScore)
     };
   }
 
-  detectInverseHeadShoulders(candles, lows) {
-    const n = candles.length;
-    if (n < 25) return null;
+  detectInverseHeadShoulders(candles) {
+    const swings = this.findSwingLows(candles.map(c => c.low));
+    if (swings.length < 3) return null;
 
-    const recent = lows.slice(n - 25);
-    const minIdx = recent.indexOf(Math.min(...recent));
+    // Last three swing lows
+    const left = swings[swings.length - 3];
+    const head = swings[swings.length - 2];
+    const right = swings[swings.length - 1];
 
-    if (minIdx < 5 || minIdx > recent.length - 6) return null;
+    // Head must be lowest
+    if (!(head.value < left.value && head.value < right.value))
+      return null;
 
-    const leftShoulder = Math.min(...recent.slice(0, minIdx - 3));
-    const head = recent[minIdx];
-    const rightShoulder = Math.min(...recent.slice(minIdx + 3));
+    // Shoulders should be similar
+    const shoulderDiff =
+      Math.abs(left.value - right.value) /
+      Math.max(left.value, right.value);
+    if (shoulderDiff > 0.03)
+      return null;
 
-    const shoulderSimilarity = Math.abs(leftShoulder - rightShoulder) / leftShoulder;
-    if (shoulderSimilarity > 0.05) return null;
+    // Minimum spacing
+    if (
+      head.index - left.index < this.minSwingDistance ||
+      right.index - head.index < this.minSwingDistance
+    )
+      return null;
 
-    const neckline = Math.max(...recent.slice(minIdx - 3, minIdx + 3));
-    const strength = ((neckline - head) / head) * 100;
+    // Neckline
+    const leftPeak = Math.max(
+      ...candles
+        .slice(left.index, head.index + 1)
+        .map(c => c.high)
+    );
+    const rightPeak = Math.max(
+      ...candles
+        .slice(head.index, right.index + 1)
+        .map(c => c.high)
+    );
+    const neckline = (leftPeak + rightPeak) / 2;
+
+    // Breakout confirmation
+    if (!this.isBreakoutConfirmed(candles, neckline, 'BUY'))
+      return null;
+
+    const strength =
+      ((neckline - head.value) / head.value) * 100;
+    const confirmationScore = this.calculatePatternQuality(
+      strength,
+      90
+    );
 
     return {
       name: 'Inverse Head and Shoulders',
       direction: 'BUY',
-      strength: Math.min(strength, 100),
-      confirmationScore: 88
+      strength: Math.round(strength),
+      confirmationScore,
+      reliability: this.getReliability(confirmationScore)
     };
   }
 
   detectAscendingTriangle(candles, highs, lows) {
-    const n = candles.length;
-    if (n < 20) return null;
+    const recentHighs = highs.slice(-this.triangleLookback);
+    const recentLows = lows.slice(-this.triangleLookback);
 
-    const recent = { highs: highs.slice(n - 20), lows: lows.slice(n - 20) };
-    
-    // Check for rising lows and flat highs
-    const lowTrend = this.isTrendingUp(recent.lows, 0.02);
-    const highFlat = this.isFlat(recent.highs, 0.015);
+    const highSlope = this.linearRegressionSlope(recentHighs);
+    const lowSlope = this.linearRegressionSlope(recentLows);
 
-    if (lowTrend && highFlat) {
-      const strength = ((recent.highs[0] - recent.lows[0]) / recent.lows[0]) * 100;
-      return {
-        name: 'Ascending Triangle',
-        direction: 'BUY',
-        strength: Math.min(strength, 100),
-        confirmationScore: 82
-      };
+    if (
+        Math.abs(highSlope) < this.regressionThreshold &&
+        lowSlope > this.regressionThreshold
+    ) {
+        const resistance = Math.max(...recentHighs);
+        if (!this.isBreakoutConfirmed(candles, resistance, "BUY"))
+            return null;
+        const confirmationScore = 90;
+        return {
+            name: "Ascending Triangle",
+            direction: "BUY",
+            strength: 82,
+            confirmationScore,
+            reliability: this.getReliability(confirmationScore)
+        };
     }
     return null;
   }
 
   detectDescendingTriangle(candles, highs, lows) {
-    const n = candles.length;
-    if (n < 20) return null;
+    const recentHighs = highs.slice(-this.triangleLookback);
+    const recentLows = lows.slice(-this.triangleLookback);
 
-    const recent = { highs: highs.slice(n - 20), lows: lows.slice(n - 20) };
-    
-    // Check for falling highs and flat lows
-    const highTrend = this.isTrendingDown(recent.highs, 0.02);
-    const lowFlat = this.isFlat(recent.lows, 0.015);
+    const highSlope = this.linearRegressionSlope(recentHighs);
+    const lowSlope = this.linearRegressionSlope(recentLows);
 
-    if (highTrend && lowFlat) {
-      const strength = ((recent.highs[0] - recent.lows[0]) / recent.lows[0]) * 100;
-      return {
-        name: 'Descending Triangle',
-        direction: 'SELL',
-        strength: Math.min(strength, 100),
-        confirmationScore: 82
-      };
+    if (
+        highSlope < -this.regressionThreshold &&
+        Math.abs(lowSlope) < this.regressionThreshold
+    ) {
+        const support = Math.min(...recentLows);
+        if (!this.isBreakoutConfirmed(candles, support, "SELL"))
+            return null;
+        const confirmationScore = 90;
+        return {
+            name: "Descending Triangle",
+            direction: "SELL",
+            strength: 82,
+            confirmationScore,
+            reliability: this.getReliability(confirmationScore)
+        };
     }
     return null;
   }
 
   detectSymmetricTriangle(candles, highs, lows) {
-    const n = candles.length;
-    if (n < 20) return null;
-
-    const recent = { highs: highs.slice(n - 20), lows: lows.slice(n - 20) };
-    
-    // Check for converging highs and lows
-    const highTrend = this.isTrendingDown(recent.highs, 0.015);
-    const lowTrend = this.isTrendingUp(recent.lows, 0.015);
-
-    if (highTrend && lowTrend) {
-      const strength = ((recent.highs[0] - recent.lows[0]) / recent.lows[0]) * 100;
-      return {
-        name: 'Symmetric Triangle',
-        direction: 'NEUTRAL',
-        strength: Math.min(strength, 100),
-        confirmationScore: 75
-      };
-    }
-    return null;
+      const recentHighs = highs.slice(-this.triangleLookback);
+      const recentLows = lows.slice(-this.triangleLookback);
+      const highSlope = this.linearRegressionSlope(recentHighs);
+      const lowSlope = this.linearRegressionSlope(recentLows);
+      if (
+          highSlope < -this.regressionThreshold &&
+          lowSlope > this.regressionThreshold
+      ) {
+          const confirmationScore = 88;
+          return {
+              name: "Symmetric Triangle",
+              direction: "NEUTRAL",
+              strength: 78,
+              confirmationScore,
+              reliability: this.getReliability(confirmationScore)
+          };
+      }
+      return null;
   }
 
   detectRisingWedge(candles, highs, lows) {
-    const n = candles.length;
-    if (n < 20) return null;
-
-    const recent = { highs: highs.slice(n - 20), lows: lows.slice(n - 20) };
-    
-    // Rising highs and rising lows, highs steeper
-    const highTrend = this.isTrendingUp(recent.highs, 0.025);
-    const lowTrend = this.isTrendingUp(recent.lows, 0.015);
-
-    if (highTrend && lowTrend) {
-      return {
-        name: 'Rising Wedge',
-        direction: 'SELL',
-        strength: 70,
-        confirmationScore: 78
-      };
-    }
-    return null;
+      const recentHighs = highs.slice(-this.wedgeLookback);
+      const recentLows = lows.slice(-this.wedgeLookback);
+      const highSlope = this.linearRegressionSlope(recentHighs);
+      const lowSlope = this.linearRegressionSlope(recentLows);
+      if (
+          highSlope > this.regressionThreshold &&
+          lowSlope > this.regressionThreshold &&
+          highSlope > lowSlope
+      ) {
+          const support = Math.min(...recentLows);
+          if (!this.isBreakoutConfirmed(candles, support, "SELL"))
+              return null;
+          const trend = this.detectTrend(candles);
+          if (trend !== "UP")
+              return null;
+          const confirmationScore = 90;
+          return {
+              name: "Rising Wedge",
+              direction: "SELL",
+              strength: 80,
+              confirmationScore,
+              reliability: this.getReliability(confirmationScore)
+          };
+      }
+      return null;
   }
 
   detectFallingWedge(candles, highs, lows) {
-    const n = candles.length;
-    if (n < 20) return null;
-
-    const recent = { highs: highs.slice(n - 20), lows: lows.slice(n - 20) };
-    
-    // Falling highs and falling lows, lows steeper
-    const highTrend = this.isTrendingDown(recent.highs, 0.015);
-    const lowTrend = this.isTrendingDown(recent.lows, 0.025);
-
-    if (highTrend && lowTrend) {
-      return {
-        name: 'Falling Wedge',
-        direction: 'BUY',
-        strength: 70,
-        confirmationScore: 78
-      };
-    }
-    return null;
+      const recentHighs = highs.slice(-this.wedgeLookback);
+      const recentLows = lows.slice(-this.wedgeLookback);
+      const highSlope = this.linearRegressionSlope(recentHighs);
+      const lowSlope = this.linearRegressionSlope(recentLows);
+      if (
+          highSlope < -this.regressionThreshold &&
+          lowSlope < -this.regressionThreshold &&
+          Math.abs(lowSlope) > Math.abs(highSlope)
+      ) {
+          const resistance = Math.max(...recentHighs);
+          if (!this.isBreakoutConfirmed(candles, resistance, "BUY"))
+              return null;
+          const trend = this.detectTrend(candles);
+          if (trend !== "DOWN")
+              return null;
+          const confirmationScore = 90;
+          return {
+              name: "Falling Wedge",
+              direction: "BUY",
+              strength: 80,
+              confirmationScore,
+              reliability: this.getReliability(confirmationScore)
+          };
+      }
+      return null;
   }
 
   detectPennant(candles, highs, lows) {
-    const n = candles.length;
-    if (n < 20) return null;
-
-    const recent = { highs: highs.slice(n - 20), lows: lows.slice(n - 20), closes: candles.slice(n - 20).map(c => c.close) };
-    
-    // Small triangle after strong move
-    const range = recent.highs[0] - recent.lows[0];
-    const newRange = recent.highs[recent.highs.length - 1] - recent.lows[recent.lows.length - 1];
-    
-    if (newRange < range * 0.3) {
-      const prevTrend = recent.closes[0] > recent.closes[10] ? 'DOWN' : 'UP';
-      return {
-        name: 'Pennant',
-        direction: prevTrend === 'UP' ? 'BUY' : 'SELL',
-        strength: 65,
-        confirmationScore: 72
-      };
-    }
-    return null;
+      if (candles.length < 40) return null;
+      const recentHighs = highs.slice(-20);
+      const recentLows = lows.slice(-20);
+      const highSlope = this.linearRegressionSlope(recentHighs);
+      const lowSlope = this.linearRegressionSlope(recentLows);
+      const closes = candles.map(c => c.close);
+      const impulse =
+          Math.abs(closes[20] - closes[0]) /
+          closes[0];
+      if (
+          impulse > 0.03 &&
+          highSlope < 0 &&
+          lowSlope > 0
+      ) {
+          const direction =
+              closes[20] > closes[0]
+                  ? "BUY"
+                  : "SELL";
+          const breakoutLevel =
+              direction === "BUY"
+                  ? Math.max(...recentHighs)
+                  : Math.min(...recentLows);
+          if (!this.isBreakoutConfirmed(candles, breakoutLevel, direction))
+              return null;
+          const confirmationScore = 91;
+          return {
+              name: "Pennant",
+              direction,
+              strength: 84,
+              confirmationScore,
+              reliability: this.getReliability(confirmationScore)
+          };
+      }
+      return null;
   }
 
   detectFlag(candles, highs, lows) {
-    const n = candles.length;
-    if (n < 20) return null;
-
-    const recent = candles.slice(n - 20);
-    const closes = recent.map(c => c.close);
-    
-    // Small consolidation after strong move
-    const firstHalf = closes.slice(0, 10);
-    const secondHalf = closes.slice(10);
-    
-    const firstRange = Math.max(...firstHalf) - Math.min(...firstHalf);
-    const secondRange = Math.max(...secondHalf) - Math.min(...secondHalf);
-    
-    if (secondRange < firstRange * 0.4) {
-      const trend = closes[0] > closes[10] ? 'DOWN' : 'UP';
-      return {
-        name: 'Flag',
-        direction: trend === 'UP' ? 'BUY' : 'SELL',
-        strength: 68,
-        confirmationScore: 75
-      };
-    }
-    return null;
+      if (candles.length < 40)
+          return null;
+      const closes = candles.map(c => c.close);
+      const impulse =
+          (closes[20] - closes[0]) / closes[0];
+      const flagSlope =
+          this.linearRegressionSlope(
+              closes.slice(-15)
+          );
+      if (
+          impulse > 0.03 &&
+          flagSlope < 0
+      ) {
+          const resistance =
+              Math.max(...highs.slice(-15));
+          if (!this.isBreakoutConfirmed(candles, resistance, "BUY"))
+              return null;
+          const trend = this.detectTrend(candles);
+          if (trend !== "UP")
+              return null;
+          const confirmationScore = 92;
+          return {
+              name: "Bull Flag",
+              direction: "BUY",
+              strength: 85,
+              confirmationScore,
+              reliability: this.getReliability(confirmationScore)
+          };
+      }
+      if (
+          impulse < -0.03 &&
+          flagSlope > 0
+      ) {
+          const support =
+              Math.min(...lows.slice(-15));
+          if (!this.isBreakoutConfirmed(candles, support, "SELL"))
+              return null;
+          const trend = this.detectTrend(candles);
+          if (trend !== "DOWN")
+              return null;
+          const confirmationScore = 92;
+          return {
+              name: "Bear Flag",
+              direction: "SELL",
+              strength: 85,
+              confirmationScore,
+              reliability: this.getReliability(confirmationScore)
+          };
+      }
+      return null;
   }
 
   detectCupHandle(candles, lows, closes) {
@@ -378,7 +578,7 @@ class PatternAnalyzer {
 
     const recent = lows.slice(n - 30);
     const minIdx = recent.indexOf(Math.min(...recent));
-    
+
     if (minIdx < 5 || minIdx > recent.length - 10) return null;
 
     // Cup formation
@@ -390,11 +590,17 @@ class PatternAnalyzer {
     const handleRange = (handleHigh - recent[minIdx]) / recent[minIdx];
     if (handleRange > 0.08) return null;
 
+    const trend = this.detectTrend(candles);
+    if (trend !== "UP")
+        return null;
+
+    const confirmationScore = 85;
     return {
       name: 'Cup and Handle',
       direction: 'BUY',
       strength: 72,
-      confirmationScore: 85
+      confirmationScore,
+      reliability: this.getReliability(confirmationScore)
     };
   }
 
@@ -404,11 +610,13 @@ class PatternAnalyzer {
 
     const recent = highs.slice(n - 20);
     if (this.isFlat(recent, 0.01)) {
+      const confirmationScore = 70;
       return {
         name: 'Rectangle Top',
         direction: 'SELL',
         strength: 65,
-        confirmationScore: 70
+        confirmationScore,
+        reliability: this.getReliability(confirmationScore)
       };
     }
     return null;
@@ -420,11 +628,13 @@ class PatternAnalyzer {
 
     const recent = lows.slice(n - 20);
     if (this.isFlat(recent, 0.01)) {
+      const confirmationScore = 70;
       return {
         name: 'Rectangle Bottom',
         direction: 'BUY',
         strength: 65,
-        confirmationScore: 70
+        confirmationScore,
+        reliability: this.getReliability(confirmationScore)
       };
     }
     return null;
@@ -436,16 +646,18 @@ class PatternAnalyzer {
 
     const recent = { highs: highs.slice(n - 25), lows: lows.slice(n - 25) };
     const mid = Math.floor(recent.highs.length / 2);
-    
+
     const firstHalfExpand = recent.highs[0] - recent.lows[0] < recent.highs[mid] - recent.lows[mid];
     const secondHalfShrink = recent.highs[mid] - recent.lows[mid] > recent.highs[recent.highs.length - 1] - recent.lows[recent.lows.length - 1];
-    
+
     if (firstHalfExpand && secondHalfShrink) {
+      const confirmationScore = 80;
       return {
         name: 'Diamond Top',
         direction: 'SELL',
         strength: 73,
-        confirmationScore: 80
+        confirmationScore,
+        reliability: this.getReliability(confirmationScore)
       };
     }
     return null;
@@ -457,16 +669,18 @@ class PatternAnalyzer {
 
     const recent = { highs: highs.slice(n - 25), lows: lows.slice(n - 25) };
     const mid = Math.floor(recent.lows.length / 2);
-    
+
     const firstHalfExpand = recent.highs[0] - recent.lows[0] < recent.highs[mid] - recent.lows[mid];
     const secondHalfShrink = recent.highs[mid] - recent.lows[mid] > recent.highs[recent.highs.length - 1] - recent.lows[recent.lows.length - 1];
-    
+
     if (firstHalfExpand && secondHalfShrink) {
+      const confirmationScore = 80;
       return {
         name: 'Diamond Bottom',
         direction: 'BUY',
         strength: 73,
-        confirmationScore: 80
+        confirmationScore,
+        reliability: this.getReliability(confirmationScore)
       };
     }
     return null;
@@ -482,11 +696,13 @@ class PatternAnalyzer {
     if (prev.close <= prev.open && curr.close > curr.open &&
         curr.open <= prev.close && curr.close >= prev.open) {
       const strength = ((curr.close - curr.open) / curr.open) * 100;
+      const confirmationScore = 80;
       return {
         name: 'Bullish Engulfing',
         direction: 'BUY',
         strength: Math.min(strength, 100),
-        confirmationScore: 80
+        confirmationScore,
+        reliability: this.getReliability(confirmationScore)
       };
     }
     return null;
@@ -502,14 +718,112 @@ class PatternAnalyzer {
     if (prev.close >= prev.open && curr.close < curr.open &&
         curr.open >= prev.close && curr.close <= prev.open) {
       const strength = ((curr.open - curr.close) / curr.close) * 100;
+      const confirmationScore = 80;
       return {
         name: 'Bearish Engulfing',
         direction: 'SELL',
         strength: Math.min(strength, 100),
-        confirmationScore: 80
+        confirmationScore,
+        reliability: this.getReliability(confirmationScore)
       };
     }
     return null;
+  }
+
+  // Detect Swing Highs
+  getSwingHighs(candles, left = 2, right = 2) {
+    const swings = [];
+
+    for (let i = left; i < candles.length - right; i++) {
+      let isSwing = true;
+
+      // Left side check
+      for (let j = 1; j <= left; j++) {
+        if (candles[i].high <= candles[i - j].high) {
+          isSwing = false;
+          break;
+        }
+      }
+
+      if (!isSwing) continue;
+
+      // Right side check
+      for (let j = 1; j <= right; j++) {
+        if (candles[i].high <= candles[i + j].high) {
+          isSwing = false;
+          break;
+        }
+      }
+
+      if (isSwing) {
+        swings.push({
+          index: i,
+          price: candles[i].high,
+          candle: candles[i]
+        });
+      }
+    }
+
+    return swings;
+  }
+
+  // Detect Swing Lows
+  getSwingLows(candles, left = 2, right = 2) {
+    const swings = [];
+
+    for (let i = left; i < candles.length - right; i++) {
+      let isSwing = true;
+
+      // Left side check
+      for (let j = 1; j <= left; j++) {
+        if (candles[i].low >= candles[i - j].low) {
+          isSwing = false;
+          break;
+        }
+      }
+
+      if (!isSwing) continue;
+
+      // Right side check
+      for (let j = 1; j <= right; j++) {
+        if (candles[i].low >= candles[i + j].low) {
+          isSwing = false;
+          break;
+        }
+      }
+
+      if (isSwing) {
+        swings.push({
+          index: i,
+          price: candles[i].low,
+          candle: candles[i]
+        });
+      }
+    }
+
+    return swings;
+  }
+
+  // Detect overall market trend
+  detectTrend(candles, period = 20) {
+
+    if (!candles || candles.length < period)
+      return "SIDEWAYS";
+
+    const recent = candles.slice(-period);
+
+    const first = recent[0].close;
+    const last = recent[recent.length - 1].close;
+
+    const change = ((last - first) / first) * 100;
+
+    if (change >= 1)
+      return "UP";
+
+    if (change <= -1)
+      return "DOWN";
+
+    return "SIDEWAYS";
   }
 
   // Helper functions
@@ -531,6 +845,148 @@ class PatternAnalyzer {
     const min = Math.min(...values);
     const range = (max - min) / min;
     return range < threshold;
+  }
+
+  // --- Step 2 helpers ---
+
+  // Find Swing Highs (returns {index, value} pairs, used by Step 3 detectors)
+  findSwingHighs(highs, left = 2, right = 2) {
+    const swings = [];
+
+    for (let i = left; i < highs.length - right; i++) {
+      let isSwing = true;
+
+      for (let j = i - left; j <= i + right; j++) {
+        if (j === i) continue;
+        if (highs[j] >= highs[i]) {
+          isSwing = false;
+          break;
+        }
+      }
+
+      if (isSwing) {
+        swings.push({
+          index: i,
+          value: highs[i]
+        });
+      }
+    }
+
+    return swings;
+  }
+
+  // Find Swing Lows (returns {index, value} pairs, used by Step 3 detectors)
+  findSwingLows(lows, left = 2, right = 2) {
+    const swings = [];
+
+    for (let i = left; i < lows.length - right; i++) {
+      let isSwing = true;
+
+      for (let j = i - left; j <= i + right; j++) {
+        if (j === i) continue;
+        if (lows[j] <= lows[i]) {
+          isSwing = false;
+          break;
+        }
+      }
+
+      if (isSwing) {
+        swings.push({
+          index: i,
+          value: lows[i]
+        });
+      }
+    }
+
+    return swings;
+  }
+
+  // Breakout Confirmation
+  isBreakoutConfirmed(candles, level, direction) {
+    const last = candles.slice(-this.breakoutConfirmationCandles);
+
+    if (direction === 'BUY') {
+      return last.every(c => c.close > level);
+    }
+    return last.every(c => c.close < level);
+  }
+
+  // Pattern Quality Score
+  calculatePatternQuality(strength, confirmation) {
+    let score = strength * 0.6 + confirmation * 0.4;
+    return Math.max(50, Math.min(95, Math.round(score)));
+  }
+
+  // Linear Regression Slope
+  linearRegressionSlope(values) {
+    const n = values.length;
+    let sumX = 0;
+    let sumY = 0;
+    let sumXY = 0;
+    let sumXX = 0;
+
+    for (let i = 0; i < n; i++) {
+      sumX += i;
+      sumY += values[i];
+      sumXY += i * values[i];
+      sumXX += i * i;
+    }
+
+    return (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+  }
+
+  // Linear Regression Intercept
+  linearRegressionIntercept(values, slope) {
+    const n = values.length;
+    let sumX = 0;
+    let sumY = 0;
+    for (let i = 0; i < n; i++) {
+      sumX += i;
+      sumY += values[i];
+    }
+    return (sumY - slope * sumX) / n;
+  }
+
+  // Predict line value
+  predictRegressionValue(index, slope, intercept) {
+    return slope * index + intercept;
+  }
+
+  // Reliability label based on confirmation score
+  getReliability(score) {
+      if (score >= 90)
+          return "Very High";
+      if (score >= 80)
+          return "High";
+      if (score >= 70)
+          return "Medium";
+      if (score >= 60)
+          return "Low";
+      return "Very Low";
+  }
+
+  // Multi-timeframe confidence weighting
+  calculateMultiTimeframeConfidence(patterns) {
+      if (!patterns || patterns.length === 0)
+          return [];
+      return patterns.map(pattern => {
+          const weight =
+              this.timeframeWeights[
+                  pattern.timeframe || "M5"
+              ] || 1;
+          let weightedScore =
+              (
+                  pattern.confirmationScore * 0.7 +
+                  pattern.strength * 0.3
+              ) * weight;
+          if (pattern.direction === "NEUTRAL") {
+              weightedScore *= 0.85;
+          }
+          return {
+              ...pattern,
+              weightedScore: Math.round(weightedScore)
+          };
+      });
   }
 }
 
