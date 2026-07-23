@@ -87,15 +87,17 @@ async function runBot() {
         const patterns = analyzer.detectAllPatterns(tfCandles);
         
         for (const pattern of patterns) {
-          // Get historical confidence for this pattern
-          const historicalConfidence = learner.getPatternConfidence(pattern.name, pair, tf);
-          
-          // Calculate confidence
-          const confidence = learner.calculateConfidence(
-            pattern.strength,
-            historicalConfidence,
-            pattern.confirmationScore
-          );
+          // Build signal for adaptive AI confidence
+          const signalContext = {
+            pair,
+            timeframe: tf,
+            pattern: pattern.name,
+            strength: pattern.strength,
+            confirmationScore: pattern.confirmationScore
+          };
+
+          // Adaptive AI confidence
+          const confidence = learner.calculateAdaptiveConfidence(signalContext);
 
           // Only generate signals for high-confidence patterns (>70%)
           if (confidence >= 70) {
@@ -107,22 +109,33 @@ async function runBot() {
               tfCandles[tfCandles.length - 1]
             );
 
+            // Update confidence before saving
+            learner.updateSignalConfidence(signal);
+
             newSignals.push({
               ...signal,
-              confidence,
-              historicalAccuracy: historicalConfidence,
               timestamp: new Date().toISOString()
             });
 
-            console.log(`✅ ${pair} ${tf} - ${pattern.name}: ${signal.direction} (${confidence}% confidence)`);
+            console.log(
+              `✅ ${pair} ${tf} | ${pattern.name} | ${signal.direction} | Confidence: ${signal.confidence}%`
+            );
           }
         }
       }
     }
 
+    // Resolve old signals before saving
+    console.log("🧠 Updating learning outcomes...");
+    await resolvePendingSignals(
+      learner,
+      data.signals.signals,
+      candles
+    );
+
     // Update learning system with new signals
     learner.updateHistory(newSignals);
-    
+
     // Save all data
     saveData(newSignals, data.signals.signals, learner.getConfidenceData(), learner.getLearningData());
 
@@ -141,7 +154,32 @@ async function runBot() {
 function saveData(newSignals, existingSignals, confidenceData, learningData) {
   try {
     // Merge signals - remove duplicates, keep latest
-    const allSignals = [...existingSignals, ...newSignals];
+    const allSignals = [...existingSignals];
+
+    // Update existing signals if they already exist
+    for (const signal of newSignals) {
+
+      const index = allSignals.findIndex(s =>
+        s.pair === signal.pair &&
+        s.timeframe === signal.timeframe &&
+        s.pattern === signal.pattern
+      );
+
+      if (index >= 0) {
+
+        // Keep old outcome if already evaluated
+        signal.outcome =
+          allSignals[index].outcome || signal.outcome;
+
+        allSignals[index] = signal;
+
+      } else {
+
+        allSignals.push(signal);
+
+      }
+
+    }
     const uniqueSignals = Array.from(
       new Map(
         allSignals.map(s => [
@@ -154,7 +192,10 @@ function saveData(newSignals, existingSignals, confidenceData, learningData) {
     const signalsData = {
       signals: uniqueSignals,
       updatedAt: new Date().toISOString(),
-      stale: {}
+      stale: {},
+      totalSignals: uniqueSignals.length,
+      resolvedSignals: uniqueSignals.filter(s => s.outcome).length,
+      pendingSignals: uniqueSignals.filter(s => !s.outcome).length
     };
 
     const confidenceDataToSave = {
@@ -186,6 +227,72 @@ function updateStaleness(reason) {
   } catch (err) {
     console.error('Error updating staleness:', err.message);
   }
+}
+
+/**
+ * Resolve pending signals automatically
+ */
+async function resolvePendingSignals(
+  learner,
+  existingSignals,
+  candles
+) {
+
+  for (const signal of existingSignals) {
+
+    if (signal.outcome) continue;
+
+    const pairCandles =
+      candles?.[signal.pair]?.[signal.timeframe];
+
+    if (!pairCandles || pairCandles.length === 0)
+      continue;
+
+    const latest =
+      pairCandles[pairCandles.length - 1];
+
+    if (!latest)
+      continue;
+
+    let outcome = null;
+
+    if (signal.direction === "BUY") {
+
+      if (latest.high >= signal.takeProfit)
+        outcome = "WIN";
+
+      else if (latest.low <= signal.stopLoss)
+        outcome = "LOSS";
+
+    }
+
+    else if (signal.direction === "SELL") {
+
+      if (latest.low <= signal.takeProfit)
+        outcome = "WIN";
+
+      else if (latest.high >= signal.stopLoss)
+        outcome = "LOSS";
+
+    }
+
+    if (outcome) {
+
+      learner.resolveSignal(
+        signal.timestamp,
+        outcome
+      );
+
+      signal.outcome = outcome;
+
+      console.log(
+        `🎯 ${signal.pattern} ${signal.pair} ${signal.timeframe} → ${outcome}`
+      );
+
+    }
+
+  }
+
 }
 
 // Run bot
