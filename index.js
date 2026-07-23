@@ -59,7 +59,7 @@ async function runBot() {
     const analyzer = new PatternAnalyzer();
     const learner = new LearningSystem(data.learning, data.confidence);
     const signalGen = new SignalGenerator();
-
+    const resolver = new SignalResolver();
     // Fetch candle data for both pairs
     console.log('📊 Fetching candle data...');
     const candles = await analyzer.fetchCandles();
