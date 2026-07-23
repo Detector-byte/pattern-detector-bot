@@ -237,6 +237,7 @@ function updateStaleness(reason) {
  */
 async function resolvePendingSignals(
   learner,
+  resolver,
   existingSignals,
   candles
 ) {
@@ -257,42 +258,21 @@ async function resolvePendingSignals(
     if (!latest)
       continue;
 
-    let outcome = null;
+    // Use professional Signal Resolver
+    const outcome =
+      resolver.resolve(signal, latest);
 
-    if (signal.direction === "BUY") {
+    if (!outcome)
+      continue;
 
-      if (latest.high >= signal.takeProfit)
-        outcome = "WIN";
+    learner.resolveSignal(
+      signal.timestamp,
+      outcome
+    );
 
-      else if (latest.low <= signal.stopLoss)
-        outcome = "LOSS";
-
-    }
-
-    else if (signal.direction === "SELL") {
-
-      if (latest.low <= signal.takeProfit)
-        outcome = "WIN";
-
-      else if (latest.high >= signal.stopLoss)
-        outcome = "LOSS";
-
-    }
-
-    if (outcome) {
-
-      learner.resolveSignal(
-        signal.timestamp,
-        outcome
-      );
-
-      signal.outcome = outcome;
-
-      console.log(
-        `🎯 ${signal.pattern} ${signal.pair} ${signal.timeframe} → ${outcome}`
-      );
-
-    }
+    console.log(
+      `🎯 ${signal.pattern} ${signal.pair} ${signal.timeframe} → ${outcome}`
+    );
 
   }
 
