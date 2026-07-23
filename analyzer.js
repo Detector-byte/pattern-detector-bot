@@ -202,7 +202,10 @@ class PatternAnalyzer {
 
     // Multi-timeframe + multi-factor weighted ranking, keep top 5
     const ranked = this.calculateMultiTimeframeConfidence(uniquePatterns);
-    return ranked
+
+    const resolved = this.resolvePatternConflicts(ranked);
+
+    return resolved
         .sort((a, b) => b.weightedScore - a.weightedScore)
         .slice(0, 5);
   }
