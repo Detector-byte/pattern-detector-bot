@@ -35,7 +35,16 @@ class PatternAnalyzer {
       'Diamond Top',
       'Diamond Bottom',
       'Bullish Engulfing',
-      'Bearish Engulfing'
+      'Bearish Engulfing',
+      // --- Phase 4: Smart Money Concepts ---
+      'Liquidity Sweep (Buy-Side)',
+      'Liquidity Sweep (Sell-Side)',
+      'Break of Structure',
+      'Change of Character',
+      'Bullish Order Block',
+      'Bearish Order Block',
+      'Fair Value Gap (Bullish)',
+      'Fair Value Gap (Bearish)'
     ];
 
     // Config used by the Step 3 swing-based detectors
@@ -56,8 +65,7 @@ class PatternAnalyzer {
         H1: 1.5,
         H4: 2
     };
-    // Pattern Conflict Engine
-    this.conflictThreshold = 5;
+
     // --- New professional-grade config ---
     this.atrPeriod = 14;
     this.minATRPercent = 0.003;   // reject dead/low-volatility markets
@@ -70,6 +78,26 @@ class PatternAnalyzer {
 
     this.slAtrMultiplier = 1.0;   // generic SL distance in ATR units (fallback)
     this.tpAtrMultiplier = 2.0;   // generic TP distance in ATR units (fallback, ~1:2 RR)
+
+    // --- Phase 4: Smart Money Concepts (SMC) config ---
+    this.liquidityTolerance = 0.0015;   // equal high/low tolerance (0.15%)
+    this.obImpulseATRMultiplier = 1.2;  // impulse candle must be >= this * ATR to count as an order block
+    this.obLookback = 20;               // candles to scan back for an order block
+    this.fvgLookback = 15;              // candles to scan back for a fair value gap
+    this.maxSMCPatternAge = 20;         // SMC patterns stay relevant longer than classic swing patterns
+
+    // --- Phase 4: AI Scoring Engine weights (must sum to 1) ---
+    this.signalScoreWeights = {
+      pattern: 0.20,
+      trend: 0.15,
+      momentum: 0.10,   // RSI
+      atr: 0.10,
+      ema: 0.10,
+      volume: 0.10,
+      liquidity: 0.10,
+      bos: 0.08,
+      choch: 0.07
+    };
   }
 
   // Fetch candle data from GitHub
@@ -100,8 +128,7 @@ class PatternAnalyzer {
     const closes = candles.map(c => c.close);
     const highs = candles.map(c => c.high);
     const lows = candles.map(c => c.low);
-    
-    
+
     // Shared context computed once per call (EMA / trend / RSI / volume / ATR%)
     // EMA20/EMA50 and trend are computed a single time here and reused by
     // every detector instead of each one recalculating them.
@@ -118,6 +145,14 @@ class PatternAnalyzer {
       else if (change <= -1) trend = "DOWN";
     }
 
+    // --- Phase 4: swing highs/lows used by every SMC detector - compute once ---
+    const swingHighsSMC = this.findSwingHighs(highs);
+    const swingLowsSMC = this.findSwingLows(lows);
+
+    const liquiditySweep = this.detectLiquiditySweep(candles, swingHighsSMC, swingLowsSMC);
+    const bos = this.detectBOS(candles, swingHighsSMC, swingLowsSMC, trend);
+    const choch = this.detectCHOCH(candles, swingHighsSMC, swingLowsSMC, trend);
+
     const context = {
       ema20,
       ema50,
@@ -125,7 +160,12 @@ class PatternAnalyzer {
       rsi: this.calculateRSI(candles, this.rsiPeriod),
       volumeOk: this.confirmVolume(candles),
       atr,
-      atrPercent
+      atrPercent,
+      // Phase 4: Smart Money Concepts confluence - reused by every pattern's
+      // AI SignalScore, not just by the dedicated SMC detectors below
+      liquiditySweep,
+      bos,
+      choch
     };
 
     const collect = (pattern) => {
@@ -178,6 +218,13 @@ class PatternAnalyzer {
     collect(this.detectBullishEngulfing(candles));
     collect(this.detectBearishEngulfing(candles));
 
+    // --- Phase 4: Smart Money Concepts as their own standalone signals ---
+    collect(liquiditySweep);
+    collect(bos);
+    collect(choch);
+    collect(this.detectOrderBlock(candles, atr));
+    collect(this.detectFairValueGap(candles));
+
     // Tag every detected pattern with the timeframe it was found on
     detectedPatterns.forEach(pattern => {
       pattern.timeframe = timeframe;
@@ -202,12 +249,10 @@ class PatternAnalyzer {
     });
 
     // Multi-timeframe + multi-factor weighted ranking, keep top 5
+    // Phase 4: the AI SignalScore (0-100) is now the headline ranking metric
     const ranked = this.calculateMultiTimeframeConfidence(uniquePatterns);
-
-    const resolved = this.resolvePatternConflicts(ranked);
-
-    return resolved
-        .sort((a, b) => b.weightedScore - a.weightedScore)
+    return ranked
+        .sort((a, b) => (b.signalScore - a.signalScore) || (b.weightedScore - a.weightedScore))
         .slice(0, 5);
   }
 
@@ -863,6 +908,266 @@ class PatternAnalyzer {
     return null;
   }
 
+  // ====================================================================
+  // --- Phase 4: Smart Money Concepts (SMC) ---
+  // ====================================================================
+
+  // Equal Highs - a liquidity pool resting above price (buy-side liquidity)
+  detectEqualHighs(swingHighs, tolerancePercent = this.liquidityTolerance) {
+    if (!swingHighs || swingHighs.length < 2) return null;
+    for (let i = swingHighs.length - 1; i > 0; i--) {
+      for (let j = i - 1; j >= 0; j--) {
+        const diff = Math.abs(swingHighs[i].value - swingHighs[j].value) / swingHighs[j].value;
+        if (diff <= tolerancePercent) {
+          return {
+            level: (swingHighs[i].value + swingHighs[j].value) / 2,
+            indices: [swingHighs[j].index, swingHighs[i].index]
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  // Equal Lows - a liquidity pool resting below price (sell-side liquidity)
+  detectEqualLows(swingLows, tolerancePercent = this.liquidityTolerance) {
+    if (!swingLows || swingLows.length < 2) return null;
+    for (let i = swingLows.length - 1; i > 0; i--) {
+      for (let j = i - 1; j >= 0; j--) {
+        const diff = Math.abs(swingLows[i].value - swingLows[j].value) / swingLows[j].value;
+        if (diff <= tolerancePercent) {
+          return {
+            level: (swingLows[i].value + swingLows[j].value) / 2,
+            indices: [swingLows[j].index, swingLows[i].index]
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  // Liquidity Sweep - price wicks through an equal-high/equal-low pool and
+  // closes back on the other side (a "stop hunt" / liquidity grab)
+  detectLiquiditySweep(candles, swingHighs, swingLows) {
+    const last = candles[candles.length - 1];
+    const eqHigh = this.detectEqualHighs(swingHighs);
+    const eqLow = this.detectEqualLows(swingLows);
+
+    if (eqHigh && last.high > eqHigh.level && last.close < eqHigh.level) {
+      const strength = ((last.high - eqHigh.level) / eqHigh.level) * 100;
+      return {
+        name: 'Liquidity Sweep (Buy-Side)',
+        direction: 'SELL',
+        strength: Math.min(Math.round(strength * 20), 100),
+        confirmationScore: 82,
+        reliability: this.getReliability(82),
+        breakoutLevel: eqHigh.level,
+        _ageIndex: candles.length - 1,
+        _maxAge: this.maxSMCPatternAge
+      };
+    }
+
+    if (eqLow && last.low < eqLow.level && last.close > eqLow.level) {
+      const strength = ((eqLow.level - last.low) / eqLow.level) * 100;
+      return {
+        name: 'Liquidity Sweep (Sell-Side)',
+        direction: 'BUY',
+        strength: Math.min(Math.round(strength * 20), 100),
+        confirmationScore: 82,
+        reliability: this.getReliability(82),
+        breakoutLevel: eqLow.level,
+        _ageIndex: candles.length - 1,
+        _maxAge: this.maxSMCPatternAge
+      };
+    }
+
+    return null;
+  }
+
+  // Break of Structure - price closes beyond the most recent swing point in
+  // the direction of the prevailing trend (continuation confirmation)
+  detectBOS(candles, swingHighs, swingLows, trend) {
+    const lastClose = candles[candles.length - 1].close;
+
+    if (trend === 'UP' && swingHighs.length >= 1) {
+      const lastSwingHigh = swingHighs[swingHighs.length - 1];
+      if (lastClose > lastSwingHigh.value) {
+        const strength = ((lastClose - lastSwingHigh.value) / lastSwingHigh.value) * 100;
+        return {
+          name: 'Break of Structure',
+          direction: 'BUY',
+          strength: Math.min(Math.round(strength * 20), 100),
+          confirmationScore: 85,
+          reliability: this.getReliability(85),
+          breakoutLevel: lastSwingHigh.value,
+          _ageIndex: lastSwingHigh.index,
+          _maxAge: this.maxSMCPatternAge
+        };
+      }
+    }
+
+    if (trend === 'DOWN' && swingLows.length >= 1) {
+      const lastSwingLow = swingLows[swingLows.length - 1];
+      if (lastClose < lastSwingLow.value) {
+        const strength = ((lastSwingLow.value - lastClose) / lastSwingLow.value) * 100;
+        return {
+          name: 'Break of Structure',
+          direction: 'SELL',
+          strength: Math.min(Math.round(strength * 20), 100),
+          confirmationScore: 85,
+          reliability: this.getReliability(85),
+          breakoutLevel: lastSwingLow.value,
+          _ageIndex: lastSwingLow.index,
+          _maxAge: this.maxSMCPatternAge
+        };
+      }
+    }
+
+    return null;
+  }
+
+  // Change of Character - price closes beyond the most recent swing point
+  // AGAINST the prevailing trend (early reversal warning)
+  detectCHOCH(candles, swingHighs, swingLows, trend) {
+    const lastClose = candles[candles.length - 1].close;
+
+    if (trend === 'DOWN' && swingHighs.length >= 1) {
+      const lastSwingHigh = swingHighs[swingHighs.length - 1];
+      if (lastClose > lastSwingHigh.value) {
+        const strength = ((lastClose - lastSwingHigh.value) / lastSwingHigh.value) * 100;
+        return {
+          name: 'Change of Character',
+          direction: 'BUY',
+          strength: Math.min(Math.round(strength * 20), 100),
+          confirmationScore: 80,
+          reliability: this.getReliability(80),
+          breakoutLevel: lastSwingHigh.value,
+          _ageIndex: lastSwingHigh.index,
+          _maxAge: this.maxSMCPatternAge
+        };
+      }
+    }
+
+    if (trend === 'UP' && swingLows.length >= 1) {
+      const lastSwingLow = swingLows[swingLows.length - 1];
+      if (lastClose < lastSwingLow.value) {
+        const strength = ((lastSwingLow.value - lastClose) / lastSwingLow.value) * 100;
+        return {
+          name: 'Change of Character',
+          direction: 'SELL',
+          strength: Math.min(Math.round(strength * 20), 100),
+          confirmationScore: 80,
+          reliability: this.getReliability(80),
+          breakoutLevel: lastSwingLow.value,
+          _ageIndex: lastSwingLow.index,
+          _maxAge: this.maxSMCPatternAge
+        };
+      }
+    }
+
+    return null;
+  }
+
+  // Order Block - the last opposite-direction candle before a strong
+  // impulsive move; treated as an institutional accumulation/distribution zone
+  detectOrderBlock(candles, atr) {
+    const n = candles.length;
+    if (n < 6 || !atr) return null;
+
+    const start = Math.max(1, n - this.obLookback);
+    for (let i = n - 2; i >= start; i--) {
+      const c = candles[i];
+      const next = candles[i + 1];
+
+      // Bullish order block: down candle immediately followed by a strong up impulse
+      if (c.close < c.open) {
+        const impulseMove = next.close - next.open;
+        if (impulseMove > atr * this.obImpulseATRMultiplier) {
+          const mitigated = candles.slice(i + 2).some(k => k.low <= c.high && k.low >= c.low);
+          return {
+            name: 'Bullish Order Block',
+            direction: 'BUY',
+            strength: Math.min(Math.round((impulseMove / atr) * 20), 100),
+            confirmationScore: mitigated ? 70 : 83,
+            reliability: this.getReliability(mitigated ? 70 : 83),
+            obHigh: c.high,
+            obLow: c.low,
+            mitigated,
+            _ageIndex: i,
+            _maxAge: this.maxSMCPatternAge
+          };
+        }
+      }
+
+      // Bearish order block: up candle immediately followed by a strong down impulse
+      if (c.close > c.open) {
+        const impulseMove = next.open - next.close;
+        if (impulseMove > atr * this.obImpulseATRMultiplier) {
+          const mitigated = candles.slice(i + 2).some(k => k.high >= c.low && k.high <= c.high);
+          return {
+            name: 'Bearish Order Block',
+            direction: 'SELL',
+            strength: Math.min(Math.round((impulseMove / atr) * 20), 100),
+            confirmationScore: mitigated ? 70 : 83,
+            reliability: this.getReliability(mitigated ? 70 : 83),
+            obHigh: c.high,
+            obLow: c.low,
+            mitigated,
+            _ageIndex: i,
+            _maxAge: this.maxSMCPatternAge
+          };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  // Fair Value Gap - a 3-candle imbalance where candle 1 and candle 3 don't
+  // overlap, leaving a gap the market often returns to "fill"
+  detectFairValueGap(candles) {
+    const n = candles.length;
+    if (n < 3) return null;
+
+    const start = Math.max(2, n - this.fvgLookback);
+    for (let i = n - 1; i >= start; i--) {
+      const c1 = candles[i - 2];
+      const c3 = candles[i];
+
+      if (c1.high < c3.low) {
+        const gapSize = ((c3.low - c1.high) / c1.high) * 100;
+        return {
+          name: 'Fair Value Gap (Bullish)',
+          direction: 'BUY',
+          strength: Math.min(Math.round(gapSize * 20), 100),
+          confirmationScore: 78,
+          reliability: this.getReliability(78),
+          gapTop: c3.low,
+          gapBottom: c1.high,
+          _ageIndex: i,
+          _maxAge: this.maxSMCPatternAge
+        };
+      }
+
+      if (c1.low > c3.high) {
+        const gapSize = ((c1.low - c3.high) / c3.high) * 100;
+        return {
+          name: 'Fair Value Gap (Bearish)',
+          direction: 'SELL',
+          strength: Math.min(Math.round(gapSize * 20), 100),
+          confirmationScore: 78,
+          reliability: this.getReliability(78),
+          gapTop: c1.low,
+          gapBottom: c3.high,
+          _ageIndex: i,
+          _maxAge: this.maxSMCPatternAge
+        };
+      }
+    }
+
+    return null;
+  }
+
   // --- 3. EMA trend confirmation (replaces plain % change trend) ---
   // Kept as a standalone helper for callers outside detectAllPatterns();
   // inside detectAllPatterns() the trend is now computed once and passed
@@ -1167,7 +1472,8 @@ class PatternAnalyzer {
     // 8. Pattern age rejection (only meaningful for swing-based patterns)
     if (pattern._ageIndex !== undefined) {
       const age = (candles.length - 1) - pattern._ageIndex;
-      if (age > this.maxPatternAge) return null;
+      const maxAge = pattern._maxAge || this.maxPatternAge;
+      if (age > maxAge) return null;
     }
 
     // 4. RSI confirmation
@@ -1245,8 +1551,56 @@ class PatternAnalyzer {
     pattern.confidence = Math.max(40, Math.min(99, confidence));
     pattern.confidenceLabel = this.getConfidenceLabel(pattern.confidence);
 
+    // --- Phase 4: AI Scoring Engine - one unified 0-100 SignalScore that
+    // blends the pattern itself with trend/momentum/volatility/volume AND
+    // the Smart Money Concepts confluence (liquidity sweep / BOS / CHOCH),
+    // instead of a fixed-formula weightedScore or a plain "High/Medium" label.
+    pattern.signalScore = this.calculateSignalScore(pattern, context, {
+      trendScore, rsiScore, atrScore, volumeScore
+    });
+    pattern.signalLabel = this.getConfidenceLabel(pattern.signalScore);
+
     delete pattern._ageIndex;
+    delete pattern._maxAge;
     return pattern;
+  }
+
+  // --- Phase 4: AI Scoring Engine ---
+  // Combines Pattern + Trend + Momentum(RSI) + ATR + EMA + Volume +
+  // Liquidity Sweep + BOS + CHOCH into a single weighted 0-100 score.
+  calculateSignalScore(pattern, context, precomputed) {
+    const { trendScore, rsiScore, atrScore, volumeScore } = precomputed;
+    const w = this.signalScoreWeights;
+
+    // EMA score: how far apart EMA20/EMA50 are (a stronger, cleaner trend)
+    let emaScore = 50;
+    if (context.ema20 !== null && context.ema50 !== null && context.ema50 !== 0) {
+      const emaGapPercent = Math.abs(context.ema20 - context.ema50) / context.ema50;
+      emaScore = Math.min(100, (emaGapPercent / 0.005) * 100);
+    }
+
+    // Confluence: does each SMC signal (if any fired this bar) agree with
+    // this specific pattern's direction?
+    const confluenceScore = (factor) => {
+      if (!factor) return 50;               // nothing fired either way - neutral
+      return factor.direction === pattern.direction ? 100 : 20; // fired against us - penalize
+    };
+    const liquidityScore = confluenceScore(context.liquiditySweep);
+    const bosScore = confluenceScore(context.bos);
+    const chochScore = confluenceScore(context.choch);
+
+    const score =
+      pattern.confirmationScore * w.pattern +
+      trendScore * w.trend +
+      rsiScore * w.momentum +
+      atrScore * w.atr +
+      emaScore * w.ema +
+      volumeScore * w.volume +
+      liquidityScore * w.liquidity +
+      bosScore * w.bos +
+      chochScore * w.choch;
+
+    return Math.max(0, Math.min(100, Math.round(score)));
   }
 
   // --- 12. Multi-timeframe + multi-factor weighted priority ranking ---
@@ -1259,12 +1613,13 @@ class PatternAnalyzer {
                   pattern.timeframe || "M5"
               ] || 1;
 
-          // weightedScore = strength*.20 + confirmation*.25 + trend/RSI/volume/ATR (via multiScore)*.45 + timeframe*.05... normalized to a 0-100+ scale
+          // weightedScore = strength*.20 + confirmation*.25 + multiScore*.35 + signalScore*.15 + timeframe*.05
           let weightedScore =
               (
                   pattern.strength * 0.20 +
                   pattern.confirmationScore * 0.25 +
-                  (pattern.multiScore || 0) * 0.45 +
+                  (pattern.multiScore || 0) * 0.35 +
+                  (pattern.signalScore || 0) * 0.15 +
                   weight * 20 * 0.05 // timeframe contributes on the same rough scale
               );
 
