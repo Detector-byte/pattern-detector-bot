@@ -1400,3 +1400,207 @@ class PatternAnalyzer {
         breakoutLevel: resistance
       };
     }
+
+    if (
+      impulse < -0.03 &&
+      flagSlope > 0
+    ) {
+      const support =
+        this.lowest(
+          lows.slice(-15)
+        );
+
+      if (
+        !this.isBreakoutConfirmed(
+          candles,
+          support,
+          'SELL'
+        )
+      ) {
+        return null;
+      }
+
+      if (trend !== 'DOWN') {
+        return null;
+      }
+
+      const confirmationScore = 92;
+
+      return {
+        name: 'Bear Flag',
+        direction: 'SELL',
+        strength: 85,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        breakoutLevel: support
+      };
+    }
+
+    return null;
+  }
+
+  detectCupHandle(
+    candles,
+    lows,
+    closes,
+    trend
+  ) {
+    const n = candles.length;
+
+    if (n < 30) {
+      return null;
+    }
+
+    const recent =
+      lows.slice(n - 30);
+
+    const minIdx =
+      recent.indexOf(
+        this.lowest(recent)
+      );
+
+    if (
+      minIdx < 5 ||
+      minIdx > recent.length - 10
+    ) {
+      return null;
+    }
+
+    // Cup formation.
+    const cupDepth =
+      (
+        this.highest(
+          recent.slice(0, minIdx)
+        ) -
+        recent[minIdx]
+      ) /
+      recent[minIdx];
+
+    if (
+      cupDepth < 0.02 ||
+      cupDepth > 0.15
+    ) {
+      return null;
+    }
+
+    // Handle formation.
+    const handleHigh =
+      this.highest(
+        recent.slice(
+          minIdx + 1,
+          minIdx + 6
+        )
+      );
+
+    const handleRange =
+      (
+        handleHigh -
+        recent[minIdx]
+      ) /
+      recent[minIdx];
+
+    if (handleRange > 0.08) {
+      return null;
+    }
+
+    if (trend !== 'UP') {
+      return null;
+    }
+
+    const confirmationScore = 85;
+
+    return {
+      name: 'Cup and Handle',
+      direction: 'BUY',
+      strength: 72,
+      confirmationScore,
+      reliability:
+        this.getReliability(
+          confirmationScore
+        ),
+      breakoutLevel: handleHigh
+    };
+  }
+
+  detectRectangleTop(candles, highs) {
+    const n = candles.length;
+
+    if (n < 20) {
+      return null;
+    }
+
+    const recent =
+      highs.slice(n - 20);
+
+    if (
+      this.isFlat(recent, 0.01)
+    ) {
+      const confirmationScore = 70;
+
+      return {
+        name: 'Rectangle Top',
+        direction: 'SELL',
+        strength: 65,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        breakoutLevel:
+          this.lowest(recent)
+      };
+    }
+
+    return null;
+  }
+
+  detectRectangleBottom(candles, lows) {
+    const n = candles.length;
+
+    if (n < 20) {
+      return null;
+    }
+
+    const recent =
+      lows.slice(n - 20);
+
+    if (
+      this.isFlat(recent, 0.01)
+    ) {
+      const confirmationScore = 70;
+
+      return {
+        name: 'Rectangle Bottom',
+        direction: 'BUY',
+        strength: 65,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        breakoutLevel:
+          this.highest(recent)
+      };
+    }
+
+    return null;
+  }
+
+  detectDiamondTop(
+    candles,
+    highs,
+    lows
+  ) {
+    const n = candles.length;
+
+    if (n < 25) {
+      return null;
+    }
+
+    const recent = {
+      highs: highs.slice(n - 25),
+      lows: lows.slice(n - 25)
+    };
