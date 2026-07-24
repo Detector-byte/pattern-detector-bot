@@ -2598,6 +2598,252 @@ class PatternAnalyzer {
 
     return null;
   }
+  detectFairValueGap(candles) {
+    const n = candles.length;
+
+    if (n < 3) {
+      return null;
+    }
+
+    const start =
+      Math.max(
+        2,
+        n - this.fvgLookback
+      );
+
+    // Scan from newest to oldest so the latest
+    // unbalanced price area is prioritised.
+    for (
+      let i = n - 1;
+      i >= start;
+      i--
+    ) {
+      const firstCandle =
+        candles[i - 2];
+
+      const thirdCandle =
+        candles[i];
+
+      // Bullish Fair Value Gap:
+      // The third candle's low remains above
+      // the first candle's high.
+      if (
+        firstCandle.high <
+        thirdCandle.low
+      ) {
+        const gapSize =
+          (
+            (
+              thirdCandle.low -
+              firstCandle.high
+            ) /
+            firstCandle.high
+          ) *
+          100;
+
+        return {
+          name:
+            'Fair Value Gap (Bullish)',
+          direction: 'BUY',
+          strength:
+            Math.min(
+              Math.round(
+                gapSize * 20
+              ),
+              100
+            ),
+          confirmationScore: 78,
+          reliability:
+            this.getReliability(78),
+          gapTop:
+            thirdCandle.low,
+          gapBottom:
+            firstCandle.high,
+          _ageIndex: i,
+          _maxAge:
+            this.maxSMCPatternAge
+        };
+      }
+
+      // Bearish Fair Value Gap:
+      // The third candle's high remains below
+      // the first candle's low.
+      if (
+        firstCandle.low >
+        thirdCandle.high
+      ) {
+        const gapSize =
+          (
+            (
+              firstCandle.low -
+              thirdCandle.high
+            ) /
+            thirdCandle.high
+          ) *
+          100;
+
+        return {
+          name:
+            'Fair Value Gap (Bearish)',
+          direction: 'SELL',
+          strength:
+            Math.min(
+              Math.round(
+                gapSize * 20
+              ),
+              100
+            ),
+          confirmationScore: 78,
+          reliability:
+            this.getReliability(78),
+          gapTop:
+            firstCandle.low,
+          gapBottom:
+            thirdCandle.high,
+          _ageIndex: i,
+          _maxAge:
+            this.maxSMCPatternAge
+        };
+      }
+    }
+
+    return null;
+  }
+
+  // =====================================================
+  // EMA Trend Detection
+  // =====================================================
+
+  /**
+   * Standalone trend helper retained for
+   * backward compatibility.
+   *
+   * detectAllPatterns() already calculates EMA values
+   * once and passes the result through shared context.
+   */
+  detectTrend(candles, period = 20) {
+    if (
+      !candles ||
+      candles.length <
+        Math.max(period, 50)
+    ) {
+      // Fall back to percentage change when
+      // EMA50 cannot be calculated.
+      if (
+        !candles ||
+        candles.length < period
+      ) {
+        return 'SIDEWAYS';
+      }
+
+      const recent =
+        candles.slice(-period);
+
+      const change =
+        (
+          (
+            recent[
+              recent.length - 1
+            ].close -
+            recent[0].close
+          ) /
+          recent[0].close
+        ) *
+        100;
+
+      if (change >= 1) {
+        return 'UP';
+      }
+
+      if (change <= -1) {
+        return 'DOWN';
+      }
+
+      return 'SIDEWAYS';
+    }
+
+    const closes =
+      candles.map(
+        candle => candle.close
+      );
+
+    const ema20 =
+      this.calculateEMA(
+        closes,
+        20
+      );
+
+    const ema50 =
+      this.calculateEMA(
+        closes,
+        50
+      );
+
+    if (ema20 > ema50) {
+      return 'UP';
+    }
+
+    if (ema20 < ema50) {
+      return 'DOWN';
+    }
+
+    return 'SIDEWAYS';
+  }
+
+  // =====================================================
+  // General Helper Functions
+  // =====================================================
+
+  isTrendingUp(values, threshold) {
+    if (values.length < 5) {
+      return false;
+    }
+
+    const change =
+      (
+        values[
+          values.length - 1
+        ] -
+        values[0]
+      ) /
+      values[0];
+
+    return change > threshold;
+  }
+
+  isTrendingDown(values, threshold) {
+    if (values.length < 5) {
+      return false;
+    }
+
+    const change =
+      (
+        values[0] -
+        values[
+          values.length - 1
+        ]
+      ) /
+      values[0];
+
+    return change > threshold;
+  }
+
+  isFlat(values, threshold) {
+    if (values.length < 5) {
+      return false;
+    }
+
+    const max =
+      this.highest(values);
+
+    const min =
+      this.lowest(values);
+
+    const range =
+      (max - min) / min;
+
+    return range < threshold;
+  }
 
   
 
