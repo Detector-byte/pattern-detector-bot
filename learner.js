@@ -20,19 +20,78 @@ class LearningSystem {
     this.minSamples = 10;
     this.actionableThreshold = 65;
 
-    // Initialize storage
+    // =====================================================
+    // Phase 4 Adaptive Learning Configuration
+    // =====================================================
+
+    // Recent outcomes have greater influence than old outcomes.
+    this.decayFactorDays = 90;
+
+    // A pattern can only be blacklisted after enough evidence.
+    this.blacklistMinSignals = 30;
+    this.blacklistWinRate = 35;
+
+    // Pattern weights are safely restricted.
+    this.minPatternWeight = 0.70;
+    this.maxPatternWeight = 1.50;
+
+    // Threshold evolution is limited to ±20%.
+    this.maxEvolutionChange = 0.20;
+
+    // Initialize existing storage
     if (!this.data.history)
-        this.data.history = [];
+      this.data.history = [];
 
     if (!this.data.stats)
-        this.data.stats = {};
+      this.data.stats = {};
 
     if (!this.confidenceData.patterns)
-        this.confidenceData.patterns = {};
+      this.confidenceData.patterns = {};
 
     if (!this.confidenceData.updatedAt)
-        this.confidenceData.updatedAt = new Date().toISOString();
+      this.confidenceData.updatedAt =
+        new Date().toISOString();
+
+    // =====================================================
+    // Phase 4 Additive Storage
+    // =====================================================
+
+    // These fields are additive, so old learning JSON
+    // remains fully backward compatible.
+    if (!this.data.patternStats)
+      this.data.patternStats = {};
+
+    if (!this.data.pairStats)
+      this.data.pairStats = {};
+
+    if (!this.data.timeframeStats)
+      this.data.timeframeStats = {};
+
+    if (!this.data.regimeStats)
+      this.data.regimeStats = {};
+
+    if (!this.data.patternWeights)
+      this.data.patternWeights = {};
+
+    if (!this.data.calibration)
+      this.data.calibration = {};
+
+    if (!this.data.patternEvolution)
+      this.data.patternEvolution = {};
+
+    if (!this.data.blacklistedPatterns)
+      this.data.blacklistedPatterns = {};
+
+    if (!this.data.optimization)
+      this.data.optimization = {};
+
+    if (!this.data.lastLearningUpdate)
+      this.data.lastLearningUpdate = null;
   }
+
+  // =====================================================
+  // Base Confidence Calculation
+  // =====================================================
 
   // Calculate confidence score based on multiple factors
   calculateConfidence(
@@ -64,94 +123,394 @@ class LearningSystem {
 
     confidence = Math.max(
       this.minConfidence,
-      Math.min(this.maxConfidence, confidence)
+      Math.min(
+        this.maxConfidence,
+        confidence
+      )
     );
 
     return Math.round(confidence);
   }
 
+  // =====================================================
+  // Phase 4 Adaptive Confidence Engine
+  // =====================================================
+
   /**
-   * Adaptive AI Confidence Engine
+   * Calculate adaptive confidence using:
+   *
+   * - Pattern performance
+   * - Exact pattern/pair/timeframe performance
+   * - Pair performance
+   * - Timeframe performance
+   * - Market regime performance
+   * - Recent weighted outcomes
+   * - Confidence calibration
+   * - Dynamic pattern weights
    */
   calculateAdaptiveConfidence(signal) {
 
     if (!signal)
       return this.defaultConfidence;
 
-    const history =
-      this.data.history.filter(s =>
-        s.pattern === signal.pattern &&
-        s.pair === signal.pair &&
-        s.timeframe === signal.timeframe &&
-        s.outcome
-      );
+    const patternName =
+      signal.pattern || "Unknown";
 
-    if (history.length === 0)
-      return this.defaultConfidence;
+    const pair =
+      signal.pair || "UNKNOWN";
 
-    const wins =
-      history.filter(s => s.outcome === "WIN").length;
+    const timeframe =
+      signal.timeframe || "UNKNOWN";
+
+    const marketRegime =
+      signal.marketRegime ||
+      signal.regime ||
+      "UNKNOWN";
+
+    const exactKey =
+      `${patternName}_${pair}_${timeframe}`;
+
+    const exactStats =
+      this.data.stats[exactKey];
+
+    const patternStats =
+      this.data.patternStats[patternName];
+
+    const pairStats =
+      this.data.pairStats[pair];
+
+    const timeframeStats =
+      this.data.timeframeStats[timeframe];
+
+    const regimeStats =
+      this.data.regimeStats[marketRegime];
+
+    const primaryStats =
+      exactStats || patternStats;
 
     const historicalAccuracy =
-      (wins / history.length) * 100;
+      primaryStats
+        ? (
+            primaryStats.decayedWinRate ??
+            primaryStats.winRate ??
+            primaryStats.accuracy ??
+            this.defaultConfidence
+          )
+        : this.defaultConfidence;
+
+    const sampleSize =
+      primaryStats
+        ? (
+            primaryStats.decayedTotal ??
+            primaryStats.resolved ??
+            primaryStats.total ??
+            0
+          )
+        : 0;
 
     let confidence =
       this.calculateConfidence(
         signal.strength || 60,
         historicalAccuracy,
         signal.confirmationScore || 60,
-        history.length
+        sampleSize
       );
 
-    // Recent trend adjustment
-    const recent =
-      history.slice(-10);
+    // Aggregate adjustment helper.
+    const getAdjustment =
+      stats => {
 
-    if (recent.length >= 5) {
+        if (!stats)
+          return 0;
+
+        const resolved =
+          stats.decayedTotal ??
+          stats.resolved ??
+          stats.total ??
+          0;
+
+        if (resolved < this.minSamples)
+          return 0;
+
+        const winRate =
+          stats.decayedWinRate ??
+          stats.winRate ??
+          stats.accuracy ??
+          50;
+
+        // Sample reliability gradually reaches full
+        // influence at approximately 50 outcomes.
+        const reliability =
+          Math.min(
+            1,
+            resolved / 50
+          );
+
+        return (
+          ((winRate - 50) / 10) *
+          reliability
+        );
+      };
+
+    // Exact setup performance has strong influence.
+    confidence +=
+      getAdjustment(exactStats) *
+      1.20;
+
+    // Pattern performance has the highest broad influence.
+    confidence +=
+      getAdjustment(patternStats) *
+      1.40;
+
+    // Pair-specific behavior.
+    confidence +=
+      getAdjustment(pairStats) *
+      0.80;
+
+    // Timeframe suitability.
+    confidence +=
+      getAdjustment(timeframeStats) *
+      0.70;
+
+    // Market-regime suitability.
+    confidence +=
+      getAdjustment(regimeStats) *
+      0.80;
+
+    // Recent trend adjustment from the exact setup.
+    const recentHistory =
+      this.getMatchingResolvedHistory(
+        signal,
+        10
+      );
+
+    if (recentHistory.length >= 5) {
 
       const recentWins =
-        recent.filter(s => s.outcome === "WIN").length;
+        recentHistory.filter(
+          item =>
+            item.outcome === "WIN"
+        ).length;
 
       const recentRate =
-        (recentWins / recent.length) * 100;
+        (
+          recentWins /
+          recentHistory.length
+        ) * 100;
 
-      if (recentRate > historicalAccuracy + 15)
+      if (
+        recentRate >
+        historicalAccuracy + 15
+      ) {
         confidence += 3;
+      }
 
-      if (recentRate < historicalAccuracy - 15)
+      if (
+        recentRate <
+        historicalAccuracy - 15
+      ) {
         confidence -= 3;
+      }
     }
+
+    // Apply learned pattern multiplier.
+    confidence *=
+      this.getPatternWeight(
+        patternName
+      );
+
+    // Penalize a statistically weak pattern.
+    if (
+      this.isPatternBlacklisted(
+        patternName
+      )
+    ) {
+      confidence -= 15;
+    }
+
+    // Apply confidence calibration.
+    confidence =
+      this.applyConfidenceCalibration(
+        confidence
+      );
 
     confidence = Math.max(
       this.minConfidence,
-      Math.min(this.maxConfidence, confidence)
+      Math.min(
+        this.maxConfidence,
+        confidence
+      )
     );
 
     return Math.round(confidence);
   }
 
   /**
-   * Update confidence of one signal
+   * Return recent resolved history matching the
+   * signal's pattern, pair and timeframe.
+   */
+  getMatchingResolvedHistory(
+    signal,
+    limit = 10
+  ) {
+
+    if (
+      !signal ||
+      !Array.isArray(
+        this.data.history
+      )
+    ) {
+      return [];
+    }
+
+    const matches = [];
+
+    for (
+      let i =
+        this.data.history.length - 1;
+      i >= 0;
+      i--
+    ) {
+
+      const historicalSignal =
+        this.data.history[i];
+
+      if (!historicalSignal.outcome)
+        continue;
+
+      if (
+        historicalSignal.pattern !==
+        signal.pattern
+      ) {
+        continue;
+      }
+
+      if (
+        signal.pair &&
+        historicalSignal.pair !==
+        signal.pair
+      ) {
+        continue;
+      }
+
+      if (
+        signal.timeframe &&
+        historicalSignal.timeframe !==
+        signal.timeframe
+      ) {
+        continue;
+      }
+
+      matches.unshift(
+        historicalSignal
+      );
+
+      if (
+        matches.length >= limit
+      ) {
+        break;
+      }
+    }
+
+    return matches;
+  }
+
+  /**
+   * Correct systematic overconfidence
+   * or underconfidence using resolved signals.
+   */
+  applyConfidenceCalibration(
+    confidence
+  ) {
+
+    const confidenceBin =
+      String(
+        Math.max(
+          50,
+          Math.min(
+            95,
+            Math.round(
+              confidence / 5
+            ) * 5
+          )
+        )
+      );
+
+    const calibration =
+      this.data.calibration[
+        confidenceBin
+      ];
+
+    if (
+      !calibration ||
+      calibration.total <
+        this.minSamples
+    ) {
+      return confidence;
+    }
+
+    const actualRate =
+      calibration.actualRate ??
+      (
+        calibration.total > 0
+          ? (
+              calibration.wins /
+              calibration.total
+            ) * 100
+          : Number(
+              confidenceBin
+            )
+      );
+
+    const calibrationDifference =
+      actualRate -
+      Number(confidenceBin);
+
+    // Limit calibration correction to ±10 points.
+    const correction =
+      Math.max(
+        -10,
+        Math.min(
+          10,
+          calibrationDifference
+        )
+      );
+
+    return confidence + correction;
+  }
+
+  /**
+   * Update confidence of one signal.
    */
   updateSignalConfidence(signal) {
 
+    if (!signal)
+      return this.defaultConfidence;
+
     signal.confidence =
-      this.calculateAdaptiveConfidence(signal);
+      this.calculateAdaptiveConfidence(
+        signal
+      );
 
     return signal.confidence;
   }
 
   /**
-   * Refresh confidence of all unresolved signals
+   * Refresh confidence of all unresolved signals.
    */
   refreshPendingConfidence() {
 
     this.data.history
-      .filter(s => !s.outcome)
+      .filter(
+        signal =>
+          !signal.outcome
+      )
       .forEach(signal => {
 
         signal.confidence =
-          this.calculateAdaptiveConfidence(signal);
+          this.calculateAdaptiveConfidence(
+            signal
+          );
 
       });
 
@@ -161,9 +520,221 @@ class LearningSystem {
     return true;
   }
 
+  // =====================================================
+  // Phase 4 Pattern Weighting
+  // =====================================================
+
   /**
-   * AI Performance Optimization Engine
+   * Return the learned multiplier for a pattern.
    */
+  getPatternWeight(patternName) {
+
+    if (!patternName)
+      return 1;
+
+    const storedWeight =
+      Number(
+        this.data.patternWeights[
+          patternName
+        ]
+      );
+
+    if (
+      !Number.isFinite(
+        storedWeight
+      )
+    ) {
+      return 1;
+    }
+
+    return Math.max(
+      this.minPatternWeight,
+      Math.min(
+        this.maxPatternWeight,
+        storedWeight
+      )
+    );
+  }
+
+  /**
+   * Learn safe pattern weights from historical
+   * decayed win rates and sample reliability.
+   */
+  updatePatternWeights() {
+
+    const newWeights = {};
+
+    for (
+      const patternName in
+      this.data.patternStats
+    ) {
+
+      const stats =
+        this.data.patternStats[
+          patternName
+        ];
+
+      const resolved =
+        stats.decayedTotal ??
+        stats.resolved ??
+        stats.total ??
+        0;
+
+      const winRate =
+        stats.decayedWinRate ??
+        stats.winRate ??
+        stats.accuracy ??
+        50;
+
+      if (
+        resolved <
+        this.minSamples
+      ) {
+        newWeights[
+          patternName
+        ] = 1;
+
+        continue;
+      }
+
+      const reliability =
+        Math.min(
+          1,
+          resolved / 50
+        );
+
+      const performanceDifference =
+        (winRate - 50) / 100;
+
+      const rawWeight =
+        1 +
+        performanceDifference *
+        reliability;
+
+      newWeights[
+        patternName
+      ] = Number(
+        Math.max(
+          this.minPatternWeight,
+          Math.min(
+            this.maxPatternWeight,
+            rawWeight
+          )
+        ).toFixed(3)
+      );
+    }
+
+    this.data.patternWeights = {
+      ...this.data.patternWeights,
+      ...newWeights
+    };
+
+    return {
+      ...this.data.patternWeights
+    };
+  }
+
+  // =====================================================
+  // Phase 4 Pattern Blacklisting
+  // =====================================================
+
+  /**
+   * Automatically blacklist patterns that have
+   * enough evidence and persistently poor results.
+   */
+  updatePatternBlacklist() {
+
+    const blacklist = {};
+
+    for (
+      const patternName in
+      this.data.patternStats
+    ) {
+
+      const stats =
+        this.data.patternStats[
+          patternName
+        ];
+
+      const resolved =
+        stats.resolved ??
+        stats.total ??
+        0;
+
+      const winRate =
+        stats.decayedWinRate ??
+        stats.winRate ??
+        stats.accuracy ??
+        50;
+
+      if (
+        resolved >=
+          this.blacklistMinSignals &&
+        winRate <
+          this.blacklistWinRate
+      ) {
+
+        blacklist[
+          patternName
+        ] = {
+          blacklisted: true,
+          winRate:
+            Number(
+              winRate.toFixed(2)
+            ),
+          sampleSize:
+            resolved,
+          reason:
+            "Historical performance below minimum threshold",
+          updatedAt:
+            new Date().toISOString()
+        };
+      }
+    }
+
+    this.data.blacklistedPatterns =
+      blacklist;
+
+    return {
+      ...blacklist
+    };
+  }
+
+  /**
+   * Check whether a pattern is currently blacklisted.
+   */
+  isPatternBlacklisted(
+    patternName
+  ) {
+
+    if (!patternName)
+      return false;
+
+    const blacklistData =
+      this.data.blacklistedPatterns[
+        patternName
+      ];
+
+    return Boolean(
+      blacklistData &&
+      blacklistData.blacklisted
+    );
+  }
+
+  /**
+   * Return blacklist information for dashboards.
+   */
+  getBlacklistedPatterns() {
+
+    return {
+      ...this.data.blacklistedPatterns
+    };
+  }
+
+  // =====================================================
+  // AI Performance Optimization Engine
+  // =====================================================
+
   optimizePerformance() {
 
     const optimization = {
@@ -177,6 +748,9 @@ class LearningSystem {
       bestTimeframe: null,
       weakestTimeframe: null,
 
+      bestRegime: null,
+      weakestRegime: null,
+
       suggestions: []
 
     };
@@ -187,163 +761,237 @@ class LearningSystem {
     let highest = -1;
     let lowest = 101;
 
-    // Pattern Ranking
-    for (const key in this.data.stats) {
+    // Exact pattern setup ranking
+    for (
+      const key in
+      this.data.stats
+    ) {
 
-      const stat = this.data.stats[key];
+      const stat =
+        this.data.stats[key];
 
-      if (stat.total < 3)
+      const resolved =
+        stat.resolved ??
+        stat.total ??
+        0;
+
+      if (resolved < 3)
         continue;
 
-      if (stat.accuracy > highest) {
+      const accuracy =
+        stat.decayedWinRate ??
+        stat.accuracy ??
+        0;
 
-        highest = stat.accuracy;
-        optimization.bestPattern = key;
+      if (accuracy > highest) {
 
+        highest = accuracy;
+
+        optimization.bestPattern =
+          key;
       }
 
-      if (stat.accuracy < lowest) {
+      if (accuracy < lowest) {
 
-        lowest = stat.accuracy;
-        optimization.weakestPattern = key;
+        lowest = accuracy;
 
+        optimization.weakestPattern =
+          key;
       }
-
     }
 
-    // Pair Ranking
-    const pairStats = {};
-
-    for (const key in this.data.stats) {
-
-      const stat = this.data.stats[key];
-
-      const pair = key.split("_")[1];
-
-      if (!pairStats[pair]) {
-
-        pairStats[pair] = {
-          wins: 0,
-          total: 0
-        };
-
-      }
-
-      pairStats[pair].wins += stat.wins;
-      pairStats[pair].total += stat.total;
-
-    }
-
+    // Pair ranking
     highest = -1;
     lowest = 101;
 
-    for (const pair in pairStats) {
+    for (
+      const pair in
+      this.data.pairStats
+    ) {
+
+      const stat =
+        this.data.pairStats[pair];
+
+      const resolved =
+        stat.resolved ??
+        stat.total ??
+        0;
+
+      if (resolved < 3)
+        continue;
 
       const rate =
-        (pairStats[pair].wins /
-        pairStats[pair].total) * 100;
+        stat.decayedWinRate ??
+        stat.winRate ??
+        stat.accuracy ??
+        0;
 
       if (rate > highest) {
 
         highest = rate;
-        optimization.bestPair = pair;
 
+        optimization.bestPair =
+          pair;
       }
 
       if (rate < lowest) {
 
         lowest = rate;
-        optimization.weakestPair = pair;
 
+        optimization.weakestPair =
+          pair;
       }
-
     }
 
-    // Timeframe Ranking
-
-    const timeframeStats = {};
-
-    for (const key in this.data.stats) {
-
-      const stat = this.data.stats[key];
-
-      const tf = key.split("_")[2];
-
-      if (!timeframeStats[tf]) {
-
-        timeframeStats[tf] = {
-          wins: 0,
-          total: 0
-        };
-
-      }
-
-      timeframeStats[tf].wins += stat.wins;
-      timeframeStats[tf].total += stat.total;
-
-    }
-
+    // Timeframe ranking
     highest = -1;
     lowest = 101;
 
-    for (const tf in timeframeStats) {
+    for (
+      const timeframe in
+      this.data.timeframeStats
+    ) {
+
+      const stat =
+        this.data.timeframeStats[
+          timeframe
+        ];
+
+      const resolved =
+        stat.resolved ??
+        stat.total ??
+        0;
+
+      if (resolved < 3)
+        continue;
 
       const rate =
-        (timeframeStats[tf].wins /
-        timeframeStats[tf].total) * 100;
+        stat.decayedWinRate ??
+        stat.winRate ??
+        stat.accuracy ??
+        0;
 
       if (rate > highest) {
 
         highest = rate;
-        optimization.bestTimeframe = tf;
 
+        optimization.bestTimeframe =
+          timeframe;
       }
 
       if (rate < lowest) {
 
         lowest = rate;
-        optimization.weakestTimeframe = tf;
 
+        optimization.weakestTimeframe =
+          timeframe;
       }
-
     }
 
-    // Suggestions
+    // Market regime ranking
+    highest = -1;
+    lowest = 101;
 
-    if (optimization.bestPattern) {
+    for (
+      const regime in
+      this.data.regimeStats
+    ) {
 
+      const stat =
+        this.data.regimeStats[
+          regime
+        ];
+
+      const resolved =
+        stat.resolved ??
+        stat.total ??
+        0;
+
+      if (resolved < 3)
+        continue;
+
+      const rate =
+        stat.decayedWinRate ??
+        stat.winRate ??
+        stat.accuracy ??
+        0;
+
+      if (rate > highest) {
+
+        highest = rate;
+
+        optimization.bestRegime =
+          regime;
+      }
+
+      if (rate < lowest) {
+
+        lowest = rate;
+
+        optimization.weakestRegime =
+          regime;
+      }
+    }
+
+    // Optimization suggestions
+    if (
+      optimization.bestPattern
+    ) {
       optimization.suggestions.push(
         `Focus on ${optimization.bestPattern}`
       );
-
     }
 
-    if (optimization.bestPair) {
-
+    if (
+      optimization.bestPair
+    ) {
       optimization.suggestions.push(
         `${optimization.bestPair} currently performs best`
       );
-
     }
 
-    if (optimization.bestTimeframe) {
-
+    if (
+      optimization.bestTimeframe
+    ) {
       optimization.suggestions.push(
         `Highest accuracy timeframe: ${optimization.bestTimeframe}`
       );
-
     }
 
-    if (optimization.weakestPattern) {
+    if (
+      optimization.bestRegime
+    ) {
+      optimization.suggestions.push(
+        `Best market regime: ${optimization.bestRegime}`
+      );
+    }
 
+    if (
+      optimization.weakestPattern
+    ) {
       optimization.suggestions.push(
         `Review ${optimization.weakestPattern}`
       );
-
     }
 
-    return optimization;
+    const blacklisted =
+      Object.keys(
+        this.data.blacklistedPatterns
+      );
 
+    if (blacklisted.length > 0) {
+      optimization.suggestions.push(
+        `Avoid blacklisted patterns: ${blacklisted.join(", ")}`
+      );
+    }
+
+    optimization.generatedAt =
+      new Date().toISOString();
+
+    this.data.optimization =
+      optimization;
+
+    return optimization;
   }
 
   /**
@@ -354,29 +1002,84 @@ class LearningSystem {
     let best = null;
     let highest = 0;
 
-    for (const key in this.data.stats) {
+    const patternStats =
+      this.data.patternStats || {};
 
-      const stat = this.data.stats[key];
+    for (
+      const patternName in
+      patternStats
+    ) {
 
-      if (stat.total < 3)
+      const stat =
+        patternStats[
+          patternName
+        ];
+
+      const resolved =
+        stat.resolved ??
+        stat.total ??
+        0;
+
+      if (resolved < 3)
         continue;
 
-      if (stat.accuracy > highest) {
+      const accuracy =
+        stat.decayedWinRate ??
+        stat.winRate ??
+        stat.accuracy ??
+        0;
 
-        highest = stat.accuracy;
-        best = key;
+      if (accuracy > highest) {
 
+        highest = accuracy;
+
+        best = patternName;
       }
+    }
 
+    // Backward-compatible fallback to exact stats.
+    if (!best) {
+
+      for (
+        const key in
+        this.data.stats
+      ) {
+
+        const stat =
+          this.data.stats[key];
+
+        const resolved =
+          stat.resolved ??
+          stat.total ??
+          0;
+
+        if (resolved < 3)
+          continue;
+
+        const accuracy =
+          stat.decayedWinRate ??
+          stat.accuracy ??
+          0;
+
+        if (accuracy > highest) {
+
+          highest = accuracy;
+
+          best = key;
+        }
+      }
     }
 
     return {
 
       pattern: best,
-      accuracy: highest
+
+      accuracy:
+        Number(
+          highest.toFixed(2)
+        )
 
     };
-
   }
 
   /**
@@ -386,42 +1089,60 @@ class LearningSystem {
 
     const resolved =
       this.data.history.filter(
-        s => s.outcome
+        signal =>
+          signal.outcome
       );
 
-    if (resolved.length < 20)
+    if (
+      resolved.length < 20
+    ) {
       return "insufficient-data";
+    }
 
     const recent =
       resolved.slice(-20);
 
     const previous =
-      resolved.slice(-40, -20);
+      resolved.slice(
+        -40,
+        -20
+      );
 
-    if (previous.length === 0)
+    if (
+      previous.length === 0
+    ) {
       return "insufficient-data";
+    }
 
     const recentRate =
-      (recent.filter(
-        s => s.outcome === "WIN"
-      ).length / recent.length) * 100;
+      (
+        recent.filter(
+          signal =>
+            signal.outcome === "WIN"
+        ).length /
+        recent.length
+      ) * 100;
 
     const previousRate =
-      (previous.filter(
-        s => s.outcome === "WIN"
-      ).length / previous.length) * 100;
+      (
+        previous.filter(
+          signal =>
+            signal.outcome === "WIN"
+        ).length /
+        previous.length
+      ) * 100;
 
-    const diff =
-      recentRate - previousRate;
+    const difference =
+      recentRate -
+      previousRate;
 
-    if (diff > 10)
+    if (difference > 10)
       return "improving";
 
-    if (diff < -10)
+    if (difference < -10)
       return "declining";
 
     return "stable";
-
   }
 
   /**
@@ -440,13 +1161,15 @@ class LearningSystem {
 
     return {
 
-      bestPattern: bestPattern.pattern,
+      bestPattern:
+        bestPattern.pattern,
 
-      bestAccuracy: bestPattern.accuracy,
+      bestAccuracy:
+        bestPattern.accuracy,
 
-      trend: trend,
+      trend,
 
-      optimization: optimization,
+      optimization,
 
       recommendation:
         this.generateRecommendation(
@@ -455,80 +1178,93 @@ class LearningSystem {
         )
 
     };
-
   }
 
   /**
    * Generate AI Trading Recommendation
    */
-  generateRecommendation(bestPattern, trend) {
+  generateRecommendation(
+    bestPattern,
+    trend
+  ) {
 
     const recommendations = [];
 
-    if (bestPattern.pattern) {
+    if (
+      bestPattern.pattern
+    ) {
 
       recommendations.push(
-
         `Prioritize ${bestPattern.pattern} (${bestPattern.accuracy.toFixed(1)}% accuracy)`
-
       );
-
     }
 
-    if (trend === "improving") {
+    if (
+      trend === "improving"
+    ) {
 
       recommendations.push(
-
         "Learning performance is improving."
-
       );
-
     }
 
-    else if (trend === "declining") {
+    else if (
+      trend === "declining"
+    ) {
 
       recommendations.push(
-
         "Performance is declining. Reduce trade frequency."
-
       );
-
     }
 
-    const overall = this.getOverallStats();
+    const overall =
+      this.getOverallStats();
 
-    if (overall.winRate >= 70) {
+    if (
+      overall.winRate >= 70
+    ) {
 
       recommendations.push(
-
         "High confidence trading conditions."
-
       );
-
     }
 
-    else if (overall.winRate < 50) {
+    else if (
+      overall.winRate < 50 &&
+      overall.resolvedSignals >=
+        this.minSamples
+    ) {
 
       recommendations.push(
-
         "Overall accuracy is low. Wait for stronger confirmations."
-
       );
-
     }
 
-    if (recommendations.length === 0) {
-
-      recommendations.push(
-
-        "Insufficient learning data."
-
+    const blacklisted =
+      Object.keys(
+        this.data.blacklistedPatterns ||
+        {}
       );
 
+    if (
+      blacklisted.length > 0
+    ) {
+
+      recommendations.push(
+        `Avoid blacklisted patterns: ${blacklisted.join(", ")}`
+      );
+    }
+
+    if (
+      recommendations.length === 0
+    ) {
+
+      recommendations.push(
+        "Insufficient learning data."
+      );
     }
 
     return recommendations;
-
   }
 
   /**
@@ -538,21 +1274,31 @@ class LearningSystem {
 
     const resolved =
       this.data.history.filter(
-        s => s.outcome
+        signal =>
+          signal.outcome === "WIN" ||
+          signal.outcome === "LOSS"
       );
 
     const wins =
       resolved.filter(
-        s => s.outcome === "WIN"
+        signal =>
+          signal.outcome === "WIN"
       ).length;
 
     const losses =
       resolved.filter(
-        s => s.outcome === "LOSS"
+        signal =>
+          signal.outcome === "LOSS"
       ).length;
 
     const total =
       resolved.length;
+
+    const pending =
+      this.data.history.filter(
+        signal =>
+          !signal.outcome
+      ).length;
 
     return {
 
@@ -562,22 +1308,35 @@ class LearningSystem {
       resolvedSignals:
         total,
 
-      wins:
-        wins,
+      wins,
 
-      losses:
-        losses,
+      losses,
 
-      pending:
-        this.data.history.length - total,
+      pending,
 
       winRate:
-        total
-        ? (wins / total) * 100
-        : 0
+        total > 0
+          ? Number(
+              (
+                wins /
+                total *
+                100
+              ).toFixed(2)
+            )
+          : 0,
+
+      lossRate:
+        total > 0
+          ? Number(
+              (
+                losses /
+                total *
+                100
+              ).toFixed(2)
+            )
+          : 0
 
     };
-
   }
 
   /**
@@ -602,11 +1361,34 @@ class LearningSystem {
       confidence:
         this.getConfidenceData(),
 
+      patternStats:
+        this.data.patternStats,
+
+      pairStats:
+        this.data.pairStats,
+
+      timeframeStats:
+        this.data.timeframeStats,
+
+      regimeStats:
+        this.data.regimeStats,
+
+      patternWeights:
+        this.data.patternWeights,
+
+      blacklistedPatterns:
+        this.getBlacklistedPatterns(),
+
+      calibration:
+        this.data.calibration,
+
+      patternEvolution:
+        this.data.patternEvolution,
+
       updatedAt:
         new Date().toISOString()
 
     };
-
   }
 
   /**
@@ -615,45 +1397,78 @@ class LearningSystem {
   shouldTrade(signal) {
 
     const confidence =
-      this.calculateAdaptiveConfidence(signal);
+      this.calculateAdaptiveConfidence(
+        signal
+      );
+
+    const patternBlacklisted =
+      this.isPatternBlacklisted(
+        signal
+          ? signal.pattern
+          : null
+      );
+
+    const execute =
+      confidence >=
+        this.actionableThreshold &&
+      !patternBlacklisted;
+
+    let reason =
+      execute
+        ? "Confidence passed"
+        : "Confidence below threshold";
+
+    if (
+      patternBlacklisted
+    ) {
+      reason =
+        "Pattern is blacklisted due to poor historical performance";
+    }
 
     return {
 
-      execute:
-        confidence >= 65,
+      execute,
 
-      confidence:
-        confidence,
+      confidence,
 
-      reason:
+      threshold:
+        this.actionableThreshold,
 
-        confidence >= 65
+      patternBlacklisted,
 
-        ? "Confidence passed"
-
-        : "Confidence below threshold"
+      reason
 
     };
-
   }
 
   /**
    * Auto Cleanup Engine
    */
-  cleanupHistory(maxRecords = 5000) {
+  cleanupHistory(
+    maxRecords =
+      this.maxHistory
+  ) {
 
-    if (!this.data.history)
-      return;
-
-    if (this.data.history.length > maxRecords) {
-
-      this.data.history =
-        this.data.history.slice(-maxRecords);
-
+    if (
+      !this.data.history
+    ) {
+      return 0;
     }
 
-    return this.data.history.length;
+    if (
+      this.data.history.length >
+      maxRecords
+    ) {
 
+      this.data.history =
+        this.data.history.slice(
+          -maxRecords
+        );
+    }
+
+    return (
+      this.data.history.length
+    );
   }
 
   /**
@@ -669,14 +1484,43 @@ class LearningSystem {
       stats:
         this.data.stats,
 
+      patternStats:
+        this.data.patternStats,
+
+      pairStats:
+        this.data.pairStats,
+
+      timeframeStats:
+        this.data.timeframeStats,
+
+      regimeStats:
+        this.data.regimeStats,
+
+      patternWeights:
+        this.data.patternWeights,
+
+      calibration:
+        this.data.calibration,
+
+      patternEvolution:
+        this.data.patternEvolution,
+
+      blacklistedPatterns:
+        this.data.blacklistedPatterns,
+
+      optimization:
+        this.data.optimization,
+
       confidence:
         this.confidenceData,
 
       exportedAt:
-        new Date().toISOString()
+        new Date().toISOString(),
+
+      version:
+        "4.0.0"
 
     };
-
   }
 
   /**
@@ -688,16 +1532,54 @@ class LearningSystem {
       return false;
 
     this.data.history =
-      data.history || [];
+      Array.isArray(
+        data.history
+      )
+        ? data.history
+        : [];
 
     this.data.stats =
       data.stats || {};
 
+    this.data.patternStats =
+      data.patternStats || {};
+
+    this.data.pairStats =
+      data.pairStats || {};
+
+    this.data.timeframeStats =
+      data.timeframeStats || {};
+
+    this.data.regimeStats =
+      data.regimeStats || {};
+
+    this.data.patternWeights =
+      data.patternWeights || {};
+
+    this.data.calibration =
+      data.calibration || {};
+
+    this.data.patternEvolution =
+      data.patternEvolution || {};
+
+    this.data.blacklistedPatterns =
+      data.blacklistedPatterns || {};
+
+    this.data.optimization =
+      data.optimization || {};
+
     this.confidenceData =
-      data.confidence || {};
+      data.confidence || {
+        patterns: {},
+        updatedAt:
+          new Date().toISOString()
+      };
+
+    this.cleanupHistory();
+
+    this.updatePatternStats();
 
     return true;
-
   }
 
   /**
@@ -709,13 +1591,32 @@ class LearningSystem {
 
     this.data.stats = {};
 
+    this.data.patternStats = {};
+
+    this.data.pairStats = {};
+
+    this.data.timeframeStats = {};
+
+    this.data.regimeStats = {};
+
+    this.data.patternWeights = {};
+
+    this.data.calibration = {};
+
+    this.data.patternEvolution = {};
+
+    this.data.blacklistedPatterns = {};
+
+    this.data.optimization = {};
+
+    this.data.lastLearningUpdate = null;
+
     this.confidenceData.patterns = {};
 
     this.confidenceData.updatedAt =
       new Date().toISOString();
 
     return true;
-
   }
 
   /**
@@ -726,17 +1627,41 @@ class LearningSystem {
     const overall =
       this.getOverallStats();
 
+    const resolved =
+      overall.resolvedSignals;
+
+    let learningStatus =
+      "COLLECTING_DATA";
+
+    if (
+      resolved >=
+      this.minSamples
+    ) {
+      learningStatus =
+        "LEARNING";
+    }
+
+    if (
+      resolved >= 100
+    ) {
+      learningStatus =
+        "OPTIMIZED";
+    }
+
     return {
 
-      engine: "AI Pattern Recognition",
+      engine:
+        "AI Pattern Recognition",
 
-      status: "ONLINE",
+      status:
+        "ONLINE",
+
+      learningStatus,
 
       totalSignals:
         overall.totalSignals,
 
-      resolved:
-        overall.resolvedSignals,
+      resolved,
 
       winRate:
         overall.winRate,
@@ -747,11 +1672,16 @@ class LearningSystem {
       bestPattern:
         this.getBestPattern(),
 
+      blacklistedPatterns:
+        Object.keys(
+          this.data.blacklistedPatterns ||
+          {}
+        ).length,
+
       updated:
         new Date().toISOString()
 
     };
-
   }
 
   /**
@@ -765,7 +1695,7 @@ class LearningSystem {
         "Pattern Recognition AI",
 
       version:
-        "2.0.0",
+        "4.0.0",
 
       learning:
         true,
@@ -777,10 +1707,24 @@ class LearningSystem {
         true,
 
       recommendation:
+        true,
+
+      weightedLearning:
+        true,
+
+      confidenceCalibration:
+        true,
+
+      marketRegimeLearning:
+        true,
+
+      patternEvolution:
+        true,
+
+      automaticBlacklisting:
         true
 
     };
-
   }
 
   /**
@@ -794,287 +1738,652 @@ class LearningSystem {
     this.confidenceData.updatedAt =
       new Date().toISOString();
 
+    this.confidenceData.overall =
+      this.getOverallStats();
+
+    this.confidenceData.patternWeights = {
+      ...this.data.patternWeights
+    };
+
+    this.confidenceData.blacklistedPatterns = {
+      ...this.data.blacklistedPatterns
+    };
+
     return this.confidenceData;
-
-  }
-
-  // Get historical confidence for a pattern
-  getPatternConfidence(patternName, pair, timeframe) {
-    const key = `${patternName}_${pair}_${timeframe}`;
-    
-    if (!this.confidenceData.patterns[key]) {
-      // Default confidence for new patterns
-      return 60;
-    }
-
-    const patternData = this.confidenceData.patterns[key];
-    return patternData.confidence || 60;
-  }
-
-  // Update learning history with new signals
-  updateHistory(newSignals) {
-    if (!this.data.history) this.data.history = [];
-    if (!this.data.stats) this.data.stats = {};
-
-    // Add signals to history (avoid duplicates)
-    for (const signal of newSignals) {
-
-      const exists = this.data.history.find(s =>
-        s.timestamp === signal.timestamp
-      );
-
-      if (exists) continue;
-
-      this.data.history.push({
-        ...signal,
-        addedAt: new Date().toISOString(),
-        outcome: signal.outcome || null
-      });
-
-    }
-
-    // Keep last 5000 signals (updated from 2000)
-    if (this.data.history.length > this.maxHistory) {
-      this.data.history = this.data.history.slice(-this.maxHistory);
-    }
-
-    // Update pattern statistics
-    this.updatePatternStats();
-  }
-
-  // Update pattern statistics based on history
-  updatePatternStats() {
-    const stats = {};
-
-    for (const signal of this.data.history) {
-      const key = `${signal.pattern}_${signal.pair}_${signal.timeframe}`;
-      
-      if (!stats[key]) {
-        stats[key] = {
-          total: 0,
-          wins: 0,
-          losses: 0,
-          accuracy: 60,
-          trend: 'stable'
-        };
-      }
-
-      stats[key].total++;
-
-      if (signal.outcome === 'WIN') {
-        stats[key].wins++;
-      } else if (signal.outcome === 'LOSS') {
-        stats[key].losses++;
-      }
-
-      // Calculate accuracy
-      if (stats[key].total >= 3) {
-        stats[key].accuracy = Math.round((stats[key].wins / stats[key].total) * 100);
-      }
-
-      // Determine trend
-      if (stats[key].total >= 5) {
-        const recent = this.data.history.slice(-5).filter(s => 
-          s.pattern === signal.pattern && 
-          s.pair === signal.pair &&
-          s.timeframe === signal.timeframe
-        );
-        
-        const recentWins = recent.filter(s => s.outcome === 'WIN').length;
-        const recentRate = (recentWins / recent.length) * 100;
-
-        if (recentRate > stats[key].accuracy + 10) {
-          stats[key].trend = 'improving';
-        } else if (recentRate < stats[key].accuracy - 10) {
-          stats[key].trend = 'declining';
-        } else {
-          stats[key].trend = 'stable';
-        }
-      }
-    }
-
-    this.data.stats = stats;
-  }
-
-  // Get confidence data for all patterns
-  getConfidenceData() {
-    const patterns = {};
-
-    for (const key in this.data.stats) {
-      const stat = this.data.stats[key];
-      
-      // Calculate confidence based on accuracy and trend
-      let confidence = stat.accuracy || 60;
-
-      // Boost for improving trend
-      if (stat.trend === 'improving') {
-        confidence = Math.min(this.maxConfidence, confidence + 5);
-      }
-      
-      // Penalty for declining trend
-      if (stat.trend === 'declining') {
-        confidence = Math.max(this.minConfidence, confidence - 5);
-      }
-
-      // Penalty if low sample size
-      if (stat.total < 3) {
-        confidence = Math.max(this.minConfidence, confidence - 10);
-      }
-
-      patterns[key] = {
-        pattern: key.split('_')[0],
-        pair: key.split('_')[1],
-        timeframe: key.split('_')[2],
-        confidence: confidence,
-        accuracy: stat.accuracy,
-        total: stat.total,
-        wins: stat.wins,
-        losses: stat.losses,
-        trend: stat.trend,
-        lastUpdated: new Date().toISOString()
-      };
-    }
-
-    return patterns;
-  }
-
-  // Get learning data
-  getLearningData() {
-    return {
-      history: this.data.history,
-      stats: this.data.stats
-    };
-  }
-
-  // Mark signal as WIN or LOSS
-  resolveSignal(signalId, outcome) {
-    const signal = this.data.history.find(s => s.timestamp === signalId);
-    if (signal) {
-      signal.outcome = outcome;
-      this.updatePatternStats();
-      // Update confidence after outcome
-      this.updateSignalConfidence(signal);
-    }
-  }
-
-  // Get pattern psychology description
-  getPatternDescription(patternName) {
-    const descriptions = {
-      'Double Top': `A bearish reversal pattern where price reaches the same resistance level twice. Indicates rejection of higher prices and weakening buying pressure. When confirmed below the neckline, expect a significant downside move. Risk:Reward typically 1:2+`,
-      
-      'Double Bottom': `A bullish reversal pattern where price touches the same support level twice. Shows buyer strength and rejection of lower prices. Once price closes above the neckline, expect a significant upside move. Common in downtrends about to reverse.`,
-      
-      'Head and Shoulders': `A classic bearish reversal pattern with 3 peaks - left shoulder, head (higher), right shoulder (similar to left). The neckline is critical support. Break below signals a strong downtrend. One of the most reliable patterns with high accuracy rate.`,
-      
-      'Inverse Head and Shoulders': `Mirror image of H&S but bullish. Three troughs with middle one deepest. Neckline resistance break signals strong uptrend. Often found at market bottoms and precedes substantial rallies. Very reliable for identifying trend reversals.`,
-      
-      'Ascending Triangle': `Rising lows with flat resistance highs indicate buyers stepping in at each dip. Bullish breakout pattern. When price breaks above resistance, expect strong continuation move upward. Time decay adds urgency - pattern must resolve within 2-3 weeks.`,
-      
-      'Descending Triangle': `Falling highs with flat support lows indicate sellers pushing price lower. Bearish breakout pattern. Break below support signals strong continuation downward. Pattern suggests supply overwhelming demand, pointing to further weakness.`,
-      
-      'Symmetric Triangle': `Converging highs and lows with narrowing range. Neutral consolidation until breakout occurs. Breakout direction (up or down) determines next trend. Tighter the triangle, stronger the eventual move. Requires volume confirmation.`,
-      
-      'Rising Wedge': `Higher lows and higher highs but highs rising faster - price rising into tighter resistance. Despite uptrend appearance, this is a bearish reversal pattern. Strong sell signal when resistance breaks. Often seen in overbought conditions before corrections.`,
-      
-      'Falling Wedge': `Lower highs and lower lows but lows falling faster - price falling into support. Despite downtrend appearance, this is a bullish reversal pattern. Strong buy signal when support holds and resistance breaks. Often precedes strong bounces.`,
-      
-      'Pennant': `Small symmetrical consolidation after a strong directional move. Flag of the trend. Breakout continues original direction. Very reliable with high probability continuation. Time factor important - should resolve quickly, typically within 1-2 weeks.`,
-      
-      'Flag': `Rectangular consolidation after strong move, price oscillating slightly higher/lower than breakout level. Very bullish (after up move) or bearish (after down move). High probability continuation pattern. Strong volume on breakout critical for confirmation.`,
-      
-      'Cup and Handle': `Rounded bottom (cup) forming support followed by shallow pullback (handle) within cup rim. Very bullish pattern. Breakout above cup rim signals substantial upside move. High probability of success when properly formed with minimum 8-12 week timeframe.`,
-      
-      'Rectangle Top': `Flat resistance area where price bounces multiple times without breaking above. Buyers lacking strength to push higher. Breakdown below support signals downtrend. Pattern shows equilibrium about to be broken to the downside.`,
-      
-      'Rectangle Bottom': `Flat support area where price bounces multiple times without breaking below. Sellers lacking strength to push lower. Breakout above resistance signals uptrend. Pattern shows accumulation before upside move.`,
-      
-      'Diamond Top': `Expanding highs and lows in first half, then contracting in second half creating diamond shape at resistance. Very rare and powerful reversal. Strong sell signal when confirmed below pattern. Can indicate major trend reversal.`,
-      
-      'Diamond Bottom': `Expanding highs and lows in first half, then contracting in second half creating diamond shape at support. Very rare and powerful reversal. Strong buy signal when confirmed above pattern. Can precede major trend reversal upward.`,
-      
-      'Bullish Engulfing': `Second candle completely engulfs first bearish candle's range and closes higher. Strong reversal signal at support levels. Indicates buyers overpowering sellers. Most reliable when first candle is small and second has strong body.`,
-      
-      'Bearish Engulfing': `Second candle completely engulfs first bullish candle's range and closes lower. Strong reversal signal at resistance levels. Indicates sellers overpowering buyers. Most reliable when first candle is small and second has strong body.`
-    };
-
-    return descriptions[patternName] || 'Pattern detected with confirmed signal.';
   }
 
   /**
-   * Pattern Quality Score
+   * Get historical confidence for a pattern.
    */
-  getPatternQuality(pattern, pair, timeframe) {
+  getPatternConfidence(
+    patternName,
+    pair,
+    timeframe
+  ) {
 
-    const key = `${pattern}_${pair}_${timeframe}`;
+    const key =
+      `${patternName}_${pair}_${timeframe}`;
 
-    const stat = this.data.stats[key];
+    const saved =
+      this.confidenceData.patterns[
+        key
+      ];
 
-    if (!stat) {
-      return {
-        qualityScore: 60,
-        grade: "C",
-        recommendation: "Insufficient Data"
-      };
+    if (
+      saved &&
+      Number.isFinite(
+        Number(saved.confidence)
+      )
+    ) {
+      return Number(
+        saved.confidence
+      );
     }
 
-    const winRate = stat.accuracy || 60;
-    const sampleSize = Math.min(100, stat.total * 5);
+    const stats =
+      this.data.stats[key];
 
-    let trendScore = 60;
+    if (stats) {
 
-    if (stat.trend === "improving")
-      trendScore = 90;
+      const accuracy =
+        stats.decayedWinRate ??
+        stats.accuracy ??
+        this.defaultConfidence;
 
-    else if (stat.trend === "stable")
-      trendScore = 70;
+      return Math.round(
+        Math.max(
+          this.minConfidence,
+          Math.min(
+            this.maxConfidence,
+            accuracy *
+              this.getPatternWeight(
+                patternName
+              )
+          )
+        )
+      );
+    }
 
-    else if (stat.trend === "declining")
-      trendScore = 40;
-
-    const confidence = Math.min(95, winRate);
-
-    const quality =
-      (winRate * 0.40) +
-      (confidence * 0.20) +
-      (trendScore * 0.20) +
-      (sampleSize * 0.20);
-
-    let grade = "F";
-
-    if (quality >= 90) grade = "A+";
-    else if (quality >= 80) grade = "A";
-    else if (quality >= 70) grade = "B";
-    else if (quality >= 60) grade = "C";
-    else if (quality >= 50) grade = "D";
-
-    return {
-      qualityScore: Math.round(quality),
-      grade,
-      recommendation:
-        grade === "A+" || grade === "A"
-          ? "Excellent"
-          : grade === "B"
-          ? "Good"
-          : grade === "C"
-          ? "Average"
-          : "Avoid"
-    };
-
+    return this.defaultConfidence;
   }
 
-  // Get risk:reward suggestion
-  getRiskRewardData(pattern, entry, stop, target) {
-    const risk = Math.abs(entry - stop);
-    const reward = Math.abs(target - entry);
-    const rr = reward / risk;
+  // =====================================================
+  // History Management
+  // =====================================================
+
+  /**
+   * Update learning history with new signals.
+   */
+  updateHistory(newSignals) {
+
+    if (
+      !Array.isArray(
+        newSignals
+      )
+    ) {
+      return false;
+    }
+
+    if (!this.data.history)
+      this.data.history = [];
+
+    if (!this.data.stats)
+      this.data.stats = {};
+
+    for (
+      const signal of
+      newSignals
+    ) {
+
+      if (!signal)
+        continue;
+
+      const signalId =
+        signal.id ||
+        signal.timestamp;
+
+      const exists =
+        this.data.history.find(
+          historicalSignal => {
+
+            const historicalId =
+              historicalSignal.id ||
+              historicalSignal.timestamp;
+
+            return (
+              signalId &&
+              historicalId ===
+                signalId
+            );
+          }
+        );
+
+      if (exists)
+        continue;
+
+      this.data.history.push({
+
+        ...signal,
+
+        addedAt:
+          signal.addedAt ||
+          new Date().toISOString(),
+
+        outcome:
+          signal.outcome || null
+
+      });
+    }
+
+    this.cleanupHistory(
+      this.maxHistory
+    );
+
+    this.updatePatternStats();
+
+    this.data.lastLearningUpdate =
+      new Date().toISOString();
+
+    return true;
+  }
+
+  /**
+   * Record one signal while preserving
+   * the existing updateHistory API.
+   */
+  recordSignal(signal) {
+
+    if (!signal)
+      return false;
+
+    return this.updateHistory([
+      signal
+    ]);
+  }
+
+  // =====================================================
+  // Phase 4 Weighted Statistics Engine
+  // =====================================================
+
+  /**
+   * Calculate time-decay weight for one signal.
+   *
+   * New signals receive weight close to 1.
+   * Older signals gradually receive less influence.
+   */
+  getTimeDecayWeight(signal) {
+
+    const rawDate =
+      signal.resolvedAt ||
+      signal.closedAt ||
+      signal.updatedAt ||
+      signal.addedAt ||
+      signal.createdAt ||
+      signal.timestamp;
+
+    if (!rawDate)
+      return 1;
+
+    const date =
+      new Date(rawDate);
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return 1;
+    }
+
+    const ageMilliseconds =
+      Math.max(
+        0,
+        Date.now() -
+        date.getTime()
+      );
+
+    const ageDays =
+      ageMilliseconds /
+      (
+        1000 *
+        60 *
+        60 *
+        24
+      );
+
+    const halfLife =
+      Math.max(
+        1,
+        this.decayFactorDays
+      );
+
+    return Math.pow(
+      0.5,
+      ageDays / halfLife
+    );
+  }
+
+  /**
+   * Create a blank aggregate statistics object.
+   */
+  createEmptyStats() {
 
     return {
-      risk: risk.toFixed(4),
-      reward: reward.toFixed(4),
-      ratio: rr.toFixed(2),
-      acceptable: rr >= 1.5
+
+      total: 0,
+
+      resolved: 0,
+
+      wins: 0,
+
+      losses: 0,
+
+      accuracy:
+        this.defaultConfidence,
+
+      winRate:
+        this.defaultConfidence,
+
+      decayedWins: 0,
+
+      decayedLosses: 0,
+
+      decayedTotal: 0,
+
+      decayedWinRate:
+        this.defaultConfidence,
+
+      trend:
+        "stable",
+
+      averageConfidence: 0,
+
+      confidenceTotal: 0,
+
+      lastUpdated: null
+
     };
   }
-}
 
-module.exports = LearningSystem;
+  /**
+   * Add one signal to an aggregate stats object.
+   */
+  addSignalToStats(
+    stats,
+    signal
+  ) {
+
+    stats.total++;
+
+    const confidence =
+      Number(
+        signal.confidence
+      );
+
+    if (
+      Number.isFinite(
+        confidence
+      )
+    ) {
+
+      stats.confidenceTotal +=
+        confidence;
+
+      stats.averageConfidence =
+        stats.confidenceTotal /
+        stats.total;
+    }
+
+    if (
+      signal.outcome !== "WIN" &&
+      signal.outcome !== "LOSS"
+    ) {
+      return;
+    }
+
+    stats.resolved++;
+
+    const decayWeight =
+      this.getTimeDecayWeight(
+        signal
+      );
+
+    if (
+      signal.outcome === "WIN"
+    ) {
+
+      stats.wins++;
+
+      stats.decayedWins +=
+        decayWeight;
+    }
+
+    else {
+
+      stats.losses++;
+
+      stats.decayedLosses +=
+        decayWeight;
+    }
+
+    stats.decayedTotal =
+      stats.decayedWins +
+      stats.decayedLosses;
+
+    stats.accuracy =
+      stats.resolved > 0
+        ? (
+            stats.wins /
+            stats.resolved
+          ) * 100
+        : this.defaultConfidence;
+
+    stats.winRate =
+      stats.accuracy;
+
+    stats.decayedWinRate =
+      stats.decayedTotal > 0
+        ? (
+            stats.decayedWins /
+            stats.decayedTotal
+          ) * 100
+        : this.defaultConfidence;
+
+    stats.lastUpdated =
+      new Date().toISOString();
+  }
+
+  /**
+   * Calculate recent aggregate trend.
+   */
+  calculateStatsTrend(
+    matchingHistory,
+    historicalRate
+  ) {
+
+    const resolved =
+      matchingHistory.filter(
+        signal =>
+          signal.outcome === "WIN" ||
+          signal.outcome === "LOSS"
+      );
+
+    if (
+      resolved.length < 5
+    ) {
+      return "stable";
+    }
+
+    const recent =
+      resolved.slice(-5);
+
+    const recentWins =
+      recent.filter(
+        signal =>
+          signal.outcome === "WIN"
+      ).length;
+
+    const recentRate =
+      (
+        recentWins /
+        recent.length
+      ) * 100;
+
+    if (
+      recentRate >
+      historicalRate + 10
+    ) {
+      return "improving";
+    }
+
+    if (
+      recentRate <
+      historicalRate - 10
+    ) {
+      return "declining";
+    }
+
+    return "stable";
+  }
+
+  /**
+   * Rebuild all learning aggregates from history.
+   */
+  updatePatternStats() {
+
+    const exactStats = {};
+    const patternStats = {};
+    const pairStats = {};
+    const timeframeStats = {};
+    const regimeStats = {};
+
+    const exactHistory = {};
+    const patternHistory = {};
+    const pairHistory = {};
+    const timeframeHistory = {};
+    const regimeHistory = {};
+
+    for (
+      const signal of
+      this.data.history
+    ) {
+
+      if (!signal)
+        continue;
+
+      const pattern =
+        signal.pattern ||
+        "Unknown";
+
+      const pair =
+        signal.pair ||
+        "UNKNOWN";
+
+      const timeframe =
+        signal.timeframe ||
+        "UNKNOWN";
+
+      const regime =
+        signal.marketRegime ||
+        signal.regime ||
+        "UNKNOWN";
+
+      const exactKey =
+        `${pattern}_${pair}_${timeframe}`;
+
+      if (!exactStats[exactKey])
+        exactStats[exactKey] =
+          this.createEmptyStats();
+
+      if (!patternStats[pattern])
+        patternStats[pattern] =
+          this.createEmptyStats();
+
+      if (!pairStats[pair])
+        pairStats[pair] =
+          this.createEmptyStats();
+
+      if (!timeframeStats[timeframe])
+        timeframeStats[timeframe] =
+          this.createEmptyStats();
+
+      if (!regimeStats[regime])
+        regimeStats[regime] =
+          this.createEmptyStats();
+
+      this.addSignalToStats(
+        exactStats[exactKey],
+        signal
+      );
+
+      this.addSignalToStats(
+        patternStats[pattern],
+        signal
+      );
+
+      this.addSignalToStats(
+        pairStats[pair],
+        signal
+      );
+
+      this.addSignalToStats(
+        timeframeStats[timeframe],
+        signal
+      );
+
+      this.addSignalToStats(
+        regimeStats[regime],
+        signal
+      );
+
+      if (!exactHistory[exactKey])
+        exactHistory[exactKey] = [];
+
+      if (!patternHistory[pattern])
+        patternHistory[pattern] = [];
+
+      if (!pairHistory[pair])
+        pairHistory[pair] = [];
+
+      if (!timeframeHistory[timeframe])
+        timeframeHistory[timeframe] = [];
+
+      if (!regimeHistory[regime])
+        regimeHistory[regime] = [];
+
+      exactHistory[exactKey].push(
+        signal
+      );
+
+      patternHistory[pattern].push(
+        signal
+      );
+
+      pairHistory[pair].push(
+        signal
+      );
+
+      timeframeHistory[
+        timeframe
+      ].push(signal);
+
+      regimeHistory[regime].push(
+        signal
+      );
+    }
+
+    const applyTrends =
+      (
+        statistics,
+        historyGroups
+      ) => {
+
+        for (
+          const key in
+          statistics
+        ) {
+
+          const stat =
+            statistics[key];
+
+          stat.trend =
+            this.calculateStatsTrend(
+              historyGroups[key] ||
+              [],
+              stat.decayedWinRate ??
+              stat.accuracy
+            );
+
+          stat.accuracy =
+            Number(
+              stat.accuracy.toFixed(2)
+            );
+
+          stat.winRate =
+            Number(
+              stat.winRate.toFixed(2)
+            );
+
+          stat.decayedWins =
+            Number(
+              stat.decayedWins.toFixed(4)
+            );
+
+          stat.decayedLosses =
+            Number(
+              stat.decayedLosses.toFixed(4)
+            );
+
+          stat.decayedTotal =
+            Number(
+              stat.decayedTotal.toFixed(4)
+            );
+
+          stat.decayedWinRate =
+            Number(
+              stat.decayedWinRate.toFixed(2)
+            );
+
+          stat.averageConfidence =
+            Number(
+              stat.averageConfidence.toFixed(2)
+            );
+
+          delete stat.confidenceTotal;
+        }
+      };
+
+    applyTrends(
+      exactStats,
+      exactHistory
+    );
+
+    applyTrends(
+      patternStats,
+      patternHistory
+    );
+
+    applyTrends(
+      pairStats,
+      pairHistory
+    );
+
+    applyTrends(
+      timeframeStats,
+      timeframeHistory
+    );
+
+    applyTrends(
+      regimeStats,
+      regimeHistory
+    );
+
+    this.data.stats =
+      exactStats;
+
+    this.data.patternStats =
+      patternStats;
+
+    this.data.pairStats =
+      pairStats;
+
+    this.data.timeframeStats =
+      timeframeStats;
+
+    this.data.regimeStats =
+      regimeStats;
+
+    this.updateConfidenceCalibration();
+
+    this.updatePatternWeights();
+
+    this.updatePatternBlacklist();
+
+    this.updatePatternEvolution();
+
+    this.data.lastLearningUpdate =
+      new Date().toISOString();
+
+    return this.data.stats;
+  }
+
