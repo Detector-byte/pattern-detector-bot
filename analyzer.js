@@ -976,3 +976,199 @@ class PatternAnalyzer {
     confirmationScore =
       confirmationScore * 0.85 +
       shoulderSymmetryScore * 0.15;
+    // A rising neckline strengthens
+    // the bullish inverse Head and Shoulders setup.
+    const necklineSlope =
+      (rightPeak - leftPeak) /
+      (right.index - head.index || 1);
+
+    if (necklineSlope > 0) {
+      confirmationScore += 3;
+    }
+
+    confirmationScore = Math.max(
+      50,
+      Math.min(
+        95,
+        Math.round(confirmationScore)
+      )
+    );
+
+    return {
+      name: 'Inverse Head and Shoulders',
+      direction: 'BUY',
+      strength: Math.round(strength),
+      confirmationScore,
+      reliability:
+        this.getReliability(
+          confirmationScore
+        ),
+      shoulderSymmetryScore:
+        Math.round(
+          shoulderSymmetryScore
+        ),
+      necklineSlope,
+
+      // Target equals neckline plus
+      // the height of the head.
+      targetPrice: +(
+        neckline +
+        (neckline - head.value)
+      ).toFixed(5),
+
+      // Stop loss sits below the right shoulder.
+      stopLoss: +right.value.toFixed(5),
+      breakoutLevel: neckline,
+      _ageIndex: right.index
+    };
+  }
+
+  detectAscendingTriangle(
+    candles,
+    recentHighs,
+    recentLows,
+    highSlope,
+    lowSlope
+  ) {
+    if (
+      Math.abs(highSlope) <
+        this.regressionThreshold &&
+      lowSlope >
+        this.regressionThreshold
+    ) {
+      const resistance =
+        this.highest(recentHighs);
+
+      // Flat resistance must be touched
+      // multiple times to confirm the structure.
+      const resistanceTouches =
+        this.countTouches(
+          recentHighs,
+          resistance
+        );
+
+      if (
+        resistanceTouches <
+        this.minTouchCount
+      ) {
+        return null;
+      }
+
+      if (
+        !this.isBreakoutConfirmed(
+          candles,
+          resistance,
+          'BUY'
+        )
+      ) {
+        return null;
+      }
+
+      const confirmationScore = 90;
+
+      return {
+        name: 'Ascending Triangle',
+        direction: 'BUY',
+        strength: 82,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        breakoutLevel: resistance,
+        resistanceTouches
+      };
+    }
+
+    return null;
+  }
+
+  detectDescendingTriangle(
+    candles,
+    recentHighs,
+    recentLows,
+    highSlope,
+    lowSlope
+  ) {
+    if (
+      highSlope <
+        -this.regressionThreshold &&
+      Math.abs(lowSlope) <
+        this.regressionThreshold
+    ) {
+      const support =
+        this.lowest(recentLows);
+
+      // Flat support must be touched
+      // multiple times to confirm the structure.
+      const supportTouches =
+        this.countTouches(
+          recentLows,
+          support
+        );
+
+      if (
+        supportTouches <
+        this.minTouchCount
+      ) {
+        return null;
+      }
+
+      if (
+        !this.isBreakoutConfirmed(
+          candles,
+          support,
+          'SELL'
+        )
+      ) {
+        return null;
+      }
+
+      const confirmationScore = 90;
+
+      return {
+        name: 'Descending Triangle',
+        direction: 'SELL',
+        strength: 82,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        breakoutLevel: support,
+        supportTouches
+      };
+    }
+
+    return null;
+  }
+
+  detectSymmetricTriangle(
+    candles,
+    recentHighs,
+    recentLows,
+    highSlope,
+    lowSlope
+  ) {
+    if (
+      highSlope <
+        -this.regressionThreshold &&
+      lowSlope >
+        this.regressionThreshold
+    ) {
+      const confirmationScore = 88;
+
+      return {
+        name: 'Symmetric Triangle',
+        direction: 'NEUTRAL',
+        strength: 78,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          )
+      };
+    }
+
+    return null;
+  }
