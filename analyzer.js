@@ -582,3 +582,227 @@ class PatternAnalyzer {
       _ageIndex: peak2.index
     };
   }
+    detectDoubleBottom(candles, lows) {
+    const swings = this.findSwingLows(lows);
+
+    if (swings.length < 2) return null;
+
+    const low1 = swings[swings.length - 2];
+    const low2 = swings[swings.length - 1];
+
+    if (
+      low2.index - low1.index <
+      this.minSwingDistance
+    ) {
+      return null;
+    }
+
+    const similarity =
+      Math.abs(low1.value - low2.value) /
+      Math.max(low1.value, low2.value);
+
+    if (similarity > this.priceTolerance) {
+      return null;
+    }
+
+    // Neckline is the highest high between both lows.
+    const neckline = this.highest(
+      candles
+        .slice(
+          low1.index,
+          low2.index + 1
+        )
+        .map(candle => candle.high)
+    );
+
+    if (
+      !this.isBreakoutConfirmed(
+        candles,
+        neckline,
+        'BUY'
+      )
+    ) {
+      return null;
+    }
+
+    const strength =
+      ((neckline - low1.value) /
+        low1.value) *
+      100;
+
+    let confirmationScore =
+      this.calculatePatternQuality(
+        strength,
+        88
+      );
+
+    // RSI divergence:
+    // Price creates a flat or lower second low,
+    // while RSI creates a stronger second low.
+    const rsi1 = this.calculateRSIAtIndex(
+      candles,
+      low1.index,
+      this.rsiPeriod
+    );
+
+    const rsi2 = this.calculateRSIAtIndex(
+      candles,
+      low2.index,
+      this.rsiPeriod
+    );
+
+    const rsiDivergence =
+      low2.value <=
+        low1.value *
+          (1 + this.priceTolerance) &&
+      rsi2 > rsi1;
+
+    if (rsiDivergence) {
+      confirmationScore += 4;
+    }
+
+    // Volume divergence:
+    // Selling volume should weaken into the second low.
+    const vol1 = this.volumeAround(
+      candles,
+      low1.index
+    );
+
+    const vol2 = this.volumeAround(
+      candles,
+      low2.index
+    );
+
+    const volumeDivergence =
+      vol1 !== null && vol2 !== null
+        ? vol2 < vol1
+        : null;
+
+    if (volumeDivergence) {
+      confirmationScore += 3;
+    }
+
+    // Neckline retest adds further confirmation.
+    const necklineRetestConfirmed =
+      this.detectNecklineRetest(
+        candles,
+        low1.index,
+        low2.index,
+        neckline
+      );
+
+    if (necklineRetestConfirmed) {
+      confirmationScore += 3;
+    }
+
+    confirmationScore = Math.max(
+      50,
+      Math.min(
+        95,
+        Math.round(confirmationScore)
+      )
+    );
+
+    return {
+      name: 'Double Bottom',
+      direction: 'BUY',
+      strength: Math.round(strength),
+      confirmationScore,
+      reliability:
+        this.getReliability(
+          confirmationScore
+        ),
+      rsiDivergence,
+      volumeDivergence,
+      necklineRetestConfirmed,
+
+      // Target equals neckline plus pattern height.
+      targetPrice: +(
+        neckline +
+        (neckline - low1.value)
+      ).toFixed(5),
+
+      // Stop loss sits below the second low.
+      stopLoss: +low2.value.toFixed(5),
+      breakoutLevel: neckline,
+      _ageIndex: low2.index
+    };
+  }
+
+  detectHeadShoulders(candles) {
+    const swings = this.findSwingHighs(
+      candles.map(candle => candle.high)
+    );
+
+    if (swings.length < 3) return null;
+
+    // Use the latest three swing highs.
+    const left =
+      swings[swings.length - 3];
+
+    const head =
+      swings[swings.length - 2];
+
+    const right =
+      swings[swings.length - 1];
+
+    // The head must be above both shoulders.
+    if (
+      !(
+        head.value > left.value &&
+        head.value > right.value
+      )
+    ) {
+      return null;
+    }
+
+    // Both shoulders should be reasonably similar.
+    const shoulderDiff =
+      Math.abs(left.value - right.value) /
+      Math.max(left.value, right.value);
+
+    if (shoulderDiff > 0.03) {
+      return null;
+    }
+
+    // Enforce minimum spacing between swing points.
+    if (
+      head.index - left.index <
+        this.minSwingDistance ||
+      right.index - head.index <
+        this.minSwingDistance
+    ) {
+      return null;
+    }
+
+    // Calculate the neckline from both valleys.
+    const leftValley = this.lowest(
+      candles
+        .slice(
+          left.index,
+          head.index + 1
+        )
+        .map(candle => candle.low)
+    );
+
+    const rightValley = this.lowest(
+      candles
+        .slice(
+          head.index,
+          right.index + 1
+        )
+        .map(candle => candle.low)
+    );
+
+    const neckline =
+      (leftValley + rightValley) / 2;
+
+    if (
+      !this.isBreakoutConfirmed(
+        candles,
+        neckline,
+        'SELL'
+      )
+    ) {
+      return null;
+    }
