@@ -2331,4 +2331,274 @@ class PatternAnalyzer {
     return null;
   }
 
+  detectCHOCH(
+    candles,
+    swingHighs,
+    swingLows,
+    trend
+  ) {
+    const lastClose =
+      candles[candles.length - 1].close;
+
+    // Bullish Change of Character:
+    // Existing downtrend breaks above
+    // the latest confirmed swing high.
+    if (
+      trend === 'DOWN' &&
+      swingHighs.length >= 1
+    ) {
+      const lastSwingHigh =
+        swingHighs[
+          swingHighs.length - 1
+        ];
+
+      if (
+        lastClose >
+        lastSwingHigh.value
+      ) {
+        const strength =
+          (
+            (
+              lastClose -
+              lastSwingHigh.value
+            ) /
+            lastSwingHigh.value
+          ) *
+          100;
+
+        return {
+          name:
+            'Change of Character',
+          direction: 'BUY',
+          strength:
+            Math.min(
+              Math.round(
+                strength * 20
+              ),
+              100
+            ),
+          confirmationScore: 80,
+          reliability:
+            this.getReliability(80),
+          breakoutLevel:
+            lastSwingHigh.value,
+          _ageIndex:
+            lastSwingHigh.index,
+          _maxAge:
+            this.maxSMCPatternAge
+        };
+      }
+    }
+
+    // Bearish Change of Character:
+    // Existing uptrend breaks below
+    // the latest confirmed swing low.
+    if (
+      trend === 'UP' &&
+      swingLows.length >= 1
+    ) {
+      const lastSwingLow =
+        swingLows[
+          swingLows.length - 1
+        ];
+
+      if (
+        lastClose <
+        lastSwingLow.value
+      ) {
+        const strength =
+          (
+            (
+              lastSwingLow.value -
+              lastClose
+            ) /
+            lastSwingLow.value
+          ) *
+          100;
+
+        return {
+          name:
+            'Change of Character',
+          direction: 'SELL',
+          strength:
+            Math.min(
+              Math.round(
+                strength * 20
+              ),
+              100
+            ),
+          confirmationScore: 80,
+          reliability:
+            this.getReliability(80),
+          breakoutLevel:
+            lastSwingLow.value,
+          _ageIndex:
+            lastSwingLow.index,
+          _maxAge:
+            this.maxSMCPatternAge
+        };
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Detect institutional Order Blocks.
+   *
+   * An Order Block is treated as the final
+   * opposite-direction candle before a strong
+   * impulsive market move.
+   */
+  detectOrderBlock(candles, atr) {
+    const n = candles.length;
+
+    if (
+      n < 6 ||
+      !atr
+    ) {
+      return null;
+    }
+
+    const start =
+      Math.max(
+        1,
+        n - this.obLookback
+      );
+
+    // Scan from newest to oldest so the most
+    // recent valid Order Block is returned.
+    for (
+      let i = n - 2;
+      i >= start;
+      i--
+    ) {
+      const candle =
+        candles[i];
+
+      const next =
+        candles[i + 1];
+
+      // Bullish Order Block:
+      // A bearish candle followed immediately
+      // by a strong bullish impulse.
+      if (
+        candle.close <
+        candle.open
+      ) {
+        const impulseMove =
+          next.close -
+          next.open;
+
+        if (
+          impulseMove >
+          atr *
+            this.obImpulseATRMultiplier
+        ) {
+          const mitigated =
+            candles
+              .slice(i + 2)
+              .some(
+                future =>
+                  future.low <=
+                    candle.high &&
+                  future.low >=
+                    candle.low
+              );
+
+          return {
+            name:
+              'Bullish Order Block',
+            direction: 'BUY',
+            strength:
+              Math.min(
+                Math.round(
+                  (
+                    impulseMove /
+                    atr
+                  ) *
+                  20
+                ),
+                100
+              ),
+            confirmationScore:
+              mitigated ? 70 : 83,
+            reliability:
+              this.getReliability(
+                mitigated ? 70 : 83
+              ),
+            obHigh: candle.high,
+            obLow: candle.low,
+            mitigated,
+            _ageIndex: i,
+            _maxAge:
+              this.maxSMCPatternAge
+          };
+        }
+      }
+
+      // Bearish Order Block:
+      // A bullish candle followed immediately
+      // by a strong bearish impulse.
+      if (
+        candle.close >
+        candle.open
+      ) {
+        const impulseMove =
+          next.open -
+          next.close;
+
+        if (
+          impulseMove >
+          atr *
+            this.obImpulseATRMultiplier
+        ) {
+          const mitigated =
+            candles
+              .slice(i + 2)
+              .some(
+                future =>
+                  future.high >=
+                    candle.low &&
+                  future.high <=
+                    candle.high
+              );
+
+          return {
+            name:
+              'Bearish Order Block',
+            direction: 'SELL',
+            strength:
+              Math.min(
+                Math.round(
+                  (
+                    impulseMove /
+                    atr
+                  ) *
+                  20
+                ),
+                100
+              ),
+            confirmationScore:
+              mitigated ? 70 : 83,
+            reliability:
+              this.getReliability(
+                mitigated ? 70 : 83
+              ),
+            obHigh: candle.high,
+            obLow: candle.low,
+            mitigated,
+            _ageIndex: i,
+            _maxAge:
+              this.maxSMCPatternAge
+          };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  
+
   
