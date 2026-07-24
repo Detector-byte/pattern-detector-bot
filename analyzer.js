@@ -360,3 +360,225 @@ class PatternAnalyzer {
         lows
       )
     );
+   
+    // Engulfing Patterns
+    collect(
+      this.detectBullishEngulfing(candles)
+    );
+
+    collect(
+      this.detectBearishEngulfing(candles)
+    );
+
+    // --- Phase 4: Smart Money Concepts as standalone signals ---
+    collect(liquiditySweep);
+    collect(bos);
+    collect(choch);
+
+    collect(
+      this.detectOrderBlock(candles, atr)
+    );
+
+    collect(
+      this.detectFairValueGap(candles)
+    );
+
+    // Tag every detected pattern with its timeframe and regime.
+    detectedPatterns.forEach(pattern => {
+      pattern.timeframe = timeframe;
+      pattern.marketRegime = context.marketRegime;
+    });
+
+    // Remove duplicate patterns.
+    const uniquePatterns = detectedPatterns.filter(
+      (pattern, index, self) =>
+        index === self.findIndex(
+          item =>
+            item.name === pattern.name &&
+            item.timeframe === pattern.timeframe
+        )
+    );
+
+    // Rank by confirmation first, then pattern strength.
+    uniquePatterns.sort((a, b) => {
+      if (
+        b.confirmationScore !==
+        a.confirmationScore
+      ) {
+        return (
+          b.confirmationScore -
+          a.confirmationScore
+        );
+      }
+
+      return b.strength - a.strength;
+    });
+
+    // Apply timeframe and multi-factor weighting.
+    // Phase 4 Signal Score is the primary ranking metric.
+    const ranked =
+      this.calculateMultiTimeframeConfidence(
+        uniquePatterns
+      );
+
+    return ranked
+      .sort(
+        (a, b) =>
+          (b.signalScore - a.signalScore) ||
+          (b.weightedScore - a.weightedScore)
+      )
+      .slice(0, 5);
+  }
+
+  // =====================================================
+  // Step 3: Swing-based Double Top / Double Bottom
+  // =====================================================
+
+  detectDoubleTop(candles, highs) {
+    const swings = this.findSwingHighs(highs);
+
+    if (swings.length < 2) return null;
+
+    const peak1 = swings[swings.length - 2];
+    const peak2 = swings[swings.length - 1];
+
+    // Peaks should not be too close together.
+    if (
+      peak2.index - peak1.index <
+      this.minSwingDistance
+    ) {
+      return null;
+    }
+
+    // Peaks must be similar in price.
+    const similarity =
+      Math.abs(peak1.value - peak2.value) /
+      Math.max(peak1.value, peak2.value);
+
+    if (similarity > this.priceTolerance) {
+      return null;
+    }
+
+    // Neckline is the lowest low between both peaks.
+    const valley = this.lowest(
+      candles
+        .slice(
+          peak1.index,
+          peak2.index + 1
+        )
+        .map(candle => candle.low)
+    );
+
+    // Confirm a bearish breakout below the neckline.
+    if (
+      !this.isBreakoutConfirmed(
+        candles,
+        valley,
+        'SELL'
+      )
+    ) {
+      return null;
+    }
+
+    const strength =
+      ((peak1.value - valley) / valley) *
+      100;
+
+    let confirmationScore =
+      this.calculatePatternQuality(
+        strength,
+        88
+      );
+
+    // RSI divergence:
+    // Price creates a flat or higher second peak,
+    // while RSI creates a weaker second peak.
+    const rsi1 = this.calculateRSIAtIndex(
+      candles,
+      peak1.index,
+      this.rsiPeriod
+    );
+
+    const rsi2 = this.calculateRSIAtIndex(
+      candles,
+      peak2.index,
+      this.rsiPeriod
+    );
+
+    const rsiDivergence =
+      peak2.value >=
+        peak1.value *
+          (1 - this.priceTolerance) &&
+      rsi2 < rsi1;
+
+    if (rsiDivergence) {
+      confirmationScore += 4;
+    }
+
+    // Volume divergence:
+    // Volume should weaken into the second peak.
+    const vol1 = this.volumeAround(
+      candles,
+      peak1.index
+    );
+
+    const vol2 = this.volumeAround(
+      candles,
+      peak2.index
+    );
+
+    const volumeDivergence =
+      vol1 !== null && vol2 !== null
+        ? vol2 < vol1
+        : null;
+
+    if (volumeDivergence) {
+      confirmationScore += 3;
+    }
+
+    // Neckline retest adds further confirmation.
+    const necklineRetestConfirmed =
+      this.detectNecklineRetest(
+        candles,
+        peak1.index,
+        peak2.index,
+        valley
+      );
+
+    if (necklineRetestConfirmed) {
+      confirmationScore += 3;
+    }
+
+    confirmationScore = Math.max(
+      50,
+      Math.min(
+        95,
+        Math.round(confirmationScore)
+      )
+    );
+
+    return {
+      name: 'Double Top',
+      direction: 'SELL',
+      strength: Math.round(strength),
+      confirmationScore,
+      reliability:
+        this.getReliability(
+          confirmationScore
+        ),
+      rsiDivergence,
+      volumeDivergence,
+      necklineRetestConfirmed,
+
+      // Target equals neckline minus pattern height.
+      targetPrice: +(
+        valley -
+        (peak1.value - valley)
+      ).toFixed(5),
+
+      // Stop loss sits above the second peak.
+      stopLoss: +peak2.value.toFixed(5),
+      breakoutLevel: valley,
+      _ageIndex: peak2.index
+    };
+  }
