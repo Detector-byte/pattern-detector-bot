@@ -148,7 +148,7 @@ class PatternAnalyzer {
       if (ema20 > ema50) trend = "UP";
       else if (ema20 < ema50) trend = "DOWN";
     } else if (candles.length >= 20) {
-            const recent = candles.slice(-20);
+      const recent = candles.slice(-20);
       const change =
         ((recent[recent.length - 1].close - recent[0].close) /
           recent[0].close) *
