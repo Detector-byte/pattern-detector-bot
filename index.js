@@ -1,17 +1,22 @@
 #!/usr/bin/env node
 
 /**
- * PipSight Pro AI - Main Entry Point
+ * PipSight Pro AI - Phase 6 Institutional Orchestrator
  *
- * Real-time chart pattern recognition with:
- * - Phase 4 adaptive learning
- * - Confidence calibration
- * - Pattern weighting and blacklist
- * - Pattern evolution
- * - Signal lifecycle management
- * - Audit logging
- * - Health monitoring
- * - Signal archiving
+ * Backward-compatible entry point.
+ * Existing analyzer.js, learner.js and signals.js APIs remain unchanged.
+ *
+ * Phase 6 adds:
+ * - Institutional AI ranking
+ * - Dynamic final confidence
+ * - Portfolio exposure management
+ * - Correlation penalties
+ * - Advanced market-state enhancement
+ * - Automatic strategy prioritization
+ * - Explainable AI
+ * - Self-optimizer recommendations
+ * - Weekly performance reports
+ * - Dashboard-ready statistics
  */
 
 const fs = require("fs");
@@ -67,6 +72,30 @@ const HEALTH_FILE =
     "pattern-health.json"
   );
 
+const PHASE6_FILE =
+  path.join(
+    DATA_DIR,
+    "phase6-intelligence.json"
+  );
+
+const DASHBOARD_FILE =
+  path.join(
+    DATA_DIR,
+    "phase6-dashboard.json"
+  );
+
+const WEEKLY_REPORT_FILE =
+  path.join(
+    DATA_DIR,
+    "phase6-weekly-report.json"
+  );
+
+const OPTIMIZER_FILE =
+  path.join(
+    DATA_DIR,
+    "phase6-optimizer.json"
+  );
+
 // =====================================================
 // Bot Configuration
 // =====================================================
@@ -102,6 +131,8 @@ const MINIMUM_CANDLES = 20;
 
 const MINIMUM_CONFIDENCE = 70;
 
+const MINIMUM_AI_SCORE = 70;
+
 const MAX_MAIN_CLOSED_SIGNALS = 500;
 
 const MAX_ARCHIVE_SIGNALS = 10000;
@@ -110,8 +141,16 @@ const MAX_AUDIT_ENTRIES = 2000;
 
 const MAX_HEALTH_ENTRIES = 100;
 
+const MAX_OPEN_TRADES = 4;
+
+const MAX_PAIR_OPEN_TRADES = 2;
+
+const MAX_SAME_DIRECTION_PER_PAIR = 2;
+
+const MAX_JPY_EXPOSURE = 2;
+
 /**
- * Signal expiry by timeframe.
+ * Existing signal expiry behavior.
  */
 const EXPIRY_MAP = {
   "1m":
@@ -137,7 +176,7 @@ const EXPIRY_MAP = {
 };
 
 /**
- * Market-session quality multipliers.
+ * Existing market-session quality multipliers.
  */
 const SESSION_QUALITY_MULTIPLIER = {
   ASIAN: 0.9,
@@ -149,6 +188,31 @@ const SESSION_QUALITY_MULTIPLIER = {
   NEWYORK: 1.05,
 
   OFF_HOURS: 0.8
+};
+
+/**
+ * Extensible portfolio correlation groups.
+ *
+ * These values do not recalculate market correlation.
+ * They apply exposure penalties to related instruments.
+ */
+const CORRELATION_GROUPS = {
+  JPY: [
+    "GBPJPY",
+    "USDJPY",
+    "EURJPY",
+    "AUDJPY",
+    "CADJPY",
+    "CHFJPY",
+    "NZDJPY"
+  ],
+
+  GOLD_USD: [
+    "XAUUSD",
+    "XAGUSD",
+    "EURUSD",
+    "GBPUSD"
+  ]
 };
 
 // =====================================================
@@ -188,6 +252,23 @@ function toNumber(
     : fallback;
 }
 
+function clamp(
+  value,
+  minimum = 0,
+  maximum = 100
+) {
+  return Math.max(
+    minimum,
+    Math.min(
+      maximum,
+      toNumber(
+        value,
+        minimum
+      )
+    )
+  );
+}
+
 function round(
   value,
   digits = 2
@@ -204,6 +285,59 @@ function round(
   return Number(
     number.toFixed(digits)
   );
+}
+
+function average(values) {
+  const validValues =
+    values
+      .map(Number)
+      .filter(Number.isFinite);
+
+  if (
+    validValues.length === 0
+  ) {
+    return 0;
+  }
+
+  return (
+    validValues.reduce(
+      (
+        total,
+        value
+      ) =>
+        total + value,
+      0
+    ) /
+    validValues.length
+  );
+}
+
+function percent(
+  part,
+  total
+) {
+  return total > 0
+    ? (
+        part /
+        total
+      ) * 100
+    : 0;
+}
+
+function safeArray(value) {
+  return Array.isArray(value)
+    ? value
+    : [];
+}
+
+function objectOrEmpty(value) {
+  return (
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value)
+  )
+    ? value
+    : {};
 }
 
 function safeReadJson(
@@ -223,11 +357,9 @@ function safeReadJson(
         "utf8"
       );
 
-    if (!raw.trim()) {
-      return fallback;
-    }
-
-    return JSON.parse(raw);
+    return raw.trim()
+      ? JSON.parse(raw)
+      : fallback;
   } catch (error) {
     console.error(
       `Error reading ${path.basename(filePath)}:`,
@@ -279,7 +411,7 @@ function safeWriteJson(
         );
       }
     } catch (_) {
-      // Ignore temporary-file cleanup errors.
+      // Ignore cleanup errors.
     }
 
     return false;
@@ -287,7 +419,7 @@ function safeWriteJson(
 }
 
 // =====================================================
-// File Initialization and Loading
+// Default Data Structures
 // =====================================================
 
 function getDefaultSignalsData() {
@@ -382,6 +514,68 @@ function getDefaultHealthData() {
   };
 }
 
+function getDefaultPhase6Data() {
+  return {
+    version:
+      "6.0.0",
+
+    updatedAt:
+      nowIso(),
+
+    lastRun:
+      null,
+
+    publishedSignalId:
+      null,
+
+    rejectedCandidates: [],
+
+    portfolio: {},
+
+    marketStates: {},
+
+    strategyPriorities: {},
+
+    optimizerRecommendations: []
+  };
+}
+
+function getDefaultDashboardData() {
+  return {
+    version:
+      "6.0.0",
+
+    updatedAt:
+      nowIso(),
+
+    distributions: {},
+
+    performance: {},
+
+    health: {}
+  };
+}
+
+function getDefaultWeeklyReport() {
+  return {
+    version:
+      "6.0.0",
+
+    generatedAt:
+      null,
+
+    period: {},
+
+    metrics: {},
+
+    recommendations: []
+  };
+}
+
+// =====================================================
+// File Initialization and Loading
+// =====================================================
+
 function initializeFiles() {
   if (
     !fs.existsSync(DATA_DIR)
@@ -394,7 +588,7 @@ function initializeFiles() {
     );
   }
 
-  const initialFiles = [
+  const files = [
     [
       SIGNALS_FILE,
       getDefaultSignalsData()
@@ -423,6 +617,34 @@ function initializeFiles() {
     [
       HEALTH_FILE,
       getDefaultHealthData()
+    ],
+
+    [
+      PHASE6_FILE,
+      getDefaultPhase6Data()
+    ],
+
+    [
+      DASHBOARD_FILE,
+      getDefaultDashboardData()
+    ],
+
+    [
+      WEEKLY_REPORT_FILE,
+      getDefaultWeeklyReport()
+    ],
+
+    [
+      OPTIMIZER_FILE,
+      {
+        version:
+          "6.0.0",
+
+        updatedAt:
+          nowIso(),
+
+        recommendations: []
+      }
     ]
   ];
 
@@ -430,7 +652,7 @@ function initializeFiles() {
     const [
       filePath,
       defaultData
-    ] of initialFiles
+    ] of files
   ) {
     if (
       !fs.existsSync(filePath)
@@ -462,17 +684,21 @@ function loadData() {
       getDefaultLearningData()
     );
 
+  const phase6 =
+    safeReadJson(
+      PHASE6_FILE,
+      getDefaultPhase6Data()
+    );
+
   return {
     signals: {
       ...getDefaultSignalsData(),
       ...signals,
 
       signals:
-        Array.isArray(
+        safeArray(
           signals.signals
         )
-          ? signals.signals
-          : []
     },
 
     confidence: {
@@ -480,11 +706,9 @@ function loadData() {
       ...confidence,
 
       patterns:
-        confidence.patterns &&
-        typeof confidence.patterns ===
-          "object"
-          ? confidence.patterns
-          : {}
+        objectOrEmpty(
+          confidence.patterns
+        )
     },
 
     learning: {
@@ -492,11 +716,14 @@ function loadData() {
       ...learning,
 
       history:
-        Array.isArray(
+        safeArray(
           learning.history
         )
-          ? learning.history
-          : []
+    },
+
+    phase6: {
+      ...getDefaultPhase6Data(),
+      ...phase6
     }
   };
 }
@@ -515,59 +742,48 @@ function logAudit(entry) {
 }
 
 function saveAuditLog() {
-  try {
-    if (
-      auditLog.length === 0
-    ) {
-      return;
-    }
-
-    const auditData =
-      safeReadJson(
-        AUDIT_FILE,
-        getDefaultAuditData()
-      );
-
-    const existingEntries =
-      Array.isArray(
-        auditData.entries
-      )
-        ? auditData.entries
-        : [];
-
-    const entries = [
-      ...existingEntries,
-      ...auditLog
-    ].slice(
-      -MAX_AUDIT_ENTRIES
-    );
-
-    safeWriteJson(
-      AUDIT_FILE,
-      {
-        ...auditData,
-
-        entries,
-
-        updatedAt:
-          nowIso(),
-
-        totalEntries:
-          entries.length
-      }
-    );
-
-    console.log(
-      `📝 Audit log: ${auditLog.length} entries recorded`
-    );
-
-    auditLog = [];
-  } catch (error) {
-    console.error(
-      "Error saving audit log:",
-      error.message
-    );
+  if (
+    auditLog.length === 0
+  ) {
+    return;
   }
+
+  const auditData =
+    safeReadJson(
+      AUDIT_FILE,
+      getDefaultAuditData()
+    );
+
+  const entries = [
+    ...safeArray(
+      auditData.entries
+    ),
+
+    ...auditLog
+  ].slice(
+    -MAX_AUDIT_ENTRIES
+  );
+
+  safeWriteJson(
+    AUDIT_FILE,
+    {
+      ...auditData,
+
+      entries,
+
+      updatedAt:
+        nowIso(),
+
+      totalEntries:
+        entries.length
+    }
+  );
+
+  console.log(
+    `📝 Audit log: ${auditLog.length} entries recorded`
+  );
+
+  auditLog = [];
 }
 
 // =====================================================
@@ -575,59 +791,45 @@ function saveAuditLog() {
 // =====================================================
 
 function runHealthCheck(report) {
-  try {
-    const healthData =
-      safeReadJson(
-        HEALTH_FILE,
-        getDefaultHealthData()
-      );
+  const healthData =
+    safeReadJson(
+      HEALTH_FILE,
+      getDefaultHealthData()
+    );
 
-    const history =
-      Array.isArray(
-        healthData.history
-      )
-        ? healthData.history
-        : [];
+  const history = [
+    ...safeArray(
+      healthData.history
+    ),
 
-    const entry = {
+    {
       timestamp:
         nowIso(),
 
       ...report
-    };
+    }
+  ].slice(
+    -MAX_HEALTH_ENTRIES
+  );
 
-    const updatedHistory = [
-      ...history,
-      entry
-    ].slice(
-      -MAX_HEALTH_ENTRIES
-    );
+  safeWriteJson(
+    HEALTH_FILE,
+    {
+      ...healthData,
 
-    safeWriteJson(
-      HEALTH_FILE,
-      {
-        ...healthData,
+      history,
 
-        history:
-          updatedHistory,
+      updatedAt:
+        nowIso(),
 
-        updatedAt:
-          nowIso(),
+      lastStatus:
+        report.status
+    }
+  );
 
-        lastStatus:
-          report.status
-      }
-    );
-
-    console.log(
-      `🩺 Health check: ${report.status}`
-    );
-  } catch (error) {
-    console.error(
-      "Error writing health check:",
-      error.message
-    );
-  }
+  console.log(
+    `🩺 Health check: ${report.status}`
+  );
 }
 
 // =====================================================
@@ -641,15 +843,13 @@ async function fetchMarketData(
     "📊 Fetching candle data..."
   );
 
-  let candles = null;
-
   for (
     let attempt = 1;
     attempt <= 3;
     attempt++
   ) {
     try {
-      candles =
+      const candles =
         await analyzer
           .fetchCandles();
 
@@ -691,7 +891,7 @@ async function fetchMarketData(
 }
 
 // =====================================================
-// Session and Market Filters
+// Existing Session and Volatility Filters
 // =====================================================
 
 function getMarketSession() {
@@ -700,28 +900,24 @@ function getMarketSession() {
       .getUTCHours();
 
   if (
-    hour >= 0 &&
     hour < 7
   ) {
     return "ASIAN";
   }
 
   if (
-    hour >= 7 &&
     hour < 12
   ) {
     return "LONDON";
   }
 
   if (
-    hour >= 12 &&
     hour < 16
   ) {
     return "LONDON_NY_OVERLAP";
   }
 
   if (
-    hour >= 16 &&
     hour < 21
   ) {
     return "NEWYORK";
@@ -731,13 +927,11 @@ function getMarketSession() {
 }
 
 function passesSpreadVolatilityFilter(
-  timeframeCandles
+  candles
 ) {
   if (
-    !Array.isArray(
-      timeframeCandles
-    ) ||
-    timeframeCandles.length < 15
+    !Array.isArray(candles) ||
+    candles.length < 15
   ) {
     return {
       pass: true
@@ -745,13 +939,13 @@ function passesSpreadVolatilityFilter(
   }
 
   const recent =
-    timeframeCandles
+    candles
       .slice(-15, -1)
       .filter(Boolean);
 
   const latest =
-    timeframeCandles[
-      timeframeCandles.length - 1
+    candles[
+      candles.length - 1
     ];
 
   if (
@@ -764,43 +958,27 @@ function passesSpreadVolatilityFilter(
   }
 
   const averageRange =
-    recent.reduce(
-      (
-        total,
-        candle
-      ) => {
-        const high =
-          toNumber(
-            candle.high,
-            0
-          );
-
-        const low =
-          toNumber(
-            candle.low,
-            0
-          );
-
-        return (
-          total +
+    average(
+      recent.map(
+        candle =>
           Math.abs(
-            high - low
+            toNumber(
+              candle.high
+            ) -
+            toNumber(
+              candle.low
+            )
           )
-        );
-      },
-      0
-    ) /
-    recent.length;
+      )
+    );
 
   const currentRange =
     Math.abs(
       toNumber(
-        latest.high,
-        0
+        latest.high
       ) -
       toNumber(
-        latest.low,
-        0
+        latest.low
       )
     );
 
@@ -813,7 +991,7 @@ function passesSpreadVolatilityFilter(
       pass: false,
 
       reason:
-        `extreme volatility: current range ${currentRange.toFixed(5)}, average ${averageRange.toFixed(5)}`
+        `extreme volatility: current ${currentRange.toFixed(5)}, average ${averageRange.toFixed(5)}`
     };
   }
 
@@ -822,52 +1000,48 @@ function passesSpreadVolatilityFilter(
       undefined
   ) {
     const averageSpread =
-      recent.reduce(
-        (
-          total,
-          candle
-        ) =>
-          total +
-          toNumber(
-            candle.spread,
-            0
-          ),
-        0
-      ) /
-      recent.length;
+      average(
+        recent.map(
+          candle =>
+            toNumber(
+              candle.spread
+            )
+        )
+      );
 
-    const latestSpread =
+    const spread =
       toNumber(
-        latest.spread,
-        0
+        latest.spread
       );
 
     if (
       averageSpread > 0 &&
-      latestSpread >
+      spread >
         averageSpread * 3
     ) {
       return {
         pass: false,
 
         reason:
-          `abnormal spread: current ${latestSpread}, average ${averageSpread.toFixed(5)}`
+          `abnormal spread: current ${spread}, average ${averageSpread.toFixed(5)}`
       };
     }
   }
 
   return {
-    pass: true
+    pass: true,
+
+    averageRange,
+
+    currentRange
   };
 }
 
 // =====================================================
-// Signal Identity and Duplicate Handling
+// Existing Signal Compatibility
 // =====================================================
 
-function getSignalTimestamp(
-  signal
-) {
+function getSignalTimestamp(signal) {
   return (
     signal?.timestamp ||
     signal?.createdAt ||
@@ -913,13 +1087,6 @@ function isSignalInCooldown(
           )
         ).getTime();
 
-      if (
-        Number.isNaN(signalTime) ||
-        Number.isNaN(existingTime)
-      ) {
-        return false;
-      }
-
       const elapsed =
         signalTime -
         existingTime;
@@ -943,7 +1110,7 @@ function buildSignalId(
   timeframe,
   patternName
 ) {
-  const dateString =
+  const date =
     nowIso()
       .slice(0, 10)
       .replace(
@@ -951,7 +1118,7 @@ function buildSignalId(
         ""
       );
 
-  const patternKey =
+  const pattern =
     String(
       patternName ||
       "UNKNOWN"
@@ -969,8 +1136,8 @@ function buildSignalId(
   return [
     pair,
     timeframe,
-    patternKey,
-    dateString
+    pattern,
+    date
   ].join("_");
 }
 
@@ -980,16 +1147,10 @@ function findActiveDuplicate(
   patternName,
   existingSignals
 ) {
-  if (
-    !Array.isArray(
-      existingSignals
-    )
-  ) {
-    return null;
-  }
-
   return (
-    existingSignals.find(
+    safeArray(
+      existingSignals
+    ).find(
       signal =>
         signal &&
         signal.pair === pair &&
@@ -1004,10 +1165,6 @@ function findActiveDuplicate(
     null
   );
 }
-
-// =====================================================
-// Signal Compatibility Helpers
-// =====================================================
 
 function getPrimaryTakeProfit(
   signal
@@ -1073,61 +1230,1435 @@ function applyLegacySignalAliases(
   };
 }
 
-// =====================================================
-// Pattern Scoring
-// =====================================================
-
 function getHistoricalWinRate(
   learner,
-  signalContext
+  context
 ) {
-  if (
-    typeof learner
-      .getPatternWinRate ===
-      "function"
-  ) {
-    const result =
-      learner.getPatternWinRate(
-        signalContext
-      );
+  try {
+    if (
+      typeof learner
+        .getPatternWinRate ===
+        "function"
+    ) {
+      const result =
+        learner
+          .getPatternWinRate(
+            context
+          );
+
+      if (
+        Number.isFinite(
+          Number(result)
+        )
+      ) {
+        return Number(result);
+      }
+    }
 
     if (
-      Number.isFinite(
-        Number(result)
-      )
+      typeof learner
+        .getPatternQuality ===
+        "function"
     ) {
-      return Number(result);
+      const quality =
+        learner
+          .getPatternQuality(
+            context.pattern,
+            context.pair,
+            context.timeframe
+          );
+
+      const accuracy =
+        Number(
+          quality?.accuracy ??
+          quality?.winRate
+        );
+
+      if (
+        Number.isFinite(
+          accuracy
+        )
+      ) {
+        return accuracy;
+      }
     }
-  }
-
-  if (
-    typeof learner
-      .getPatternQuality ===
-      "function"
-  ) {
-    const quality =
-      learner.getPatternQuality(
-        signalContext.pattern,
-        signalContext.pair,
-        signalContext.timeframe
-      );
-
-    const accuracy =
-      Number(
-        quality?.accuracy
-      );
-
-    if (
-      Number.isFinite(
-        accuracy
-      )
-    ) {
-      return accuracy;
-    }
+  } catch (_) {
+    // Use neutral fallback.
   }
 
   return 50;
 }
+
+// =====================================================
+// Phase 6 - Advanced Market State Engine
+// =====================================================
+
+function detectAdvancedMarketState(
+  candles,
+  baseRegime = "UNKNOWN"
+) {
+  const list =
+    safeArray(candles)
+      .slice(-30);
+
+  if (
+    list.length < 10
+  ) {
+    return {
+      state:
+        baseRegime ||
+        "UNKNOWN",
+
+      confidence: 40,
+
+      features: {}
+    };
+  }
+
+  const ranges =
+    list.map(
+      candle =>
+        Math.abs(
+          toNumber(
+            candle.high
+          ) -
+          toNumber(
+            candle.low
+          )
+        )
+    );
+
+  const bodies =
+    list.map(
+      candle =>
+        Math.abs(
+          toNumber(
+            candle.close
+          ) -
+          toNumber(
+            candle.open
+          )
+        )
+    );
+
+  const closes =
+    list.map(
+      candle =>
+        toNumber(
+          candle.close
+        )
+    );
+
+  const volumes =
+    list.map(
+      candle =>
+        toNumber(
+          candle.volume,
+          0
+        )
+    );
+
+  const recentRange =
+    average(
+      ranges.slice(-5)
+    );
+
+  const priorRange =
+    average(
+      ranges.slice(
+        -15,
+        -5
+      )
+    );
+
+  const averageRange =
+    average(ranges);
+
+  const averageBody =
+    average(bodies);
+
+  const directionalMove =
+    closes.length > 1 &&
+    closes[0] !== 0
+      ? (
+          closes[
+            closes.length - 1
+          ] -
+          closes[0]
+        ) /
+        closes[0]
+      : 0;
+
+  const rangeRatio =
+    priorRange > 0
+      ? recentRange /
+        priorRange
+      : 1;
+
+  const bodyRatio =
+    averageRange > 0
+      ? averageBody /
+        averageRange
+      : 0;
+
+  const recentVolume =
+    average(
+      volumes.slice(-5)
+    );
+
+  const priorVolume =
+    average(
+      volumes.slice(
+        -15,
+        -5
+      )
+    );
+
+  const volumeRatio =
+    priorVolume > 0
+      ? recentVolume /
+        priorVolume
+      : 1;
+
+  const latest =
+    list[
+      list.length - 1
+    ];
+
+  const priorHigh =
+    Math.max(
+      ...list
+        .slice(0, -1)
+        .map(
+          candle =>
+            toNumber(
+              candle.high
+            )
+        )
+    );
+
+  const priorLow =
+    Math.min(
+      ...list
+        .slice(0, -1)
+        .map(
+          candle =>
+            toNumber(
+              candle.low
+            )
+        )
+    );
+
+  const breakout =
+    toNumber(
+      latest.close
+    ) > priorHigh ||
+    toNumber(
+      latest.close
+    ) < priorLow;
+
+  const latestRange =
+    Math.abs(
+      toNumber(
+        latest.high
+      ) -
+      toNumber(
+        latest.low
+      )
+    );
+
+  const wick =
+    Math.max(
+      0,
+      latestRange -
+      Math.abs(
+        toNumber(
+          latest.close
+        ) -
+        toNumber(
+          latest.open
+        )
+      )
+    );
+
+  const wickRatio =
+    latestRange > 0
+      ? wick /
+        latestRange
+      : 0;
+
+  let state =
+    "RANGING";
+
+  let confidence = 60;
+
+  if (
+    breakout &&
+    rangeRatio > 1.15
+  ) {
+    state =
+      "BREAKOUT";
+
+    confidence = 85;
+  } else if (
+    rangeRatio < 0.65
+  ) {
+    state =
+      "COMPRESSION";
+
+    confidence = 80;
+  } else if (
+    rangeRatio > 1.6
+  ) {
+    state =
+      "EXPANSION";
+
+    confidence = 82;
+  } else if (
+    Math.abs(
+      directionalMove
+    ) > 0.015 &&
+    bodyRatio > 0.45
+  ) {
+    state =
+      "TRENDING";
+
+    confidence = 80;
+  } else if (
+    rangeRatio > 2.2 ||
+    String(
+      baseRegime
+    ).includes(
+      "VOLATILE"
+    )
+  ) {
+    state =
+      "HIGH_VOLATILITY";
+
+    confidence = 85;
+  } else if (
+    volumeRatio < 0.5
+  ) {
+    state =
+      "LOW_LIQUIDITY";
+
+    confidence = 75;
+  } else if (
+    wickRatio > 0.7 &&
+    rangeRatio > 1.2
+  ) {
+    state =
+      "MANIPULATION";
+
+    confidence = 72;
+  } else if (
+    directionalMove >
+      0.004 &&
+    volumeRatio > 1.15 &&
+    bodyRatio < 0.45
+  ) {
+    state =
+      "ACCUMULATION";
+
+    confidence = 68;
+  } else if (
+    directionalMove <
+      -0.004 &&
+    volumeRatio > 1.15 &&
+    bodyRatio < 0.45
+  ) {
+    state =
+      "DISTRIBUTION";
+
+    confidence = 68;
+  } else if (
+    rangeRatio > 1.8 &&
+    volumeRatio > 2.2
+  ) {
+    state =
+      "NEWS_DRIVEN";
+
+    confidence = 70;
+  }
+
+  return {
+    state,
+
+    confidence,
+
+    features: {
+      baseRegime,
+
+      directionalMove:
+        round(
+          directionalMove,
+          5
+        ),
+
+      rangeRatio:
+        round(
+          rangeRatio,
+          2
+        ),
+
+      bodyRatio:
+        round(
+          bodyRatio,
+          2
+        ),
+
+      volumeRatio:
+        round(
+          volumeRatio,
+          2
+        ),
+
+      breakout
+    }
+  };
+}
+
+// =====================================================
+// Phase 6 - Strategy Manager
+// =====================================================
+
+function chooseStrategyPriority(
+  timeframe,
+  marketState,
+  volatilityRatio = 1
+) {
+  const state =
+    marketState?.state ||
+    marketState ||
+    "UNKNOWN";
+
+  const scores = {
+    SCALPING: 50,
+
+    INTRADAY: 50,
+
+    SWING: 50
+  };
+
+  if (
+    [
+      "1m",
+      "5m",
+      "15m"
+    ].includes(
+      timeframe
+    )
+  ) {
+    scores.SCALPING += 20;
+  }
+
+  if (
+    [
+      "15m",
+      "30m",
+      "1H"
+    ].includes(
+      timeframe
+    )
+  ) {
+    scores.INTRADAY += 20;
+  }
+
+  if (
+    [
+      "1H",
+      "4H",
+      "1D"
+    ].includes(
+      timeframe
+    )
+  ) {
+    scores.SWING += 20;
+  }
+
+  if (
+    [
+      "BREAKOUT",
+      "EXPANSION",
+      "HIGH_VOLATILITY",
+      "NEWS_DRIVEN"
+    ].includes(state)
+  ) {
+    scores.SCALPING += 10;
+
+    scores.INTRADAY += 15;
+
+    scores.SWING -= 10;
+  }
+
+  if (
+    [
+      "TRENDING",
+      "ACCUMULATION",
+      "DISTRIBUTION"
+    ].includes(state)
+  ) {
+    scores.SWING += 15;
+
+    scores.INTRADAY += 10;
+  }
+
+  if (
+    [
+      "RANGING",
+      "COMPRESSION"
+    ].includes(state)
+  ) {
+    scores.SCALPING += 10;
+
+    scores.SWING -= 5;
+  }
+
+  if (
+    state ===
+    "LOW_LIQUIDITY"
+  ) {
+    scores.SCALPING -= 20;
+
+    scores.INTRADAY -= 10;
+  }
+
+  if (
+    volatilityRatio > 1.5
+  ) {
+    scores.SWING -= 10;
+  }
+
+  const ranking =
+    Object.entries(scores)
+      .sort(
+        (
+          first,
+          second
+        ) =>
+          second[1] -
+          first[1]
+      );
+
+  return {
+    primary:
+      ranking[0][0],
+
+    scores:
+      Object.fromEntries(
+        ranking.map(
+          (
+            [
+              name,
+              score
+            ]
+          ) => [
+            name,
+            clamp(score)
+          ]
+        )
+      )
+  };
+}
+
+// =====================================================
+// Phase 6 - Dynamic Confidence Engine
+// =====================================================
+
+function calculateFinalAIConfidence(
+  candidate
+) {
+  const signal =
+    candidate.signal ||
+    {};
+
+  const components = {
+    adaptiveConfidence:
+      toNumber(
+        signal.adaptiveConfidence ??
+        candidate.confidence,
+        50
+      ),
+
+    learningConfidence:
+      toNumber(
+        candidate.learningScore ??
+        signal.tradeDecision
+          ?.confidence,
+        50
+      ),
+
+    historicalAccuracy:
+      toNumber(
+        candidate.historicalWinRate,
+        50
+      ),
+
+    marketRegime:
+      toNumber(
+        candidate.marketState
+          ?.confidence,
+        50
+      ),
+
+    sessionQuality:
+      clamp(
+        (
+          SESSION_QUALITY_MULTIPLIER[
+            candidate.session
+          ] ||
+          1
+        ) * 75
+      ),
+
+    riskReward:
+      clamp(
+        (
+          toNumber(
+            candidate.riskReward
+          ) /
+          3
+        ) * 100
+      ),
+
+    patternWeight:
+      clamp(
+        toNumber(
+          signal.patternWeight,
+          1
+        ) * 50
+      ),
+
+    trendStrength:
+      clamp(
+        toNumber(
+          candidate
+            .trendAlignmentScore,
+          50
+        )
+      ),
+
+    freshness:
+      clamp(
+        toNumber(
+          candidate.freshnessScore,
+          100
+        )
+      ),
+
+    volatility:
+      clamp(
+        toNumber(
+          candidate.volatilityScore,
+          65
+        )
+      )
+  };
+
+  const weights = {
+    adaptiveConfidence: 0.25,
+
+    learningConfidence: 0.12,
+
+    historicalAccuracy: 0.12,
+
+    marketRegime: 0.1,
+
+    sessionQuality: 0.08,
+
+    riskReward: 0.1,
+
+    patternWeight: 0.08,
+
+    trendStrength: 0.08,
+
+    freshness: 0.04,
+
+    volatility: 0.03
+  };
+
+  const finalConfidence =
+    clamp(
+      Object.keys(weights)
+        .reduce(
+          (
+            total,
+            key
+          ) =>
+            total +
+            components[key] *
+            weights[key],
+          0
+        )
+    );
+
+  return {
+    finalConfidence:
+      round(
+        finalConfidence,
+        1
+      ),
+
+    components
+  };
+}
+
+// =====================================================
+// Phase 6 - Institutional AI Ranking
+// =====================================================
+
+function calculateInstitutionalAIScore(
+  candidate
+) {
+  const signal =
+    candidate.signal ||
+    {};
+
+  const values = {
+    patternStrength:
+      clamp(
+        toNumber(
+          signal.strength ??
+          candidate.pattern
+            ?.strength,
+          0
+        )
+      ),
+
+    confirmationScore:
+      clamp(
+        toNumber(
+          signal.confirmationScore ??
+          candidate.pattern
+            ?.confirmationScore,
+          0
+        )
+      ),
+
+    adaptiveConfidence:
+      clamp(
+        toNumber(
+          signal.adaptiveConfidence ??
+          candidate.confidence,
+          0
+        )
+      ),
+
+    historicalAccuracy:
+      clamp(
+        toNumber(
+          candidate
+            .historicalWinRate,
+          50
+        )
+      ),
+
+    riskReward:
+      clamp(
+        (
+          toNumber(
+            candidate.riskReward
+          ) /
+          3
+        ) * 100
+      ),
+
+    marketRegime:
+      clamp(
+        toNumber(
+          candidate.marketState
+            ?.confidence,
+          50
+        )
+      ),
+
+    sessionQuality:
+      clamp(
+        (
+          SESSION_QUALITY_MULTIPLIER[
+            candidate.session
+          ] ||
+          1
+        ) * 75
+      ),
+
+    patternWeight:
+      clamp(
+        toNumber(
+          signal.patternWeight,
+          1
+        ) * 50
+      ),
+
+    trendAlignment:
+      clamp(
+        toNumber(
+          candidate
+            .trendAlignmentScore,
+          50
+        )
+      ),
+
+    learningScore:
+      clamp(
+        toNumber(
+          candidate.learningScore,
+          50
+        )
+      ),
+
+    patternEvolution:
+      clamp(
+        toNumber(
+          candidate.evolutionScore,
+          50
+        )
+      )
+  };
+
+  const weights = {
+    patternStrength: 0.1,
+
+    confirmationScore: 0.12,
+
+    adaptiveConfidence: 0.16,
+
+    historicalAccuracy: 0.11,
+
+    riskReward: 0.1,
+
+    marketRegime: 0.08,
+
+    sessionQuality: 0.06,
+
+    patternWeight: 0.08,
+
+    trendAlignment: 0.08,
+
+    learningScore: 0.06,
+
+    patternEvolution: 0.05
+  };
+
+  const aiScore =
+    clamp(
+      Object.keys(weights)
+        .reduce(
+          (
+            total,
+            key
+          ) =>
+            total +
+            values[key] *
+            weights[key],
+          0
+        )
+    );
+
+  const qualityGrade =
+    aiScore >= 90
+      ? "A+"
+      : aiScore >= 82
+        ? "A"
+        : aiScore >= 72
+          ? "B"
+          : "C";
+
+  return {
+    aiScore:
+      round(
+        aiScore,
+        1
+      ),
+
+    qualityGrade,
+
+    components:
+      values
+  };
+}
+
+// =====================================================
+// Phase 6 - Correlation and Portfolio Manager
+// =====================================================
+
+function getCorrelationPenalty(
+  signal,
+  openSignals
+) {
+  const pair =
+    String(
+      signal.pair ||
+      ""
+    ).toUpperCase();
+
+  const direction =
+    signal.direction;
+
+  let penalty = 0;
+
+  const reasons = [];
+
+  for (
+    const [
+      group,
+      pairs
+    ] of Object.entries(
+      CORRELATION_GROUPS
+    )
+  ) {
+    if (
+      !pairs.includes(pair)
+    ) {
+      continue;
+    }
+
+    const related =
+      safeArray(openSignals)
+        .filter(
+          openSignal =>
+            OPEN_STATUSES.includes(
+              openSignal.status
+            ) &&
+            pairs.includes(
+              String(
+                openSignal.pair ||
+                ""
+              ).toUpperCase()
+            )
+        );
+
+    const sameDirection =
+      related.filter(
+        openSignal =>
+          openSignal.direction ===
+          direction
+      ).length;
+
+    const oppositeDirection =
+      related.filter(
+        openSignal =>
+          openSignal.direction &&
+          openSignal.direction !==
+            direction
+      ).length;
+
+    if (
+      sameDirection > 0
+    ) {
+      const groupPenalty =
+        Math.min(
+          18,
+          sameDirection * 6
+        );
+
+      penalty +=
+        groupPenalty;
+
+      reasons.push(
+        `${group} same-direction exposure -${groupPenalty}`
+      );
+    }
+
+    if (
+      oppositeDirection > 0
+    ) {
+      const conflictPenalty =
+        Math.min(
+          10,
+          oppositeDirection * 4
+        );
+
+      penalty +=
+        conflictPenalty;
+
+      reasons.push(
+        `${group} conflicting exposure -${conflictPenalty}`
+      );
+    }
+  }
+
+  return {
+    penalty:
+      Math.min(
+        25,
+        penalty
+      ),
+
+    reasons
+  };
+}
+
+function evaluatePortfolioRisk(
+  signal,
+  openSignals
+) {
+  const open =
+    safeArray(openSignals)
+      .filter(
+        openSignal =>
+          OPEN_STATUSES.includes(
+            openSignal.status
+          )
+      );
+
+  const samePair =
+    open.filter(
+      openSignal =>
+        openSignal.pair ===
+        signal.pair
+    );
+
+  const samePairDirection =
+    samePair.filter(
+      openSignal =>
+        openSignal.direction ===
+        signal.direction
+    );
+
+  const jpyExposure =
+    open.filter(
+      openSignal =>
+        String(
+          openSignal.pair ||
+          ""
+        ).includes(
+          "JPY"
+        )
+    );
+
+  const reasons = [];
+
+  let hardReject = false;
+
+  if (
+    open.length >=
+    MAX_OPEN_TRADES
+  ) {
+    hardReject = true;
+
+    reasons.push(
+      `maximum open trades reached (${MAX_OPEN_TRADES})`
+    );
+  }
+
+  if (
+    samePair.length >=
+    MAX_PAIR_OPEN_TRADES
+  ) {
+    hardReject = true;
+
+    reasons.push(
+      `maximum ${signal.pair} exposure reached`
+    );
+  }
+
+  if (
+    samePairDirection.length >=
+    MAX_SAME_DIRECTION_PER_PAIR
+  ) {
+    hardReject = true;
+
+    reasons.push(
+      `too many ${signal.direction} trades on ${signal.pair}`
+    );
+  }
+
+  if (
+    String(
+      signal.pair ||
+      ""
+    ).includes(
+      "JPY"
+    ) &&
+    jpyExposure.length >=
+      MAX_JPY_EXPOSURE
+  ) {
+    reasons.push(
+      "JPY portfolio exposure is elevated"
+    );
+  }
+
+  const correlation =
+    getCorrelationPenalty(
+      signal,
+      open
+    );
+
+  return {
+    approved:
+      !hardReject,
+
+    hardReject,
+
+    reasons: [
+      ...reasons,
+      ...correlation.reasons
+    ],
+
+    correlationPenalty:
+      correlation.penalty,
+
+    exposure: {
+      totalOpen:
+        open.length,
+
+      samePair:
+        samePair.length,
+
+      samePairDirection:
+        samePairDirection.length,
+
+      jpy:
+        jpyExposure.length
+    }
+  };
+}
+
+// =====================================================
+// Phase 6 - Explainable AI
+// =====================================================
+
+function generateExplanation(
+  candidate,
+  rejectedCandidates = []
+) {
+  const signal =
+    candidate.signal;
+
+  const directionReason =
+    signal.direction === "BUY"
+      ? "buyers gained control with bullish pattern and confirmation alignment"
+      : "sellers gained control with bearish pattern and confirmation alignment";
+
+  const rejectedPatterns =
+    rejectedCandidates
+      .slice(0, 5)
+      .map(
+        rejected => ({
+          pattern:
+            rejected.pattern?.name ||
+            rejected.signal?.pattern,
+
+          reason:
+            rejected.rejectionReason ||
+            `lower AI score (${round(rejected.aiScore, 1)})`
+        })
+      );
+
+  return {
+    summary:
+      `${signal.direction} selected because ${signal.pattern} produced the strongest institutional score for ${signal.pair} ${signal.timeframe}.`,
+
+    whyDirection:
+      directionReason,
+
+    whyConfidence:
+      `Final AI Confidence ${candidate.finalAIConfidence}% combines existing adaptive confidence with learning, historical accuracy, regime quality, session quality, risk/reward, pattern weight, trend alignment, freshness and volatility.`,
+
+    whyStopLoss:
+      `Stop loss ${signal.stopLoss} comes from the existing signal engine's market-structure and invalidation logic.`,
+
+    whyTakeProfit:
+      `Primary take profit ${getPrimaryTakeProfit(signal)} preserves the existing risk/reward calculation. Phase 6 validates its institutional quality without replacing it.`,
+
+    whyPatternSelected:
+      `${signal.pattern} achieved AI Score ${candidate.aiScore}/100 with Quality Grade ${candidate.qualityGrade} after portfolio and correlation review.`,
+
+    whyRiskRewardAccepted:
+      `Risk/reward ${round(candidate.riskReward, 2)} passed the existing signal engine and the institutional ranking threshold.`,
+
+    marketState:
+      candidate.marketState,
+
+    strategy:
+      candidate.strategyPriority,
+
+    rejectedPatterns
+  };
+}
+
+// =====================================================
+// Phase 6 - Learning and Evolution Hooks
+// =====================================================
+
+function getLearningScore(
+  learner,
+  candidate
+) {
+  try {
+    const quality =
+      learner
+        .getPatternQuality?.(
+          candidate.pattern.name,
+          candidate.signal.pair,
+          candidate.signal.timeframe
+        ) ||
+      {};
+
+    return clamp(
+      toNumber(
+        quality.qualityScore ??
+        quality.score ??
+        quality.accuracy,
+        50
+      )
+    );
+  } catch (_) {
+    return 50;
+  }
+}
+
+function getEvolutionScore(
+  learner,
+  patternName
+) {
+  try {
+    const recommendations =
+      learner
+        .getPatternEvolutionRecommendations?.() ||
+      {};
+
+    const patternData =
+      recommendations[
+        patternName
+      ] ||
+      recommendations
+        .patterns?.[
+          patternName
+        ] ||
+      {};
+
+    if (
+      Number.isFinite(
+        Number(
+          patternData.score
+        )
+      )
+    ) {
+      return clamp(
+        patternData.score
+      );
+    }
+
+    if (
+      Number.isFinite(
+        Number(
+          patternData
+            .confidenceAdjustment
+        )
+      )
+    ) {
+      return clamp(
+        50 +
+        Number(
+          patternData
+            .confidenceAdjustment
+        ) * 5
+      );
+    }
+  } catch (_) {
+    // Return neutral score.
+  }
+
+  return 50;
+}
+
+function enrichCandidatePhase6(
+  candidate,
+  learner,
+  candles,
+  higherTrend
+) {
+  const timeframeCandles =
+    candles?.[
+      candidate.signal.pair
+    ]?.[
+      candidate.signal.timeframe
+    ] ||
+    [];
+
+  candidate.marketState =
+    detectAdvancedMarketState(
+      timeframeCandles,
+      candidate.marketRegime
+    );
+
+  candidate.strategyPriority =
+    chooseStrategyPriority(
+      candidate.signal.timeframe,
+      candidate.marketState,
+      candidate.marketState
+        .features?.rangeRatio
+    );
+
+  candidate.trendAlignmentScore =
+    !higherTrend ||
+    higherTrend === "SIDEWAYS" ||
+    higherTrend === "NEUTRAL"
+      ? 65
+      : higherTrend ===
+          candidate.signal.direction
+        ? 95
+        : 20;
+
+  candidate.freshnessScore =
+    100;
+
+  candidate.volatilityScore =
+    candidate.marketState.state ===
+      "HIGH_VOLATILITY"
+      ? 45
+      : candidate.marketState.state ===
+          "LOW_LIQUIDITY"
+        ? 35
+        : 75;
+
+  candidate.learningScore =
+    getLearningScore(
+      learner,
+      candidate
+    );
+
+  candidate.evolutionScore =
+    getEvolutionScore(
+      learner,
+      candidate.pattern.name
+    );
+
+  const confidence =
+    calculateFinalAIConfidence(
+      candidate
+    );
+
+  candidate.finalAIConfidence =
+    confidence.finalConfidence;
+
+  candidate.confidenceComponents =
+    confidence.components;
+
+  const ranking =
+    calculateInstitutionalAIScore(
+      candidate
+    );
+
+  candidate.aiScore =
+    ranking.aiScore;
+
+  candidate.qualityGrade =
+    ranking.qualityGrade;
+
+  candidate.aiScoreComponents =
+    ranking.components;
+
+  return candidate;
+}
+
+// =====================================================
+// Phase 6 - Final Institutional Selection
+// =====================================================
+
+function selectInstitutionalSignal(
+  candidates,
+  existingSignals
+) {
+  const ranked =
+    safeArray(candidates)
+      .map(
+        candidate => {
+          const portfolioRisk =
+            evaluatePortfolioRisk(
+              candidate.signal,
+              existingSignals
+            );
+
+          candidate.portfolioRisk =
+            portfolioRisk;
+
+          candidate.prePenaltyAIScore =
+            candidate.aiScore;
+
+          candidate.aiScore =
+            round(
+              clamp(
+                candidate.aiScore -
+                portfolioRisk
+                  .correlationPenalty
+              ),
+              1
+            );
+
+          candidate.qualityGrade =
+            candidate.aiScore >= 90
+              ? "A+"
+              : candidate.aiScore >= 82
+                ? "A"
+                : candidate.aiScore >= 72
+                  ? "B"
+                  : "C";
+
+          if (
+            !portfolioRisk.approved
+          ) {
+            candidate.rejectionReason =
+              portfolioRisk.reasons
+                .join("; ");
+          } else if (
+            candidate.aiScore <
+            MINIMUM_AI_SCORE
+          ) {
+            candidate.rejectionReason =
+              `AI score ${candidate.aiScore} below ${MINIMUM_AI_SCORE}`;
+          }
+
+          return candidate;
+        }
+      )
+      .sort(
+        (
+          first,
+          second
+        ) =>
+          second.aiScore -
+          first.aiScore
+      );
+
+  const approved =
+    ranked.filter(
+      candidate =>
+        !candidate.rejectionReason
+    );
+
+  const selected =
+    approved[0] ||
+    null;
+
+  const rejected =
+    ranked.filter(
+      candidate =>
+        candidate !== selected
+    );
+
+  if (selected) {
+    selected.explanation =
+      generateExplanation(
+        selected,
+        rejected
+      );
+  }
+
+  return {
+    selected,
+
+    ranked,
+
+    rejected
+  };
+}
+
+// =====================================================
+// Existing Pattern Scoring + Phase 6 Inputs
+// =====================================================
 
 function scorePattern(
   pair,
@@ -1149,7 +2680,7 @@ function scorePattern(
         lastCandle
       );
 
-  const signalContext = {
+  const context = {
     pair,
 
     timeframe,
@@ -1159,14 +2690,12 @@ function scorePattern(
 
     strength:
       toNumber(
-        pattern.strength,
-        0
+        pattern.strength
       ),
 
     confirmationScore:
       toNumber(
-        pattern.confirmationScore,
-        0
+        pattern.confirmationScore
       ),
 
     marketRegime,
@@ -1176,9 +2705,10 @@ function scorePattern(
   };
 
   if (
-    learner.isPatternBlacklisted(
-      pattern.name
-    )
+    learner
+      .isPatternBlacklisted?.(
+        pattern.name
+      )
   ) {
     logAudit({
       pair,
@@ -1201,7 +2731,7 @@ function scorePattern(
   const confidence =
     learner
       .calculateAdaptiveConfidence(
-        signalContext
+        context
       );
 
   if (
@@ -1270,76 +2800,67 @@ function scorePattern(
       NaN
     );
 
-  const stopLoss =
+  const stop =
     toNumber(
       signal.stopLoss,
       NaN
     );
 
-  const primaryTarget =
+  const target =
     getPrimaryTakeProfit(
       signal
     );
 
   const risk =
     Math.abs(
-      entry - stopLoss
+      entry - stop
     );
 
   const reward =
     Math.abs(
-      primaryTarget - entry
+      target - entry
     );
 
   const riskReward =
     risk > 0
-      ? reward / risk
+      ? reward /
+        risk
       : 0;
-
-  const riskRewardScore =
-    Math.min(
-      (
-        riskReward / 5
-      ) * 100,
-      100
-    );
 
   const historicalWinRate =
     getHistoricalWinRate(
       learner,
-      signalContext
+      context
     );
-
-  let qualityScore =
-    confidence * 0.35 +
-    toNumber(
-      pattern.confirmationScore,
-      0
-    ) * 0.25 +
-    toNumber(
-      pattern.strength,
-      0
-    ) * 0.2 +
-    riskRewardScore * 0.1 +
-    historicalWinRate * 0.1;
 
   const session =
     getMarketSession();
 
-  const sessionMultiplier =
-    SESSION_QUALITY_MULTIPLIER[
-      session
-    ] || 1;
-
-  qualityScore *=
-    sessionMultiplier;
+  let qualityScore =
+    confidence * 0.35 +
+    toNumber(
+      pattern.confirmationScore
+    ) * 0.25 +
+    toNumber(
+      pattern.strength
+    ) * 0.2 +
+    Math.min(
+      (
+        riskReward /
+        5
+      ) * 100,
+      100
+    ) * 0.1 +
+    historicalWinRate * 0.1;
 
   qualityScore =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        qualityScore
+    clamp(
+      qualityScore *
+      (
+        SESSION_QUALITY_MULTIPLIER[
+          session
+        ] ||
+        1
       )
     );
 
@@ -1374,7 +2895,7 @@ function selectBestPattern(
   signalGenerator
 ) {
   const candidates =
-    patterns
+    safeArray(patterns)
       .map(
         pattern =>
           scorePattern(
@@ -1414,37 +2935,39 @@ function selectBestPattern(
     const candidate of
     candidates
   ) {
-    const sameDirectionCount =
+    const sameDirection =
       candidate.signal
-        .direction === "BUY"
+        .direction ===
+      "BUY"
         ? buyCount
         : sellCount;
 
-    const oppositeDirectionCount =
+    const oppositeDirection =
       candidate.signal
-        .direction === "BUY"
+        .direction ===
+      "BUY"
         ? sellCount
         : buyCount;
 
     if (
-      oppositeDirectionCount > 0
+      oppositeDirection > 0
     ) {
       candidate.qualityScore =
         Math.max(
+          0,
           candidate.qualityScore -
-            5,
-          0
+          5
         );
 
       candidate.consensusNote =
-        `conflict: ${buyCount} BUY vs ${sellCount} SELL patterns`;
+        `conflict: ${buyCount} BUY vs ${sellCount} SELL`;
     } else if (
-      sameDirectionCount >= 2
+      sameDirection >= 2
     ) {
       const boost =
         Math.min(
           (
-            sameDirectionCount -
+            sameDirection -
             1
           ) * 3,
           10
@@ -1452,13 +2975,13 @@ function selectBestPattern(
 
       candidate.qualityScore =
         Math.min(
+          100,
           candidate.qualityScore +
-            boost,
-          100
+          boost
         );
 
       candidate.consensusNote =
-        `${sameDirectionCount} ${candidate.signal.direction} patterns agree (+${boost})`;
+        `${sameDirection} ${candidate.signal.direction} patterns agree (+${boost})`;
     }
   }
 
@@ -1487,10 +3010,6 @@ function selectBestPattern(
       .direction !==
       best.signal.direction
   ) {
-    console.log(
-      `⚖️ ${pair} ${timeframe} | Conflicting patterns near quality parity (${best.pattern.name} vs ${runnerUp.pattern.name}) — skipped`
-    );
-
     logAudit({
       pair,
 
@@ -1500,122 +3019,75 @@ function selectBestPattern(
         "REJECTED",
 
       reason:
-        `near-parity conflict: ${best.pattern.name} (${best.qualityScore.toFixed(1)}) vs ${runnerUp.pattern.name} (${runnerUp.qualityScore.toFixed(1)})`
+        `near-parity conflict: ${best.pattern.name} vs ${runnerUp.pattern.name}`
     });
 
     return null;
   }
 
-  logAudit({
-    pair,
-
-    timeframe,
-
-    pattern:
-      best.pattern.name,
-
-    decision:
-      "SELECTED",
-
-    direction:
-      best.signal.direction,
-
-    confidence:
-      best.confidence,
-
-    qualityScore:
-      round(
-        best.qualityScore,
-        2
-      ),
-
-    session:
-      best.session,
-
-    marketRegime:
-      best.marketRegime,
-
-    reason:
-      best.consensusNote ||
-      "best quality score among candidates"
-  });
-
   return best;
 }
 
 // =====================================================
-// Pair Analysis
+// Signal Refresh
 // =====================================================
 
 function refreshExistingSignal(
   existingSignal,
-  newSignal,
+  incomingSignal,
   pattern
 ) {
   const oldConfidence =
     toNumber(
-      existingSignal.confidence,
-      0
-    );
-
-  const newConfidence =
-    toNumber(
-      newSignal.confidence,
-      0
+      existingSignal.confidence
     );
 
   if (
-    newConfidence >
+    toNumber(
+      incomingSignal.confidence
+    ) >
     oldConfidence
   ) {
     existingSignal.confidence =
-      newConfidence;
+      incomingSignal.confidence;
   }
 
-  const oldConfirmation =
+  if (
+    toNumber(
+      pattern.confirmationScore
+    ) >
     toNumber(
       existingSignal
-        .confirmationScore,
-      0
-    );
-
-  const newConfirmation =
-    toNumber(
-      pattern.confirmationScore,
-      0
-    );
-
-  if (
-    newConfirmation >
-    oldConfirmation
+        .confirmationScore
+    )
   ) {
     existingSignal
       .confirmationScore =
-      newConfirmation;
+      pattern.confirmationScore;
   }
 
-  const newTarget1 =
+  const takeProfit1 =
     getPrimaryTakeProfit(
-      newSignal
+      incomingSignal
     );
 
-  const newTarget2 =
+  const takeProfit2 =
     getSecondTakeProfit(
-      newSignal
+      incomingSignal
     );
 
-  const newTarget3 =
+  const takeProfit3 =
     getThirdTakeProfit(
-      newSignal
+      incomingSignal
     );
 
   if (
-    newSignal.direction ===
+    incomingSignal.direction ===
     "BUY"
   ) {
     if (
       toNumber(
-        newSignal.stopLoss,
+        incomingSignal.stopLoss,
         -Infinity
       ) >
       toNumber(
@@ -1624,62 +3096,48 @@ function refreshExistingSignal(
       )
     ) {
       existingSignal.stopLoss =
-        newSignal.stopLoss;
+        incomingSignal.stopLoss;
     }
 
     if (
-      newTarget1 >
+      takeProfit1 >
       getPrimaryTakeProfit(
         existingSignal
       )
     ) {
       existingSignal.takeProfit =
-        newTarget1;
+        takeProfit1;
 
       existingSignal.takeProfit1 =
-        newTarget1;
+        takeProfit1;
     }
 
     if (
-      newTarget2 >
+      takeProfit2 >
       getSecondTakeProfit(
         existingSignal
       )
     ) {
       existingSignal.takeProfit2 =
-        newTarget2;
+        takeProfit2;
     }
 
     if (
-      newTarget3 >
+      takeProfit3 >
       getThirdTakeProfit(
         existingSignal
       )
     ) {
       existingSignal.takeProfit3 =
-        newTarget3;
-    }
-
-    if (
-      toNumber(
-        newSignal.entry,
-        -Infinity
-      ) >
-      toNumber(
-        existingSignal.entry,
-        -Infinity
-      )
-    ) {
-      existingSignal.entry =
-        newSignal.entry;
+        takeProfit3;
     }
   } else if (
-    newSignal.direction ===
+    incomingSignal.direction ===
     "SELL"
   ) {
     if (
       toNumber(
-        newSignal.stopLoss,
+        incomingSignal.stopLoss,
         Infinity
       ) <
       toNumber(
@@ -1688,93 +3146,74 @@ function refreshExistingSignal(
       )
     ) {
       existingSignal.stopLoss =
-        newSignal.stopLoss;
+        incomingSignal.stopLoss;
     }
 
     if (
-      newTarget1 <
+      takeProfit1 <
       getPrimaryTakeProfit(
         existingSignal
       )
     ) {
       existingSignal.takeProfit =
-        newTarget1;
+        takeProfit1;
 
       existingSignal.takeProfit1 =
-        newTarget1;
+        takeProfit1;
     }
 
     if (
-      newTarget2 <
+      takeProfit2 <
       getSecondTakeProfit(
         existingSignal
       )
     ) {
       existingSignal.takeProfit2 =
-        newTarget2;
+        takeProfit2;
     }
 
     if (
-      newTarget3 <
+      takeProfit3 <
       getThirdTakeProfit(
         existingSignal
       )
     ) {
       existingSignal.takeProfit3 =
-        newTarget3;
-    }
-
-    if (
-      toNumber(
-        newSignal.entry,
-        Infinity
-      ) <
-      toNumber(
-        existingSignal.entry,
-        Infinity
-      )
-    ) {
-      existingSignal.entry =
-        newSignal.entry;
+        takeProfit3;
     }
   }
 
-  existingSignal.qualityScore =
-    Math.max(
-      toNumber(
-        existingSignal
-          .qualityScore,
-        0
-      ),
-      toNumber(
-        newSignal.qualityScore,
-        0
-      )
-    );
+  const phase6Fields = [
+    "qualityScore",
+    "adaptiveConfidence",
+    "patternWeight",
+    "marketRegime",
+    "aiScore",
+    "qualityGrade",
+    "finalAIConfidence",
+    "explanation",
+    "marketState",
+    "strategyPriority",
+    "portfolioRisk"
+  ];
 
-  existingSignal
-    .adaptiveConfidence =
-    newSignal
-      .adaptiveConfidence ??
-    existingSignal
-      .adaptiveConfidence;
+  for (
+    const field of
+    phase6Fields
+  ) {
+    if (
+      incomingSignal[field] !==
+      undefined
+    ) {
+      existingSignal[field] =
+        incomingSignal[field];
+    }
+  }
 
-  existingSignal
-    .patternWeight =
-    newSignal.patternWeight ??
-    existingSignal.patternWeight;
-
-  existingSignal
-    .marketRegime =
-    newSignal.marketRegime ??
-    existingSignal.marketRegime;
-
-  existingSignal
-    .lastUpdated =
+  existingSignal.lastUpdated =
     nowIso();
 
-  existingSignal
-    .refreshCount =
+  existingSignal.refreshCount =
     (
       existingSignal
         .refreshCount ||
@@ -1795,29 +3234,27 @@ function refreshExistingSignal(
   };
 }
 
+// =====================================================
+// Pair and Market Analysis
+// =====================================================
+
 function analyzePair(
   pair,
   candles,
   analyzer,
   learner,
   signalGenerator,
-  existingSignals
+  existingSignals,
+  phase6Candidates = []
 ) {
-  const generatedSignals = [];
-
   const trendCache = {};
 
   if (
     !candles?.[pair]
   ) {
-    return generatedSignals;
+    return phase6Candidates;
   }
 
-  /*
-   * Precalculate available trends so lower timeframes
-   * can use 1H/4H confirmation even if they are
-   * processed first.
-   */
   for (
     const timeframe of
     SUPPORTED_TIMEFRAMES
@@ -1828,21 +3265,19 @@ function analyzePair(
       ];
 
     if (
-      !Array.isArray(
+      Array.isArray(
         timeframeCandles
-      ) ||
-      timeframeCandles.length <
+      ) &&
+      timeframeCandles.length >=
         MINIMUM_CANDLES
     ) {
-      continue;
+      trendCache[
+        `${pair}_${timeframe}`
+      ] =
+        analyzer.detectTrend(
+          timeframeCandles
+        );
     }
-
-    trendCache[
-      `${pair}_${timeframe}`
-    ] =
-      analyzer.detectTrend(
-        timeframeCandles
-      );
   }
 
   for (
@@ -1864,18 +3299,12 @@ function analyzePair(
       continue;
     }
 
-    const volatilityCheck =
+    const filter =
       passesSpreadVolatilityFilter(
         timeframeCandles
       );
 
-    if (
-      !volatilityCheck.pass
-    ) {
-      console.log(
-        `🚫 ${pair} ${timeframe} | Skipped — ${volatilityCheck.reason}`
-      );
-
+    if (!filter.pass) {
       logAudit({
         pair,
 
@@ -1885,16 +3314,17 @@ function analyzePair(
           "REJECTED",
 
         reason:
-          volatilityCheck.reason
+          filter.reason
       });
 
       continue;
     }
 
     const patterns =
-      analyzer.detectAllPatterns(
-        timeframeCandles
-      );
+      analyzer
+        .detectAllPatterns(
+          timeframeCandles
+        );
 
     if (
       !Array.isArray(patterns) ||
@@ -1917,12 +3347,6 @@ function analyzePair(
       continue;
     }
 
-    const {
-      pattern,
-      signal,
-      confidence
-    } = best;
-
     const higherTrend =
       timeframe === "4H"
         ? null
@@ -1937,12 +3361,13 @@ function analyzePair(
 
     if (
       higherTrend &&
-      higherTrend !==
-        "SIDEWAYS" &&
-      higherTrend !==
-        "NEUTRAL" &&
-      higherTrend !==
-        signal.direction
+      ![
+        "SIDEWAYS",
+        "NEUTRAL",
+        best.signal.direction
+      ].includes(
+        higherTrend
+      )
     ) {
       logAudit({
         pair,
@@ -1950,7 +3375,7 @@ function analyzePair(
         timeframe,
 
         pattern:
-          pattern.name,
+          best.pattern.name,
 
         decision:
           "REJECTED",
@@ -1962,144 +3387,17 @@ function analyzePair(
       continue;
     }
 
-    const activeMatch =
-      findActiveDuplicate(
-        pair,
-        timeframe,
-        pattern.name,
-        existingSignals
-      );
-
-    if (activeMatch) {
-      const refresh =
-        refreshExistingSignal(
-          activeMatch,
-          signal,
-          pattern
-        );
-
-      console.log(
-        `🔁 ${pair} ${timeframe} | ${pattern.name} refreshed → v${activeMatch.version} (refresh #${activeMatch.refreshCount})`
-      );
-
-      logAudit({
-        pair,
-
-        timeframe,
-
-        pattern:
-          pattern.name,
-
-        decision:
-          "REFRESHED",
-
-        reason:
-          `confidence ${refresh.oldConfidence}% → ${refresh.newConfidence}%, version ${activeMatch.version}`
-      });
-
-      continue;
-    }
-
-    const timestamp =
-      nowIso();
-
-    const preparedSignal =
-      applyLegacySignalAliases({
-        ...signal,
-
-        signalId:
-          buildSignalId(
-            pair,
-            timeframe,
-            pattern.name
-          ),
-
-        timestamp,
-
-        status:
-          "NEW",
-
-        version: 1,
-
-        createdAt:
-          timestamp,
-
-        lastUpdated:
-          timestamp,
-
-        refreshCount: 1,
-
-        outcome: null
-      });
-
-    if (
-      isSignalInCooldown(
-        preparedSignal,
-        existingSignals
+    phase6Candidates.push(
+      enrichCandidatePhase6(
+        best,
+        learner,
+        candles,
+        higherTrend
       )
-    ) {
-      logAudit({
-        pair,
-
-        timeframe,
-
-        pattern:
-          pattern.name,
-
-        decision:
-          "REJECTED",
-
-        reason:
-          "cooldown active"
-      });
-
-      continue;
-    }
-
-    generatedSignals.push(
-      preparedSignal
     );
-
-    /*
-     * Include the new signal in duplicate/cooldown
-     * checks for the remainder of this run.
-     */
-    existingSignals.push(
-      preparedSignal
-    );
-
-    console.log(
-      `✅ ${pair} ${timeframe} | ${pattern.name} | ${signal.direction} | Confidence: ${confidence}%`
-    );
-
-    logAudit({
-      pair,
-
-      timeframe,
-
-      pattern:
-        pattern.name,
-
-      decision:
-        "GENERATED",
-
-      direction:
-        signal.direction,
-
-      confidence,
-
-      qualityScore:
-        signal.qualityScore,
-
-      marketRegime:
-        signal.marketRegime,
-
-      reason:
-        "passed trend, session, volatility, cooldown and consensus filters"
-    });
   }
 
-  return generatedSignals;
+  return phase6Candidates;
 }
 
 function analyzeMarkets(
@@ -2110,39 +3408,241 @@ function analyzeMarkets(
   existingSignals
 ) {
   console.log(
-    "🔍 Analyzing patterns..."
+    "🔍 Analyzing patterns with Phase 6 institutional layer..."
   );
 
-  const newSignals = [];
-
-  const workingSignals =
-    Array.isArray(
-      existingSignals
-    )
-      ? existingSignals
-      : [];
+  const candidates = [];
 
   for (
     const pair of
     SUPPORTED_PAIRS
   ) {
-    newSignals.push(
-      ...analyzePair(
-        pair,
-        candles,
-        analyzer,
-        learner,
-        signalGenerator,
-        workingSignals
-      )
+    analyzePair(
+      pair,
+      candles,
+      analyzer,
+      learner,
+      signalGenerator,
+      existingSignals,
+      candidates
     );
   }
 
-  return newSignals;
+  const institutionalResult =
+    selectInstitutionalSignal(
+      candidates,
+      existingSignals
+    );
+
+  for (
+    const rejected of
+    institutionalResult.rejected
+  ) {
+    logAudit({
+      pair:
+        rejected.signal.pair,
+
+      timeframe:
+        rejected.signal.timeframe,
+
+      pattern:
+        rejected.pattern.name,
+
+      decision:
+        "PHASE6_REJECTED",
+
+      aiScore:
+        rejected.aiScore,
+
+      reason:
+        rejected.rejectionReason ||
+        "lower institutional ranking than published signal"
+    });
+  }
+
+  if (
+    !institutionalResult.selected
+  ) {
+    return [];
+  }
+
+  const selected =
+    institutionalResult.selected;
+
+  const activeSignal =
+    findActiveDuplicate(
+      selected.signal.pair,
+      selected.signal.timeframe,
+      selected.pattern.name,
+      existingSignals
+    );
+
+  const enhancedSignal =
+    applyLegacySignalAliases({
+      ...selected.signal,
+
+      confidence:
+        selected.finalAIConfidence,
+
+      finalAIConfidence:
+        selected.finalAIConfidence,
+
+      aiScore:
+        selected.aiScore,
+
+      qualityGrade:
+        selected.qualityGrade,
+
+      aiScoreComponents:
+        selected.aiScoreComponents,
+
+      confidenceComponents:
+        selected.confidenceComponents,
+
+      marketState:
+        selected.marketState,
+
+      strategyPriority:
+        selected.strategyPriority,
+
+      portfolioRisk:
+        selected.portfolioRisk,
+
+      explanation:
+        selected.explanation,
+
+      phase: 6,
+
+      institutionalRank: 1
+    });
+
+  if (activeSignal) {
+    const refresh =
+      refreshExistingSignal(
+        activeSignal,
+        enhancedSignal,
+        selected.pattern
+      );
+
+    logAudit({
+      pair:
+        enhancedSignal.pair,
+
+      timeframe:
+        enhancedSignal.timeframe,
+
+      pattern:
+        enhancedSignal.pattern,
+
+      decision:
+        "REFRESHED",
+
+      reason:
+        `Phase 6 confidence ${refresh.oldConfidence}% → ${refresh.newConfidence}%`
+    });
+
+    return [];
+  }
+
+  const timestamp =
+    nowIso();
+
+  const preparedSignal = {
+    ...enhancedSignal,
+
+    signalId:
+      buildSignalId(
+        enhancedSignal.pair,
+        enhancedSignal.timeframe,
+        enhancedSignal.pattern
+      ),
+
+    timestamp,
+
+    status:
+      "NEW",
+
+    version: 1,
+
+    createdAt:
+      timestamp,
+
+    lastUpdated:
+      timestamp,
+
+    refreshCount: 1,
+
+    outcome: null
+  };
+
+  if (
+    isSignalInCooldown(
+      preparedSignal,
+      existingSignals
+    )
+  ) {
+    logAudit({
+      pair:
+        preparedSignal.pair,
+
+      timeframe:
+        preparedSignal.timeframe,
+
+      pattern:
+        preparedSignal.pattern,
+
+      decision:
+        "REJECTED",
+
+      reason:
+        "cooldown active"
+    });
+
+    return [];
+  }
+
+  existingSignals.push(
+    preparedSignal
+  );
+
+  logAudit({
+    pair:
+      preparedSignal.pair,
+
+    timeframe:
+      preparedSignal.timeframe,
+
+    pattern:
+      preparedSignal.pattern,
+
+    decision:
+      "PUBLISHED",
+
+    aiScore:
+      preparedSignal.aiScore,
+
+    qualityGrade:
+      preparedSignal.qualityGrade,
+
+    confidence:
+      preparedSignal
+        .finalAIConfidence,
+
+    reason:
+      "highest-quality institutional signal"
+  });
+
+  console.log(
+    `🏛️ Published: ${preparedSignal.pair} ${preparedSignal.timeframe} ${preparedSignal.pattern} | AI ${preparedSignal.aiScore} ${preparedSignal.qualityGrade} | Confidence ${preparedSignal.finalAIConfidence}%`
+  );
+
+  return [
+    preparedSignal
+  ];
 }
 
 // =====================================================
-// Signal Resolution
+// Existing Signal Resolution
 // =====================================================
 
 function determineSignalOutcome(
@@ -2180,12 +3680,14 @@ function determineSignalOutcome(
     );
 
   if (
-    !Number.isFinite(high) ||
-    !Number.isFinite(low) ||
-    !Number.isFinite(
-      stopLoss
-    ) ||
-    !Number.isFinite(target)
+    ![
+      high,
+      low,
+      stopLoss,
+      target
+    ].every(
+      Number.isFinite
+    )
   ) {
     return null;
   }
@@ -2200,10 +3702,6 @@ function determineSignalOutcome(
     const stopHit =
       low <= stopLoss;
 
-    /*
-     * Conservative handling when both TP and SL
-     * appear inside the same candle.
-     */
     if (
       targetHit &&
       stopHit
@@ -2254,19 +3752,13 @@ async function resolvePendingSignals(
   existingSignals,
   candles
 ) {
-  if (
-    !Array.isArray(
-      existingSignals
-    )
-  ) {
-    return existingSignals;
-  }
-
   const resolutions = [];
 
   for (
     const signal of
-    existingSignals
+    safeArray(
+      existingSignals
+    )
   ) {
     if (
       !signal ||
@@ -2340,10 +3832,6 @@ async function resolvePendingSignals(
           signal.resolvedAt
       });
 
-      console.log(
-        `🎯 ${signal.pattern} ${signal.pair} ${signal.timeframe} → ${outcome}`
-      );
-
       logAudit({
         pair:
           signal.pair,
@@ -2357,25 +3845,16 @@ async function resolvePendingSignals(
         decision:
           "RESOLVED",
 
-        outcome,
-
-        reason:
-          outcome === "WIN"
-            ? "take-profit reached"
-            : "stop-loss reached"
+        outcome
       });
 
       continue;
     }
 
-    const expiryMs =
+    const expiry =
       EXPIRY_MAP[
         signal.timeframe
       ];
-
-    if (!expiryMs) {
-      continue;
-    }
 
     const createdTime =
       new Date(
@@ -2385,19 +3864,13 @@ async function resolvePendingSignals(
       ).getTime();
 
     if (
-      Number.isNaN(
+      expiry &&
+      Number.isFinite(
         createdTime
-      )
-    ) {
-      continue;
-    }
-
-    const elapsed =
+      ) &&
       Date.now() -
-      createdTime;
-
-    if (
-      elapsed >= expiryMs
+        createdTime >=
+        expiry
     ) {
       signal.status =
         "EXPIRED";
@@ -2410,10 +3883,6 @@ async function resolvePendingSignals(
 
       signal.lastUpdated =
         signal.expiredAt;
-
-      console.log(
-        `⌛ ${signal.pattern} ${signal.pair} ${signal.timeframe} → EXPIRED`
-      );
 
       logAudit({
         pair:
@@ -2429,7 +3898,7 @@ async function resolvePendingSignals(
           "EXPIRED",
 
         reason:
-          `signal exceeded ${signal.timeframe} lifecycle limit`
+          "signal lifecycle limit reached"
       });
     }
   }
@@ -2462,7 +3931,7 @@ async function resolvePendingSignals(
 }
 
 // =====================================================
-// Learning Update
+// Existing Learning Update
 // =====================================================
 
 async function updateLearning(
@@ -2482,16 +3951,21 @@ async function updateLearning(
   );
 
   if (
-    Array.isArray(
-      newSignals
-    ) &&
-    newSignals.length > 0
+    newSignals.length > 0 &&
+    typeof learner
+      .updateHistory ===
+      "function"
   ) {
     learner.updateHistory(
       newSignals
     );
-  } else {
-    learner.updatePatternStats();
+  } else if (
+    typeof learner
+      .updatePatternStats ===
+      "function"
+  ) {
+    learner
+      .updatePatternStats();
   }
 
   if (
@@ -2499,187 +3973,105 @@ async function updateLearning(
       .runLearningCycle ===
       "function"
   ) {
-    learner.runLearningCycle();
+    learner
+      .runLearningCycle();
   }
 
   return existingSignals;
 }
 
 // =====================================================
-// Archive and Persistence
+// Existing Archive and Persistence
 // =====================================================
 
 function archiveSignals(
   signalsToArchive
 ) {
   if (
-    !Array.isArray(
+    safeArray(
       signalsToArchive
-    ) ||
-    signalsToArchive.length === 0
+    ).length === 0
   ) {
     return;
   }
 
-  try {
-    const archiveData =
-      safeReadJson(
-        ARCHIVE_FILE,
-        getDefaultArchiveData()
-      );
-
-    const existingArchive =
-      Array.isArray(
-        archiveData.signals
-      )
-        ? archiveData.signals
-        : [];
-
-    const archivedEntries =
-      signalsToArchive.map(
-        signal => ({
-          ...signal,
-
-          previousStatus:
-            signal.status,
-
-          status:
-            "ARCHIVED",
-
-          archivedAt:
-            nowIso()
-        })
-      );
-
-    const combined =
-      [
-        ...existingArchive,
-        ...archivedEntries
-      ].slice(
-        -MAX_ARCHIVE_SIGNALS
-      );
-
-    safeWriteJson(
+  const archiveData =
+    safeReadJson(
       ARCHIVE_FILE,
-      {
-        ...archiveData,
-
-        signals:
-          combined,
-
-        updatedAt:
-          nowIso(),
-
-        totalArchived:
-          combined.length
-      }
+      getDefaultArchiveData()
     );
 
-    console.log(
-      `🗄️ Archived ${archivedEntries.length} closed signal(s)`
+  const archivedEntries =
+    signalsToArchive.map(
+      signal => ({
+        ...signal,
+
+        previousStatus:
+          signal.status,
+
+        status:
+          "ARCHIVED",
+
+        archivedAt:
+          nowIso()
+      })
     );
-  } catch (error) {
-    console.error(
-      "Error archiving signals:",
-      error.message
-    );
-  }
+
+  const signals = [
+    ...safeArray(
+      archiveData.signals
+    ),
+
+    ...archivedEntries
+  ].slice(
+    -MAX_ARCHIVE_SIGNALS
+  );
+
+  safeWriteJson(
+    ARCHIVE_FILE,
+    {
+      ...archiveData,
+
+      signals,
+
+      updatedAt:
+        nowIso(),
+
+      totalArchived:
+        signals.length
+    }
+  );
 }
 
 function mergeSignals(
   newSignals,
   existingSignals
 ) {
-  const allSignals =
-    Array.isArray(
-      existingSignals
-    )
-      ? [...existingSignals]
-      : [];
-
-  for (
-    const incomingSignal of
-    newSignals || []
-  ) {
-    const signal =
-      applyLegacySignalAliases(
-        incomingSignal
-      );
-
-    const incomingId =
-      signal.id ||
-      signal.signalId;
-
-    const index =
-      allSignals.findIndex(
-        existingSignal => {
-          const existingId =
-            existingSignal.id ||
-            existingSignal.signalId;
-
-          if (
-            incomingId &&
-            existingId
-          ) {
-            return (
-              incomingId ===
-              existingId
-            );
-          }
-
-          return (
-            existingSignal.pair ===
-              signal.pair &&
-            existingSignal.timeframe ===
-              signal.timeframe &&
-            existingSignal.pattern ===
-              signal.pattern &&
-            OPEN_STATUSES.includes(
-              existingSignal.status
-            )
-          );
-        }
-      );
-
-    if (
-      index >= 0
-    ) {
-      const previous =
-        allSignals[index];
-
-      allSignals[index] = {
-        ...previous,
-        ...signal,
-
-        outcome:
-          signal.outcome ??
-          previous.outcome,
-
-        createdAt:
-          previous.createdAt ||
-          signal.createdAt,
-
-        timestamp:
-          previous.timestamp ||
-          signal.timestamp
-      };
-    } else {
-      allSignals.push(
-        signal
-      );
-    }
-  }
-
-  const uniqueMap =
+  const signalMap =
     new Map();
 
+  const allSignals = [
+    ...safeArray(
+      existingSignals
+    ),
+
+    ...safeArray(
+      newSignals
+    )
+  ];
+
   for (
-    const signal of
+    const rawSignal of
     allSignals
   ) {
-    if (!signal) {
+    if (!rawSignal) {
       continue;
     }
+
+    const signal =
+      applyLegacySignalAliases(
+        rawSignal
+      );
 
     const key =
       signal.id ||
@@ -2693,45 +4085,38 @@ function mergeSignals(
       ].join("_");
 
     const previous =
-      uniqueMap.get(key);
+      signalMap.get(key);
 
-    if (!previous) {
-      uniqueMap.set(
-        key,
-        signal
-      );
-
-      continue;
-    }
-
-    const previousTime =
-      new Date(
-        previous.lastUpdated ||
-        previous.createdAt ||
-        0
-      ).getTime();
-
-    const signalTime =
+    if (
+      !previous ||
       new Date(
         signal.lastUpdated ||
         signal.createdAt ||
         0
-      ).getTime();
-
-    if (
-      signalTime >=
-      previousTime
+      ) >=
+      new Date(
+        previous.lastUpdated ||
+        previous.createdAt ||
+        0
+      )
     ) {
-      uniqueMap.set(
+      signalMap.set(
         key,
-        signal
+        {
+          ...previous,
+          ...signal,
+
+          outcome:
+            signal.outcome ??
+            previous?.outcome
+        }
       );
     }
   }
 
-  return Array.from(
-    uniqueMap.values()
-  );
+  return [
+    ...signalMap.values()
+  ];
 }
 
 function saveData(
@@ -2740,85 +4125,75 @@ function saveData(
   confidenceData,
   learningData
 ) {
-  try {
-    const uniqueSignals =
-      mergeSignals(
-        newSignals,
-        existingSignals
-      );
+  const uniqueSignals =
+    mergeSignals(
+      newSignals,
+      existingSignals
+    );
 
-    const openSignals =
-      uniqueSignals.filter(
+  const openSignals =
+    uniqueSignals.filter(
+      signal =>
+        OPEN_STATUSES.includes(
+          signal.status
+        )
+    );
+
+  const closedSignals =
+    uniqueSignals
+      .filter(
         signal =>
-          OPEN_STATUSES.includes(
+          !OPEN_STATUSES.includes(
             signal.status
+          )
+      )
+      .sort(
+        (
+          first,
+          second
+        ) =>
+          new Date(
+            first.lastUpdated ||
+            first.createdAt ||
+            0
+          ) -
+          new Date(
+            second.lastUpdated ||
+            second.createdAt ||
+            0
           )
       );
 
-    const closedSignals =
-      uniqueSignals
-        .filter(
-          signal =>
-            !OPEN_STATUSES.includes(
-              signal.status
-            )
-        )
-        .sort(
-          (
-            first,
-            second
-          ) =>
-            new Date(
-              first.resolvedAt ||
-              first.expiredAt ||
-              first.lastUpdated ||
-              first.createdAt ||
-              0
-            ).getTime() -
-            new Date(
-              second.resolvedAt ||
-              second.expiredAt ||
-              second.lastUpdated ||
-              second.createdAt ||
-              0
-            ).getTime()
-        );
+  const closedToKeep =
+    closedSignals.slice(
+      -MAX_MAIN_CLOSED_SIGNALS
+    );
 
-    const closedToKeep =
-      closedSignals.slice(
-        -MAX_MAIN_CLOSED_SIGNALS
-      );
+  const archiveCount =
+    Math.max(
+      0,
+      closedSignals.length -
+      closedToKeep.length
+    );
 
-    const archiveCount =
-      Math.max(
-        0,
-        closedSignals.length -
-        closedToKeep.length
-      );
+  archiveSignals(
+    closedSignals.slice(
+      0,
+      archiveCount
+    )
+  );
 
-    const closedToArchive =
-      closedSignals.slice(
-        0,
-        archiveCount
-      );
+  const keptSignals = [
+    ...openSignals,
+    ...closedToKeep
+  ];
 
-    if (
-      closedToArchive.length > 0
-    ) {
-      archiveSignals(
-        closedToArchive
-      );
-    }
+  const timestamp =
+    nowIso();
 
-    const keptSignals = [
-      ...openSignals,
-      ...closedToKeep
-    ];
-
-    const timestamp =
-      nowIso();
-
-    const signalsData = {
+  safeWriteJson(
+    SIGNALS_FILE,
+    {
       signals:
         keptSignals,
 
@@ -2833,10 +4208,12 @@ function saveData(
       resolvedSignals:
         keptSignals.filter(
           signal =>
-            signal.status ===
-              "WIN" ||
-            signal.status ===
+            [
+              "WIN",
               "LOSS"
+            ].includes(
+              signal.status
+            )
         ).length,
 
       expiredSignals:
@@ -2848,68 +4225,44 @@ function saveData(
 
       pendingSignals:
         openSignals.length
-    };
+    }
+  );
 
-    const confidenceDataToSave = {
+  safeWriteJson(
+    CONFIDENCE_FILE,
+    {
       patterns:
-        confidenceData &&
-        typeof confidenceData ===
-          "object"
-          ? confidenceData
-          : {},
+        objectOrEmpty(
+          confidenceData
+        ),
 
       updatedAt:
         timestamp
-    };
+    }
+  );
 
-    /*
-     * Save all Phase 4 fields instead of only
-     * history and stats.
-     */
-    const learningDataToSave = {
+  safeWriteJson(
+    LEARNING_FILE,
+    {
       ...getDefaultLearningData(),
-      ...learningData,
+      ...objectOrEmpty(
+        learningData
+      ),
 
       history:
-        Array.isArray(
+        safeArray(
           learningData?.history
-        )
-          ? learningData.history
-          : [],
+        ),
 
       stats:
-        learningData?.stats &&
-        typeof learningData.stats ===
-          "object"
-          ? learningData.stats
-          : {},
+        objectOrEmpty(
+          learningData?.stats
+        ),
 
       updatedAt:
         timestamp
-    };
-
-    safeWriteJson(
-      SIGNALS_FILE,
-      signalsData
-    );
-
-    safeWriteJson(
-      CONFIDENCE_FILE,
-      confidenceDataToSave
-    );
-
-    safeWriteJson(
-      LEARNING_FILE,
-      learningDataToSave
-    );
-  } catch (error) {
-    console.error(
-      "Error saving data:",
-      error.message
-    );
-
-    throw error;
-  }
+    }
+  );
 }
 
 function saveBotResults(
@@ -2926,50 +4279,767 @@ function saveBotResults(
 }
 
 // =====================================================
+// Phase 6 - Performance Engine
+// =====================================================
+
+function buildPerformanceBreakdown(
+  signals,
+  keyGetter
+) {
+  const groups = {};
+
+  for (
+    const signal of
+    safeArray(signals)
+  ) {
+    const key =
+      keyGetter(signal) ||
+      "UNKNOWN";
+
+    if (!groups[key]) {
+      groups[key] = {
+        total: 0,
+
+        wins: 0,
+
+        losses: 0,
+
+        expired: 0,
+
+        riskRewards: []
+      };
+    }
+
+    groups[key].total++;
+
+    if (
+      signal.status ===
+      "WIN"
+    ) {
+      groups[key].wins++;
+    }
+
+    if (
+      signal.status ===
+      "LOSS"
+    ) {
+      groups[key].losses++;
+    }
+
+    if (
+      signal.status ===
+      "EXPIRED"
+    ) {
+      groups[key].expired++;
+    }
+
+    if (
+      Number.isFinite(
+        Number(
+          signal.riskReward
+        )
+      )
+    ) {
+      groups[key]
+        .riskRewards
+        .push(
+          Number(
+            signal.riskReward
+          )
+        );
+    }
+  }
+
+  return Object.fromEntries(
+    Object.entries(groups)
+      .map(
+        (
+          [
+            key,
+            value
+          ]
+        ) => [
+          key,
+          {
+            total:
+              value.total,
+
+            wins:
+              value.wins,
+
+            losses:
+              value.losses,
+
+            expired:
+              value.expired,
+
+            winRate:
+              round(
+                percent(
+                  value.wins,
+                  value.wins +
+                  value.losses
+                ),
+                1
+              ),
+
+            averageRiskReward:
+              round(
+                average(
+                  value.riskRewards
+                ),
+                2
+              )
+          }
+        ]
+      )
+  );
+}
+
+// =====================================================
+// Phase 6 - Self Optimizer
+// =====================================================
+
+function generateOptimizerRecommendations(
+  signals,
+  learner
+) {
+  const patternPerformance =
+    buildPerformanceBreakdown(
+      signals,
+      signal =>
+        signal.pattern
+    );
+
+  const recommendations = [];
+
+  for (
+    const [
+      pattern,
+      statistics
+    ] of Object.entries(
+      patternPerformance
+    )
+  ) {
+    if (
+      statistics.wins +
+      statistics.losses <
+      5
+    ) {
+      continue;
+    }
+
+    if (
+      statistics.winRate >= 65
+    ) {
+      recommendations.push({
+        type:
+          "PATTERN_WEIGHT",
+
+        pattern,
+
+        action:
+          "INCREASE",
+
+        suggestedChange:
+          0.05,
+
+        reason:
+          `win rate ${statistics.winRate}%`,
+
+        applyAutomatically:
+          false
+      });
+    }
+
+    if (
+      statistics.winRate <= 40
+    ) {
+      recommendations.push({
+        type:
+          "PATTERN_WEIGHT",
+
+        pattern,
+
+        action:
+          "DECREASE",
+
+        suggestedChange:
+          -0.05,
+
+        reason:
+          `win rate ${statistics.winRate}%`,
+
+        applyAutomatically:
+          false
+      });
+    }
+  }
+
+  const evolution =
+    learner
+      .getPatternEvolutionRecommendations?.() ||
+    {};
+
+  if (
+    Object.keys(evolution)
+      .length > 0
+  ) {
+    recommendations.push({
+      type:
+        "DETECTOR_THRESHOLDS",
+
+      action:
+        "REVIEW",
+
+      data:
+        evolution,
+
+      applyAutomatically:
+        false
+    });
+  }
+
+  return recommendations;
+}
+
+// =====================================================
+// Phase 6 - Weekly Report
+// =====================================================
+
+function generateWeeklyReport(
+  signals,
+  learner
+) {
+  const end =
+    new Date();
+
+  const start =
+    new Date(
+      end.getTime() -
+      7 *
+      24 *
+      60 *
+      60 *
+      1000
+    );
+
+  const weeklySignals =
+    safeArray(signals)
+      .filter(
+        signal =>
+          new Date(
+            signal.resolvedAt ||
+            signal.expiredAt ||
+            signal.lastUpdated ||
+            signal.createdAt ||
+            0
+          ) >= start
+      );
+
+  const resolvedSignals =
+    weeklySignals.filter(
+      signal =>
+        [
+          "WIN",
+          "LOSS"
+        ].includes(
+          signal.status
+        )
+    );
+
+  const wins =
+    resolvedSignals.filter(
+      signal =>
+        signal.status ===
+        "WIN"
+    ).length;
+
+  const patternAccuracy =
+    buildPerformanceBreakdown(
+      weeklySignals,
+      signal =>
+        signal.pattern
+    );
+
+  const pairAccuracy =
+    buildPerformanceBreakdown(
+      weeklySignals,
+      signal =>
+        signal.pair
+    );
+
+  const timeframeAccuracy =
+    buildPerformanceBreakdown(
+      weeklySignals,
+      signal =>
+        signal.timeframe
+    );
+
+  const sessionAccuracy =
+    buildPerformanceBreakdown(
+      weeklySignals,
+      signal =>
+        signal.session ||
+        signal.executionNotes
+          ?.bestSessions
+    );
+
+  const marketRegimeAccuracy =
+    buildPerformanceBreakdown(
+      weeklySignals,
+      signal =>
+        signal.marketState
+          ?.state ||
+        signal.marketRegime
+    );
+
+  const rankedPatterns =
+    Object.entries(
+      patternAccuracy
+    )
+      .sort(
+        (
+          first,
+          second
+        ) =>
+          second[1].winRate -
+          first[1].winRate
+      );
+
+  const recommendations =
+    generateOptimizerRecommendations(
+      weeklySignals,
+      learner
+    );
+
+  return {
+    version:
+      "6.0.0",
+
+    generatedAt:
+      nowIso(),
+
+    period: {
+      start:
+        start.toISOString(),
+
+      end:
+        end.toISOString()
+    },
+
+    metrics: {
+      totalSignals:
+        weeklySignals.length,
+
+      resolvedSignals:
+        resolvedSignals.length,
+
+      overallWinRate:
+        round(
+          percent(
+            wins,
+            resolvedSignals.length
+          ),
+          1
+        ),
+
+      averageRiskReward:
+        round(
+          average(
+            weeklySignals.map(
+              signal =>
+                signal.riskReward
+            )
+          ),
+          2
+        ),
+
+      patternAccuracy,
+
+      pairAccuracy,
+
+      timeframeAccuracy,
+
+      sessionAccuracy,
+
+      marketRegimeAccuracy,
+
+      learningProgress:
+        learner
+          .getPerformanceTrend?.() ||
+        learner
+          .getDashboardData?.()
+          ?.learningProgress ||
+        null,
+
+      bestPattern:
+        rankedPatterns[0]?.[0] ||
+        null,
+
+      worstPattern:
+        rankedPatterns[
+          rankedPatterns.length - 1
+        ]?.[0] ||
+        null,
+
+      mostImprovedPattern:
+        recommendations.find(
+          recommendation =>
+            recommendation.action ===
+            "INCREASE"
+        )?.pattern ||
+        null,
+
+      blacklistedPatterns:
+        Object.keys(
+          learner.data
+            ?.blacklistedPatterns ||
+          {}
+        ),
+
+      optimizationSuggestions:
+        recommendations
+    },
+
+    recommendations
+  };
+}
+
+// =====================================================
+// Phase 6 - Dashboard Data
+// =====================================================
+
+function distribution(
+  values,
+  buckets
+) {
+  const result =
+    Object.fromEntries(
+      buckets.map(
+        bucket => [
+          bucket.label,
+          0
+        ]
+      )
+    );
+
+  for (
+    const rawValue of
+    values
+  ) {
+    const value =
+      toNumber(
+        rawValue,
+        NaN
+      );
+
+    if (
+      !Number.isFinite(value)
+    ) {
+      continue;
+    }
+
+    const bucket =
+      buckets.find(
+        item =>
+          value >= item.min &&
+          value <= item.max
+      );
+
+    if (bucket) {
+      result[
+        bucket.label
+      ]++;
+    }
+  }
+
+  return result;
+}
+
+function generateDashboardData(
+  signals,
+  learner,
+  health
+) {
+  const signalList =
+    safeArray(signals);
+
+  const scoreBuckets = [
+    {
+      label:
+        "0-59",
+
+      min: 0,
+
+      max: 59.99
+    },
+
+    {
+      label:
+        "60-69",
+
+      min: 60,
+
+      max: 69.99
+    },
+
+    {
+      label:
+        "70-79",
+
+      min: 70,
+
+      max: 79.99
+    },
+
+    {
+      label:
+        "80-89",
+
+      min: 80,
+
+      max: 89.99
+    },
+
+    {
+      label:
+        "90-100",
+
+      min: 90,
+
+      max: 100
+    }
+  ];
+
+  return {
+    version:
+      "6.0.0",
+
+    updatedAt:
+      nowIso(),
+
+    distributions: {
+      aiScore:
+        distribution(
+          signalList.map(
+            signal =>
+              signal.aiScore
+          ),
+          scoreBuckets
+        ),
+
+      confidence:
+        distribution(
+          signalList.map(
+            signal =>
+              signal
+                .finalAIConfidence ??
+              signal.confidence
+          ),
+          scoreBuckets
+        )
+    },
+
+    performance: {
+      strategy:
+        buildPerformanceBreakdown(
+          signalList,
+          signal =>
+            signal.strategyPriority
+              ?.primary
+        ),
+
+      pair:
+        buildPerformanceBreakdown(
+          signalList,
+          signal =>
+            signal.pair
+        ),
+
+      marketState:
+        buildPerformanceBreakdown(
+          signalList,
+          signal =>
+            signal.marketState
+              ?.state ||
+            signal.marketRegime
+        ),
+
+      session:
+        buildPerformanceBreakdown(
+          signalList,
+          signal =>
+            signal.session
+        ),
+
+      patternRanking:
+        buildPerformanceBreakdown(
+          signalList,
+          signal =>
+            signal.pattern
+        ),
+
+      learningGrowth:
+        learner
+          .getPerformanceTrend?.() ||
+        null
+    },
+
+    health
+  };
+}
+
+function persistPhase6Outputs(
+  allSignals,
+  newSignals,
+  learner,
+  health
+) {
+  const weeklyReport =
+    generateWeeklyReport(
+      allSignals,
+      learner
+    );
+
+  const dashboard =
+    generateDashboardData(
+      allSignals,
+      learner,
+      health
+    );
+
+  const recommendations =
+    generateOptimizerRecommendations(
+      allSignals,
+      learner
+    );
+
+  safeWriteJson(
+    WEEKLY_REPORT_FILE,
+    weeklyReport
+  );
+
+  safeWriteJson(
+    DASHBOARD_FILE,
+    dashboard
+  );
+
+  safeWriteJson(
+    OPTIMIZER_FILE,
+    {
+      version:
+        "6.0.0",
+
+      updatedAt:
+        nowIso(),
+
+      recommendations
+    }
+  );
+
+  safeWriteJson(
+    PHASE6_FILE,
+    {
+      version:
+        "6.0.0",
+
+      updatedAt:
+        nowIso(),
+
+      lastRun:
+        nowIso(),
+
+      publishedSignalId:
+        newSignals[0]
+          ?.signalId ||
+        null,
+
+      portfolio: {
+        openTrades:
+          allSignals.filter(
+            signal =>
+              OPEN_STATUSES.includes(
+                signal.status
+              )
+          ).length,
+
+        limits: {
+          maxOpenTrades:
+            MAX_OPEN_TRADES,
+
+          maxPairOpenTrades:
+            MAX_PAIR_OPEN_TRADES,
+
+          maxJPYExposure:
+            MAX_JPY_EXPOSURE
+        }
+      },
+
+      marketStates:
+        Object.fromEntries(
+          newSignals.map(
+            signal => [
+              `${signal.pair}_${signal.timeframe}`,
+              signal.marketState
+            ]
+          )
+        ),
+
+      strategyPriorities:
+        Object.fromEntries(
+          newSignals.map(
+            signal => [
+              `${signal.pair}_${signal.timeframe}`,
+              signal.strategyPriority
+            ]
+          )
+        ),
+
+      optimizerRecommendations:
+        recommendations
+    }
+  );
+}
+
+// =====================================================
 // Staleness
 // =====================================================
 
 function updateStaleness(
   reason
 ) {
-  try {
-    const data =
-      safeReadJson(
-        SIGNALS_FILE,
-        getDefaultSignalsData()
-      );
-
-    const stale = {};
-
-    for (
-      const pair of
-      SUPPORTED_PAIRS
-    ) {
-      stale[pair] =
-        true;
-    }
-
-    safeWriteJson(
+  const data =
+    safeReadJson(
       SIGNALS_FILE,
-      {
-        ...data,
+      getDefaultSignalsData()
+    );
 
-        stale: {
-          ...stale,
+  const stale =
+    Object.fromEntries(
+      SUPPORTED_PAIRS.map(
+        pair => [
+          pair,
+          true
+        ]
+      )
+    );
 
-          reason,
+  safeWriteJson(
+    SIGNALS_FILE,
+    {
+      ...data,
 
-          timestamp:
-            nowIso()
-        }
+      stale: {
+        ...stale,
+
+        reason,
+
+        timestamp:
+          nowIso()
       }
-    );
-  } catch (error) {
-    console.error(
-      "Error updating staleness:",
-      error.message
-    );
-  }
+    }
+  );
 }
 
 // =====================================================
@@ -2978,7 +5048,7 @@ function updateStaleness(
 
 async function runBot() {
   console.log(
-    "🤖 PipSight Pro AI Starting..."
+    "🤖 PipSight Pro AI Phase 6 Starting..."
   );
 
   console.log(
@@ -3011,10 +5081,10 @@ async function runBot() {
         data.confidence
       );
 
-    /*
-     * Important:
-     * SignalGenerator and index.js must use the same
-     * learner instance.
+    /**
+     * SignalGenerator and index.js share the same
+     * learner instance. Existing learning remains the
+     * base source for all Phase 6 intelligence.
      */
     const signalGenerator =
       new SignalGenerator({
@@ -3027,13 +5097,15 @@ async function runBot() {
           MINIMUM_CONFIDENCE
       });
 
-    /*
-     * Apply learned detector thresholds when the
-     * analyzer supports Phase 4 evolution.
+    /**
+     * Existing evolution recommendations are passed
+     * to analyzer only if analyzer supports the hook.
+     * Analyzer rules are never overwritten here.
      */
     const evolution =
       learner
-        .getPatternEvolutionRecommendations();
+        .getPatternEvolutionRecommendations?.() ||
+      {};
 
     if (
       typeof analyzer
@@ -3058,10 +5130,6 @@ async function runBot() {
       Date.now() -
       fetchStart;
 
-    console.log(
-      `📊 Fetch completed in ${fetchDurationMs} ms`
-    );
-
     if (!candles) {
       saveAuditLog();
 
@@ -3083,11 +5151,9 @@ async function runBot() {
     }
 
     const existingSignals =
-      Array.isArray(
+      safeArray(
         data.signals.signals
-      )
-        ? data.signals.signals
-        : [];
+      );
 
     const analysisStart =
       Date.now();
@@ -3105,10 +5171,6 @@ async function runBot() {
       Date.now() -
       analysisStart;
 
-    console.log(
-      `🔍 Analysis completed in ${analysisDurationMs} ms`
-    );
-
     const learningStart =
       Date.now();
 
@@ -3124,10 +5186,6 @@ async function runBot() {
       Date.now() -
       learningStart;
 
-    console.log(
-      `🧠 Learning completed in ${learningDurationMs} ms`
-    );
-
     const saveStart =
       Date.now();
 
@@ -3141,77 +5199,72 @@ async function runBot() {
       Date.now() -
       saveStart;
 
-    console.log(
-      `💾 Save completed in ${saveDurationMs} ms`
-    );
-
-    const averageConfidence =
-      newSignals.length > 0
-        ? newSignals.reduce(
-            (
-              total,
-              signal
-            ) =>
-              total +
-              toNumber(
-                signal.confidence,
-                0
-              ),
-            0
-          ) /
-          newSignals.length
-        : null;
-
-    const recentlyResolved =
+    const resolvedSignals =
       updatedSignals.filter(
         signal =>
-          signal.status ===
-            "WIN" ||
-          signal.status ===
+          [
+            "WIN",
             "LOSS"
+          ].includes(
+            signal.status
+          )
       );
 
-    const recentWins =
-      recentlyResolved.filter(
+    const wins =
+      resolvedSignals.filter(
         signal =>
           signal.status ===
           "WIN"
       ).length;
 
-    const recentWinRate =
-      recentlyResolved.length > 0
-        ? (
-            recentWins /
-            recentlyResolved.length
-          ) * 100
-        : null;
+    const learnerHealth =
+      learner
+        .getHealthStatus?.() ||
+      {
+        status:
+          "HEALTHY"
+      };
 
-    const learningHealth =
-      learner.getHealthStatus();
-
-    runHealthCheck({
+    const health = {
       status:
-        learningHealth?.status ||
+        learnerHealth.status ||
         "HEALTHY",
 
       signalsGenerated:
         newSignals.length,
 
       averageConfidence:
-        averageConfidence !== null
-          ? round(
-              averageConfidence,
-              1
+        round(
+          average(
+            newSignals.map(
+              signal =>
+                signal
+                  .finalAIConfidence ??
+                signal.confidence
             )
-          : null,
+          ),
+          1
+        ),
+
+      averageAIScore:
+        round(
+          average(
+            newSignals.map(
+              signal =>
+                signal.aiScore
+            )
+          ),
+          1
+        ),
 
       recentWinRate:
-        recentWinRate !== null
-          ? round(
-              recentWinRate,
-              1
-            )
-          : null,
+        round(
+          percent(
+            wins,
+            resolvedSignals.length
+          ),
+          1
+        ),
 
       openSignals:
         updatedSignals.filter(
@@ -3239,20 +5292,30 @@ async function runBot() {
       totalRuntimeMs:
         Date.now() -
         totalStart
-    });
+    };
+
+    runHealthCheck(
+      health
+    );
+
+    persistPhase6Outputs(
+      mergeSignals(
+        newSignals,
+        updatedSignals
+      ),
+      newSignals,
+      learner,
+      health
+    );
 
     saveAuditLog();
 
     console.log(
-      "\n✨ Bot execution complete"
+      "\n✨ Phase 6 execution complete"
     );
 
     console.log(
-      `📈 Signals generated: ${newSignals.length}`
-    );
-
-    console.log(
-      "💾 Data saved successfully"
+      `🏛️ Institutional signals published: ${newSignals.length}`
     );
 
     console.log(
@@ -3352,20 +5415,21 @@ process.on(
 if (
   require.main === module
 ) {
-  runBot().catch(
-    error => {
-      console.error(
-        "Fatal error:",
-        error
-      );
+  runBot()
+    .catch(
+      error => {
+        console.error(
+          "Fatal error:",
+          error
+        );
 
-      process.exitCode = 1;
-    }
-  );
+        process.exitCode = 1;
+      }
+    );
 }
 
 // =====================================================
-// Optional Exports for Testing
+// Backward-Compatible Exports
 // =====================================================
 
 module.exports = {
@@ -3410,6 +5474,30 @@ module.exports = {
   findActiveDuplicate,
 
   applyLegacySignalAliases,
+
+  detectAdvancedMarketState,
+
+  chooseStrategyPriority,
+
+  calculateFinalAIConfidence,
+
+  calculateInstitutionalAIScore,
+
+  getCorrelationPenalty,
+
+  evaluatePortfolioRisk,
+
+  generateExplanation,
+
+  selectInstitutionalSignal,
+
+  generateOptimizerRecommendations,
+
+  generateWeeklyReport,
+
+  generateDashboardData,
+
+  persistPhase6Outputs,
 
   OPEN_STATUSES,
 
