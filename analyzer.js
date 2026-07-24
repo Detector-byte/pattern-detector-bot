@@ -1172,3 +1172,231 @@ class PatternAnalyzer {
 
     return null;
   }
+    
+  detectRisingWedge(
+    candles,
+    recentHighs,
+    recentLows,
+    highSlope,
+    lowSlope,
+    trend
+  ) {
+    if (
+      highSlope >
+        this.regressionThreshold &&
+      lowSlope >
+        this.regressionThreshold &&
+      highSlope > lowSlope
+    ) {
+      const support =
+        this.lowest(recentLows);
+
+      if (
+        !this.isBreakoutConfirmed(
+          candles,
+          support,
+          'SELL'
+        )
+      ) {
+        return null;
+      }
+
+      if (trend !== 'UP') {
+        return null;
+      }
+
+      const confirmationScore = 90;
+
+      return {
+        name: 'Rising Wedge',
+        direction: 'SELL',
+        strength: 80,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        breakoutLevel: support
+      };
+    }
+
+    return null;
+  }
+
+  detectFallingWedge(
+    candles,
+    recentHighs,
+    recentLows,
+    highSlope,
+    lowSlope,
+    trend
+  ) {
+    if (
+      highSlope <
+        -this.regressionThreshold &&
+      lowSlope <
+        -this.regressionThreshold &&
+      Math.abs(lowSlope) >
+        Math.abs(highSlope)
+    ) {
+      const resistance =
+        this.highest(recentHighs);
+
+      if (
+        !this.isBreakoutConfirmed(
+          candles,
+          resistance,
+          'BUY'
+        )
+      ) {
+        return null;
+      }
+
+      if (trend !== 'DOWN') {
+        return null;
+      }
+
+      const confirmationScore = 90;
+
+      return {
+        name: 'Falling Wedge',
+        direction: 'BUY',
+        strength: 80,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        breakoutLevel: resistance
+      };
+    }
+
+    return null;
+  }
+
+  detectPennant(candles, highs, lows) {
+    if (candles.length < 40) {
+      return null;
+    }
+
+    const recentHighs =
+      highs.slice(-20);
+
+    const recentLows =
+      lows.slice(-20);
+
+    const highSlope =
+      this.linearRegressionSlope(
+        recentHighs
+      );
+
+    const lowSlope =
+      this.linearRegressionSlope(
+        recentLows
+      );
+
+    const closes =
+      candles.map(candle => candle.close);
+
+    const impulse =
+      Math.abs(
+        closes[20] - closes[0]
+      ) / closes[0];
+
+    if (
+      impulse > 0.03 &&
+      highSlope < 0 &&
+      lowSlope > 0
+    ) {
+      const direction =
+        closes[20] > closes[0]
+          ? 'BUY'
+          : 'SELL';
+
+      const breakoutLevel =
+        direction === 'BUY'
+          ? this.highest(recentHighs)
+          : this.lowest(recentLows);
+
+      if (
+        !this.isBreakoutConfirmed(
+          candles,
+          breakoutLevel,
+          direction
+        )
+      ) {
+        return null;
+      }
+
+      const confirmationScore = 91;
+
+      return {
+        name: 'Pennant',
+        direction,
+        strength: 84,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        breakoutLevel
+      };
+    }
+
+    return null;
+  }
+
+  detectFlag(candles, highs, lows, trend) {
+    if (candles.length < 40) {
+      return null;
+    }
+
+    const closes =
+      candles.map(candle => candle.close);
+
+    const impulse =
+      (closes[20] - closes[0]) /
+      closes[0];
+
+    const flagSlope =
+      this.linearRegressionSlope(
+        closes.slice(-15)
+      );
+
+    if (
+      impulse > 0.03 &&
+      flagSlope < 0
+    ) {
+      const resistance =
+        this.highest(
+          highs.slice(-15)
+        );
+
+      if (
+        !this.isBreakoutConfirmed(
+          candles,
+          resistance,
+          'BUY'
+        )
+      ) {
+        return null;
+      }
+
+      if (trend !== 'UP') {
+        return null;
+      }
+
+      const confirmationScore = 92;
+
+      return {
+        name: 'Bull Flag',
+        direction: 'BUY',
+        strength: 85,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        breakoutLevel: resistance
+      };
+    }
