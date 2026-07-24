@@ -1,30 +1,53 @@
 {
-  "name": "pattern-detector-bot",
-  "version": "1.0.0",
-  "description": "AI-powered pattern detection bot for XAUUSD & GBPJPY. Real-time chart pattern recognition with self-learning confidence system.",
+  "name": "pipsight-pro-ai",
+  "version": "6.0.0",
+  "description": "Institutional-grade AI trading engine for XAUUSD and GBPJPY with adaptive learning, signal ranking, portfolio risk control, explainable AI, market-state analysis, signal lifecycle management, performance reporting and continuous optimization.",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node index.js",
-    "dev": "node index.js --verbose",
-    "test": "echo \"Tests coming soon\""
+    "dev": "node --trace-warnings index.js --verbose",
+    "check": "node --check index.js && node --check analyzer.js && node --check learner.js && node --check signals.js && node --check resolver.js && node --check evaluator.js",
+    "check:index": "node --check index.js",
+    "check:core": "node --check analyzer.js && node --check learner.js && node --check signals.js",
+    "check:lifecycle": "node --check resolver.js && node --check evaluator.js",
+    "test": "npm run check"
   },
   "keywords": [
+    "pipsight",
+    "pro-ai",
+    "institutional-trading",
     "pattern-detection",
-    "trading",
+    "adaptive-learning",
+    "machine-learning",
+    "signal-ranking",
+    "portfolio-risk",
+    "correlation-engine",
+    "explainable-ai",
+    "market-regime",
+    "market-state",
     "forex",
     "gold",
-    "ai-bot",
+    "xauusd",
+    "gbpjpy",
     "candlestick-patterns",
-    "technical-analysis"
+    "technical-analysis",
+    "algorithmic-trading",
+    "trading-bot"
   ],
   "author": "Detector-byte",
   "license": "MIT",
   "dependencies": {},
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Detector-byte/pattern-detector-bot"
-  }
+    "url": "https://github.com/Detector-byte/pattern-detector-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Detector-byte/pattern-detector-bot/issues"
+  },
+  "homepage": "https://github.com/Detector-byte/pattern-detector-bot#readme",
+  "private": false
 }
