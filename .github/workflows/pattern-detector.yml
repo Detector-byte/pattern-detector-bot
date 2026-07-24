@@ -1,63 +1,81 @@
-name: Pattern Detector Bot - 5 Minute Execution
+name: PipSight Pro AI - 5 Minute Execution
 
 on:
   schedule:
     # Run every 5 minutes
-    - cron: '*/5 * * * *'
+    - cron: "*/5 * * * *"
 
-  # Allow manual trigger
+  # Allow manual execution
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
-  group: pattern-detector
+  group: pipsight-pro-ai-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  pattern-detection:
+  pro-ai-engine:
+    name: Run PipSight Pro AI
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v5
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
-      - name: Run Pattern Detection Bot
-        run: node index.js
+      - name: Validate Pro AI system
+        run: npm test
 
-      - name: Commit and push updates
+      - name: Run PipSight Pro AI
+        run: npm start
+
+      - name: Commit and push generated updates
+        shell: bash
         run: |
-          git config --global user.email "bot@detector-byte.com"
-          git config --global user.name "Pattern Bot"
+          set -e
 
-          # Check if there are changes
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git add -A
-            git commit -m "🤖 Pattern signals updated - $(date +'%Y-%m-%d %H:%M:%S')"
+          git config user.email "bot@detector-byte.com"
+          git config user.name "PipSight Pro AI"
 
-            # Get latest changes before pushing
-            git pull --rebase origin main
-
-            # Push updated changes
-            git push origin main
-          else
-            echo "No changes to commit"
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "No generated changes to commit"
+            exit 0
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log execution
+          echo "Generated changes detected:"
+          git status --short
+
+          git add -A
+
+          git commit \
+            -m "🤖 PipSight Pro AI update - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+
+          git pull --rebase origin "${{ github.ref_name }}"
+
+          git push origin "HEAD:${{ github.ref_name }}"
+
+      - name: Execution summary
         if: always()
+        shell: bash
         run: |
-          echo "✅ Bot execution completed at $(date)"
+          echo "========================================"
+          echo "PipSight Pro AI execution completed"
+          echo "Time: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           echo "Repository: ${{ github.repository }}"
-          echo "Workflow: Pattern Detector Bot"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Run number: ${{ github.run_number }}"
+          echo "Run result: ${{ job.status }}"
+          echo "========================================"
