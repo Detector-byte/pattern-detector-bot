@@ -2102,4 +2102,233 @@ class PatternAnalyzer {
       };
     }
 
+    // Sell-side liquidity sweep:
+    // Price trades below equal lows,
+    // but closes back above the level.
+    if (
+      equalLows &&
+      current.low <
+        equalLows.level &&
+      current.close >
+        equalLows.level
+    ) {
+      const rejection =
+        (
+          current.close -
+          current.low
+        ) /
+        current.low;
+
+      const confirmationScore =
+        Math.min(
+          95,
+          Math.round(
+            82 +
+            rejection * 1000
+          )
+        );
+
+      return {
+        name:
+          'Liquidity Sweep (Sell-Side)',
+        direction: 'BUY',
+        strength:
+          Math.min(
+            95,
+            Math.round(
+              75 +
+              rejection * 1000
+            )
+          ),
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        liquidityLevel:
+          equalLows.level,
+        sweptLevel:
+          equalLows.level,
+        previousClose:
+          previous.close,
+        breakoutLevel:
+          equalLows.level,
+        _ageIndex:
+          lastIndex
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Detect Break of Structure.
+   *
+   * A bullish BOS occurs when price closes above
+   * the latest confirmed swing high.
+   *
+   * A bearish BOS occurs when price closes below
+   * the latest confirmed swing low.
+   */
+  detectBOS(
+    candles,
+    swingHighs,
+    swingLows,
+    trend = 'SIDEWAYS'
+  ) {
+    if (
+      !candles ||
+      candles.length < 5
+    ) {
+      return null;
+    }
+
+    const lastIndex =
+      candles.length - 1;
+
+    const current =
+      candles[lastIndex];
+
+    const previous =
+      candles[lastIndex - 1];
+
+    const latestHigh =
+      this.getLatestSwingBeforeIndex(
+        swingHighs,
+        lastIndex
+      );
+
+    const latestLow =
+      this.getLatestSwingBeforeIndex(
+        swingLows,
+        lastIndex
+      );
+
+    // Bullish continuation BOS.
+    if (
+      latestHigh &&
+      current.close >
+        latestHigh.value &&
+      previous.close <=
+        latestHigh.value
+    ) {
+      const breakoutStrength =
+        (
+          current.close -
+          latestHigh.value
+        ) /
+        latestHigh.value;
+
+      let confirmationScore =
+        Math.min(
+          95,
+          Math.round(
+            82 +
+            breakoutStrength * 1000
+          )
+        );
+
+      // A BOS aligned with the existing trend
+      // receives a small confirmation boost.
+      if (trend === 'UP') {
+        confirmationScore =
+          Math.min(
+            95,
+            confirmationScore + 4
+          );
+      }
+
+      return {
+        name: 'Break of Structure',
+        direction: 'BUY',
+        structureType:
+          'BULLISH_BOS',
+        strength:
+          Math.min(
+            95,
+            Math.round(
+              75 +
+              breakoutStrength * 1000
+            )
+          ),
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        brokenSwingIndex:
+          latestHigh.index,
+        breakoutLevel:
+          latestHigh.value,
+        _ageIndex:
+          lastIndex,
+        _maxAge:
+          this.maxSMCPatternAge
+      };
+    }
+
+    // Bearish continuation BOS.
+    if (
+      latestLow &&
+      current.close <
+        latestLow.value &&
+      previous.close >=
+        latestLow.value
+    ) {
+      const breakoutStrength =
+        (
+          latestLow.value -
+          current.close
+        ) /
+        latestLow.value;
+
+      let confirmationScore =
+        Math.min(
+          95,
+          Math.round(
+            82 +
+            breakoutStrength * 1000
+          )
+        );
+
+      if (trend === 'DOWN') {
+        confirmationScore =
+          Math.min(
+            95,
+            confirmationScore + 4
+          );
+      }
+
+      return {
+        name: 'Break of Structure',
+        direction: 'SELL',
+        structureType:
+          'BEARISH_BOS',
+        strength:
+          Math.min(
+            95,
+            Math.round(
+              75 +
+              breakoutStrength * 1000
+            )
+          ),
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        brokenSwingIndex:
+          latestLow.index,
+        breakoutLevel:
+          latestLow.value,
+        _ageIndex:
+          lastIndex,
+        _maxAge:
+          this.maxSMCPatternAge
+      };
+    }
+
+    return null;
+  }
+
   
