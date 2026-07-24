@@ -1785,3 +1785,321 @@ class PatternAnalyzer {
 
     return null;
   }
+
+  detectBearishEngulfing(candles) {
+    if (
+      !candles ||
+      candles.length < 2
+    ) {
+      return null;
+    }
+
+    const previous =
+      candles[candles.length - 2];
+
+    const current =
+      candles[candles.length - 1];
+
+    const previousBullish =
+      previous.close >
+      previous.open;
+
+    const currentBearish =
+      current.close <
+      current.open;
+
+    const bodyEngulfed =
+      current.open >=
+        previous.close &&
+      current.close <=
+        previous.open;
+
+    if (
+      previousBullish &&
+      currentBearish &&
+      bodyEngulfed
+    ) {
+      const previousBody =
+        Math.abs(
+          previous.close -
+          previous.open
+        );
+
+      const currentBody =
+        Math.abs(
+          current.close -
+          current.open
+        );
+
+      const bodyRatio =
+        previousBody > 0
+          ? currentBody /
+            previousBody
+          : 1;
+
+      const strength =
+        Math.min(
+          95,
+          Math.round(
+            70 + bodyRatio * 10
+          )
+        );
+
+      const confirmationScore =
+        Math.min(
+          93,
+          Math.round(
+            78 + bodyRatio * 7
+          )
+        );
+
+      return {
+        name: 'Bearish Engulfing',
+        direction: 'SELL',
+        strength,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        _ageIndex:
+          candles.length - 1
+      };
+    }
+
+    return null;
+  }
+
+  // =====================================================
+  // Phase 4: Smart Money Concepts
+  // =====================================================
+
+  /**
+   * Detect equal swing highs.
+   *
+   * Equal highs may represent buy-side liquidity
+   * resting above the market.
+   */
+  detectEqualHighs(
+    swingHighs,
+    tolerancePercent =
+      this.liquidityTolerance
+  ) {
+    if (
+      !swingHighs ||
+      swingHighs.length < 2
+    ) {
+      return null;
+    }
+
+    // Start with the latest swing points because
+    // recent liquidity levels are more relevant.
+    for (
+      let i = swingHighs.length - 1;
+      i > 0;
+      i--
+    ) {
+      for (
+        let j = i - 1;
+        j >= 0;
+        j--
+      ) {
+        const first =
+          swingHighs[j];
+
+        const second =
+          swingHighs[i];
+
+        const difference =
+          Math.abs(
+            second.value -
+            first.value
+          ) / first.value;
+
+        if (
+          difference <=
+          tolerancePercent
+        ) {
+          return {
+            level:
+              (
+                first.value +
+                second.value
+              ) / 2,
+
+            indices: [
+              first.index,
+              second.index
+            ],
+
+            first,
+            second
+          };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Detect equal swing lows.
+   *
+   * Equal lows may represent sell-side liquidity
+   * resting below the market.
+   */
+  detectEqualLows(
+    swingLows,
+    tolerancePercent =
+      this.liquidityTolerance
+  ) {
+    if (
+      !swingLows ||
+      swingLows.length < 2
+    ) {
+      return null;
+    }
+
+    for (
+      let i = swingLows.length - 1;
+      i > 0;
+      i--
+    ) {
+      for (
+        let j = i - 1;
+        j >= 0;
+        j--
+      ) {
+        const first =
+          swingLows[j];
+
+        const second =
+          swingLows[i];
+
+        const difference =
+          Math.abs(
+            second.value -
+            first.value
+          ) / first.value;
+
+        if (
+          difference <=
+          tolerancePercent
+        ) {
+          return {
+            level:
+              (
+                first.value +
+                second.value
+              ) / 2,
+
+            indices: [
+              first.index,
+              second.index
+            ],
+
+            first,
+            second
+          };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Detect a liquidity sweep.
+   *
+   * A valid sweep temporarily trades through
+   * an equal-high/equal-low liquidity level,
+   * then closes back inside the previous range.
+   */
+  detectLiquiditySweep(
+    candles,
+    swingHighs,
+    swingLows
+  ) {
+    if (
+      !candles ||
+      candles.length < 5
+    ) {
+      return null;
+    }
+
+    const lastIndex =
+      candles.length - 1;
+
+    const current =
+      candles[lastIndex];
+
+    const previous =
+      candles[lastIndex - 1];
+
+    const equalHighs =
+      this.detectEqualHighs(
+        swingHighs
+      );
+
+    const equalLows =
+      this.detectEqualLows(
+        swingLows
+      );
+
+    // Buy-side liquidity sweep:
+    // Price trades above equal highs,
+    // but closes back below the level.
+    if (
+      equalHighs &&
+      current.high >
+        equalHighs.level &&
+      current.close <
+        equalHighs.level
+    ) {
+      const rejection =
+        (
+          current.high -
+          current.close
+        ) /
+        current.high;
+
+      const confirmationScore =
+        Math.min(
+          95,
+          Math.round(
+            82 +
+            rejection * 1000
+          )
+        );
+
+      return {
+        name:
+          'Liquidity Sweep (Buy-Side)',
+        direction: 'SELL',
+        strength:
+          Math.min(
+            95,
+            Math.round(
+              75 +
+              rejection * 1000
+            )
+          ),
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        liquidityLevel:
+          equalHighs.level,
+        sweptLevel:
+          equalHighs.level,
+        previousClose:
+          previous.close,
+        breakoutLevel:
+          equalHighs.level,
+        _ageIndex:
+          lastIndex
+      };
+    }
+
+  
