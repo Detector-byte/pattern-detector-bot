@@ -806,3 +806,173 @@ class PatternAnalyzer {
     ) {
       return null;
     }
+        const strength =
+      ((head.value - neckline) /
+        neckline) *
+      100;
+
+    let confirmationScore =
+      this.calculatePatternQuality(
+        strength,
+        90
+      );
+
+    // Shoulder symmetry is now scored instead of
+    // relying only on a hard pass/fail threshold.
+    const shoulderSymmetryScore =
+      Math.max(
+        0,
+        100 - shoulderDiff * 2000
+      );
+
+    confirmationScore =
+      confirmationScore * 0.85 +
+      shoulderSymmetryScore * 0.15;
+
+    // A declining neckline strengthens
+    // the bearish Head and Shoulders setup.
+    const necklineSlope =
+      (rightValley - leftValley) /
+      (right.index - head.index || 1);
+
+    if (necklineSlope < 0) {
+      confirmationScore += 3;
+    }
+
+    confirmationScore = Math.max(
+      50,
+      Math.min(
+        95,
+        Math.round(confirmationScore)
+      )
+    );
+
+    return {
+      name: 'Head and Shoulders',
+      direction: 'SELL',
+      strength: Math.round(strength),
+      confirmationScore,
+      reliability:
+        this.getReliability(
+          confirmationScore
+        ),
+      shoulderSymmetryScore:
+        Math.round(
+          shoulderSymmetryScore
+        ),
+      necklineSlope,
+
+      // Target equals neckline minus
+      // the height of the head.
+      targetPrice: +(
+        neckline -
+        (head.value - neckline)
+      ).toFixed(5),
+
+      // Stop loss sits above the right shoulder.
+      stopLoss: +right.value.toFixed(5),
+      breakoutLevel: neckline,
+      _ageIndex: right.index
+    };
+  }
+
+  detectInverseHeadShoulders(candles) {
+    const swings = this.findSwingLows(
+      candles.map(candle => candle.low)
+    );
+
+    if (swings.length < 3) return null;
+
+    // Use the latest three swing lows.
+    const left =
+      swings[swings.length - 3];
+
+    const head =
+      swings[swings.length - 2];
+
+    const right =
+      swings[swings.length - 1];
+
+    // The head must be below both shoulders.
+    if (
+      !(
+        head.value < left.value &&
+        head.value < right.value
+      )
+    ) {
+      return null;
+    }
+
+    // Both shoulders should be reasonably similar.
+    const shoulderDiff =
+      Math.abs(left.value - right.value) /
+      Math.max(left.value, right.value);
+
+    if (shoulderDiff > 0.03) {
+      return null;
+    }
+
+    // Enforce minimum spacing between swing points.
+    if (
+      head.index - left.index <
+        this.minSwingDistance ||
+      right.index - head.index <
+        this.minSwingDistance
+    ) {
+      return null;
+    }
+
+    // Calculate the neckline from both peaks.
+    const leftPeak = this.highest(
+      candles
+        .slice(
+          left.index,
+          head.index + 1
+        )
+        .map(candle => candle.high)
+    );
+
+    const rightPeak = this.highest(
+      candles
+        .slice(
+          head.index,
+          right.index + 1
+        )
+        .map(candle => candle.high)
+    );
+
+    const neckline =
+      (leftPeak + rightPeak) / 2;
+
+    if (
+      !this.isBreakoutConfirmed(
+        candles,
+        neckline,
+        'BUY'
+      )
+    ) {
+      return null;
+    }
+
+    const strength =
+      ((neckline - head.value) /
+        head.value) *
+      100;
+
+    let confirmationScore =
+      this.calculatePatternQuality(
+        strength,
+        90
+      );
+
+    // Score shoulder symmetry for a smoother
+    // and more reliable confirmation value.
+    const shoulderSymmetryScore =
+      Math.max(
+        0,
+        100 - shoulderDiff * 2000
+      );
+
+    confirmationScore =
+      confirmationScore * 0.85 +
+      shoulderSymmetryScore * 0.15;
