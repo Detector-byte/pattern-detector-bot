@@ -1604,3 +1604,184 @@ class PatternAnalyzer {
       highs: highs.slice(n - 25),
       lows: lows.slice(n - 25)
     };
+    const mid = Math.floor(
+      recent.highs.length / 2
+    );
+
+    const firstHalfExpand =
+      recent.highs[0] -
+        recent.lows[0] <
+      recent.highs[mid] -
+        recent.lows[mid];
+
+    const secondHalfShrink =
+      recent.highs[mid] -
+        recent.lows[mid] >
+      recent.highs[
+        recent.highs.length - 1
+      ] -
+        recent.lows[
+          recent.lows.length - 1
+        ];
+
+    if (
+      firstHalfExpand &&
+      secondHalfShrink
+    ) {
+      const confirmationScore = 80;
+
+      return {
+        name: 'Diamond Top',
+        direction: 'SELL',
+        strength: 73,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          )
+      };
+    }
+
+    return null;
+  }
+
+  detectDiamondBottom(
+    candles,
+    highs,
+    lows
+  ) {
+    const n = candles.length;
+
+    if (n < 25) {
+      return null;
+    }
+
+    const recent = {
+      highs: highs.slice(n - 25),
+      lows: lows.slice(n - 25)
+    };
+
+    const mid = Math.floor(
+      recent.highs.length / 2
+    );
+
+    const firstHalfExpand =
+      recent.highs[0] -
+        recent.lows[0] <
+      recent.highs[mid] -
+        recent.lows[mid];
+
+    const secondHalfShrink =
+      recent.highs[mid] -
+        recent.lows[mid] >
+      recent.highs[
+        recent.highs.length - 1
+      ] -
+        recent.lows[
+          recent.lows.length - 1
+        ];
+
+    if (
+      firstHalfExpand &&
+      secondHalfShrink
+    ) {
+      const confirmationScore = 80;
+
+      return {
+        name: 'Diamond Bottom',
+        direction: 'BUY',
+        strength: 73,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          )
+      };
+    }
+
+    return null;
+  }
+
+  detectBullishEngulfing(candles) {
+    if (
+      !candles ||
+      candles.length < 2
+    ) {
+      return null;
+    }
+
+    const previous =
+      candles[candles.length - 2];
+
+    const current =
+      candles[candles.length - 1];
+
+    const previousBearish =
+      previous.close <
+      previous.open;
+
+    const currentBullish =
+      current.close >
+      current.open;
+
+    const bodyEngulfed =
+      current.open <=
+        previous.close &&
+      current.close >=
+        previous.open;
+
+    if (
+      previousBearish &&
+      currentBullish &&
+      bodyEngulfed
+    ) {
+      const previousBody =
+        Math.abs(
+          previous.close -
+          previous.open
+        );
+
+      const currentBody =
+        Math.abs(
+          current.close -
+          current.open
+        );
+
+      const bodyRatio =
+        previousBody > 0
+          ? currentBody /
+            previousBody
+          : 1;
+
+      const strength =
+        Math.min(
+          95,
+          Math.round(
+            70 + bodyRatio * 10
+          )
+        );
+
+      const confirmationScore =
+        Math.min(
+          93,
+          Math.round(
+            78 + bodyRatio * 7
+          )
+        );
+
+      return {
+        name: 'Bullish Engulfing',
+        direction: 'BUY',
+        strength,
+        confirmationScore,
+        reliability:
+          this.getReliability(
+            confirmationScore
+          ),
+        _ageIndex:
+          candles.length - 1
+      };
+    }
+
+    return null;
+  }
