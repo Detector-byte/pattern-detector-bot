@@ -1542,3 +1542,1882 @@ function selectBestPattern(
 
   return best;
 }
+
+// =====================================================
+// Pair Analysis
+// =====================================================
+
+function refreshExistingSignal(
+  existingSignal,
+  newSignal,
+  pattern
+) {
+  const oldConfidence =
+    toNumber(
+      existingSignal.confidence,
+      0
+    );
+
+  const newConfidence =
+    toNumber(
+      newSignal.confidence,
+      0
+    );
+
+  if (
+    newConfidence >
+    oldConfidence
+  ) {
+    existingSignal.confidence =
+      newConfidence;
+  }
+
+  const oldConfirmation =
+    toNumber(
+      existingSignal
+        .confirmationScore,
+      0
+    );
+
+  const newConfirmation =
+    toNumber(
+      pattern.confirmationScore,
+      0
+    );
+
+  if (
+    newConfirmation >
+    oldConfirmation
+  ) {
+    existingSignal
+      .confirmationScore =
+      newConfirmation;
+  }
+
+  const newTarget1 =
+    getPrimaryTakeProfit(
+      newSignal
+    );
+
+  const newTarget2 =
+    getSecondTakeProfit(
+      newSignal
+    );
+
+  const newTarget3 =
+    getThirdTakeProfit(
+      newSignal
+    );
+
+  if (
+    newSignal.direction ===
+    "BUY"
+  ) {
+    if (
+      toNumber(
+        newSignal.stopLoss,
+        -Infinity
+      ) >
+      toNumber(
+        existingSignal.stopLoss,
+        -Infinity
+      )
+    ) {
+      existingSignal.stopLoss =
+        newSignal.stopLoss;
+    }
+
+    if (
+      newTarget1 >
+      getPrimaryTakeProfit(
+        existingSignal
+      )
+    ) {
+      existingSignal.takeProfit =
+        newTarget1;
+
+      existingSignal.takeProfit1 =
+        newTarget1;
+    }
+
+    if (
+      newTarget2 >
+      getSecondTakeProfit(
+        existingSignal
+      )
+    ) {
+      existingSignal.takeProfit2 =
+        newTarget2;
+    }
+
+    if (
+      newTarget3 >
+      getThirdTakeProfit(
+        existingSignal
+      )
+    ) {
+      existingSignal.takeProfit3 =
+        newTarget3;
+    }
+
+    if (
+      toNumber(
+        newSignal.entry,
+        -Infinity
+      ) >
+      toNumber(
+        existingSignal.entry,
+        -Infinity
+      )
+    ) {
+      existingSignal.entry =
+        newSignal.entry;
+    }
+  } else if (
+    newSignal.direction ===
+    "SELL"
+  ) {
+    if (
+      toNumber(
+        newSignal.stopLoss,
+        Infinity
+      ) <
+      toNumber(
+        existingSignal.stopLoss,
+        Infinity
+      )
+    ) {
+      existingSignal.stopLoss =
+        newSignal.stopLoss;
+    }
+
+    if (
+      newTarget1 <
+      getPrimaryTakeProfit(
+        existingSignal
+      )
+    ) {
+      existingSignal.takeProfit =
+        newTarget1;
+
+      existingSignal.takeProfit1 =
+        newTarget1;
+    }
+
+    if (
+      newTarget2 <
+      getSecondTakeProfit(
+        existingSignal
+      )
+    ) {
+      existingSignal.takeProfit2 =
+        newTarget2;
+    }
+
+    if (
+      newTarget3 <
+      getThirdTakeProfit(
+        existingSignal
+      )
+    ) {
+      existingSignal.takeProfit3 =
+        newTarget3;
+    }
+
+    if (
+      toNumber(
+        newSignal.entry,
+        Infinity
+      ) <
+      toNumber(
+        existingSignal.entry,
+        Infinity
+      )
+    ) {
+      existingSignal.entry =
+        newSignal.entry;
+    }
+  }
+
+  existingSignal.qualityScore =
+    Math.max(
+      toNumber(
+        existingSignal
+          .qualityScore,
+        0
+      ),
+      toNumber(
+        newSignal.qualityScore,
+        0
+      )
+    );
+
+  existingSignal
+    .adaptiveConfidence =
+    newSignal
+      .adaptiveConfidence ??
+    existingSignal
+      .adaptiveConfidence;
+
+  existingSignal
+    .patternWeight =
+    newSignal.patternWeight ??
+    existingSignal.patternWeight;
+
+  existingSignal
+    .marketRegime =
+    newSignal.marketRegime ??
+    existingSignal.marketRegime;
+
+  existingSignal
+    .lastUpdated =
+    nowIso();
+
+  existingSignal
+    .refreshCount =
+    (
+      existingSignal
+        .refreshCount ||
+      1
+    ) + 1;
+
+  existingSignal.version =
+    (
+      existingSignal.version ||
+      1
+    ) + 1;
+
+  return {
+    oldConfidence,
+
+    newConfidence:
+      existingSignal.confidence
+  };
+}
+
+function analyzePair(
+  pair,
+  candles,
+  analyzer,
+  learner,
+  signalGenerator,
+  existingSignals
+) {
+  const generatedSignals = [];
+
+  const trendCache = {};
+
+  if (
+    !candles?.[pair]
+  ) {
+    return generatedSignals;
+  }
+
+  /*
+   * Precalculate available trends so lower timeframes
+   * can use 1H/4H confirmation even if they are
+   * processed first.
+   */
+  for (
+    const timeframe of
+    SUPPORTED_TIMEFRAMES
+  ) {
+    const timeframeCandles =
+      candles[pair][
+        timeframe
+      ];
+
+    if (
+      !Array.isArray(
+        timeframeCandles
+      ) ||
+      timeframeCandles.length <
+        MINIMUM_CANDLES
+    ) {
+      continue;
+    }
+
+    trendCache[
+      `${pair}_${timeframe}`
+    ] =
+      analyzer.detectTrend(
+        timeframeCandles
+      );
+  }
+
+  for (
+    const timeframe of
+    SUPPORTED_TIMEFRAMES
+  ) {
+    const timeframeCandles =
+      candles[pair][
+        timeframe
+      ];
+
+    if (
+      !Array.isArray(
+        timeframeCandles
+      ) ||
+      timeframeCandles.length <
+        MINIMUM_CANDLES
+    ) {
+      continue;
+    }
+
+    const volatilityCheck =
+      passesSpreadVolatilityFilter(
+        timeframeCandles
+      );
+
+    if (
+      !volatilityCheck.pass
+    ) {
+      console.log(
+        `🚫 ${pair} ${timeframe} | Skipped — ${volatilityCheck.reason}`
+      );
+
+      logAudit({
+        pair,
+
+        timeframe,
+
+        decision:
+          "REJECTED",
+
+        reason:
+          volatilityCheck.reason
+      });
+
+      continue;
+    }
+
+    const patterns =
+      analyzer.detectAllPatterns(
+        timeframeCandles
+      );
+
+    if (
+      !Array.isArray(patterns) ||
+      patterns.length === 0
+    ) {
+      continue;
+    }
+
+    const best =
+      selectBestPattern(
+        pair,
+        timeframe,
+        patterns,
+        timeframeCandles,
+        learner,
+        signalGenerator
+      );
+
+    if (!best) {
+      continue;
+    }
+
+    const {
+      pattern,
+      signal,
+      confidence
+    } = best;
+
+    const higherTrend =
+      timeframe === "4H"
+        ? null
+        : (
+            trendCache[
+              `${pair}_4H`
+            ] ||
+            trendCache[
+              `${pair}_1H`
+            ]
+          );
+
+    if (
+      higherTrend &&
+      higherTrend !==
+        "SIDEWAYS" &&
+      higherTrend !==
+        "NEUTRAL" &&
+      higherTrend !==
+        signal.direction
+    ) {
+      logAudit({
+        pair,
+
+        timeframe,
+
+        pattern:
+          pattern.name,
+
+        decision:
+          "REJECTED",
+
+        reason:
+          `against higher-timeframe trend (${higherTrend})`
+      });
+
+      continue;
+    }
+
+    const activeMatch =
+      findActiveDuplicate(
+        pair,
+        timeframe,
+        pattern.name,
+        existingSignals
+      );
+
+    if (activeMatch) {
+      const refresh =
+        refreshExistingSignal(
+          activeMatch,
+          signal,
+          pattern
+        );
+
+      console.log(
+        `🔁 ${pair} ${timeframe} | ${pattern.name} refreshed → v${activeMatch.version} (refresh #${activeMatch.refreshCount})`
+      );
+
+      logAudit({
+        pair,
+
+        timeframe,
+
+        pattern:
+          pattern.name,
+
+        decision:
+          "REFRESHED",
+
+        reason:
+          `confidence ${refresh.oldConfidence}% → ${refresh.newConfidence}%, version ${activeMatch.version}`
+      });
+
+      continue;
+    }
+
+    const timestamp =
+      nowIso();
+
+    const preparedSignal =
+      applyLegacySignalAliases({
+        ...signal,
+
+        signalId:
+          buildSignalId(
+            pair,
+            timeframe,
+            pattern.name
+          ),
+
+        timestamp,
+
+        status:
+          "NEW",
+
+        version: 1,
+
+        createdAt:
+          timestamp,
+
+        lastUpdated:
+          timestamp,
+
+        refreshCount: 1,
+
+        outcome: null
+      });
+
+    if (
+      isSignalInCooldown(
+        preparedSignal,
+        existingSignals
+      )
+    ) {
+      logAudit({
+        pair,
+
+        timeframe,
+
+        pattern:
+          pattern.name,
+
+        decision:
+          "REJECTED",
+
+        reason:
+          "cooldown active"
+      });
+
+      continue;
+    }
+
+    generatedSignals.push(
+      preparedSignal
+    );
+
+    /*
+     * Include the new signal in duplicate/cooldown
+     * checks for the remainder of this run.
+     */
+    existingSignals.push(
+      preparedSignal
+    );
+
+    console.log(
+      `✅ ${pair} ${timeframe} | ${pattern.name} | ${signal.direction} | Confidence: ${confidence}%`
+    );
+
+    logAudit({
+      pair,
+
+      timeframe,
+
+      pattern:
+        pattern.name,
+
+      decision:
+        "GENERATED",
+
+      direction:
+        signal.direction,
+
+      confidence,
+
+      qualityScore:
+        signal.qualityScore,
+
+      marketRegime:
+        signal.marketRegime,
+
+      reason:
+        "passed trend, session, volatility, cooldown and consensus filters"
+    });
+  }
+
+  return generatedSignals;
+}
+
+function analyzeMarkets(
+  candles,
+  analyzer,
+  learner,
+  signalGenerator,
+  existingSignals
+) {
+  console.log(
+    "🔍 Analyzing patterns..."
+  );
+
+  const newSignals = [];
+
+  const workingSignals =
+    Array.isArray(
+      existingSignals
+    )
+      ? existingSignals
+      : [];
+
+  for (
+    const pair of
+    SUPPORTED_PAIRS
+  ) {
+    newSignals.push(
+      ...analyzePair(
+        pair,
+        candles,
+        analyzer,
+        learner,
+        signalGenerator,
+        workingSignals
+      )
+    );
+  }
+
+  return newSignals;
+}
+
+// =====================================================
+// Signal Resolution
+// =====================================================
+
+function determineSignalOutcome(
+  signal,
+  candle
+) {
+  if (
+    !signal ||
+    !candle
+  ) {
+    return null;
+  }
+
+  const high =
+    toNumber(
+      candle.high,
+      NaN
+    );
+
+  const low =
+    toNumber(
+      candle.low,
+      NaN
+    );
+
+  const stopLoss =
+    toNumber(
+      signal.stopLoss,
+      NaN
+    );
+
+  const target =
+    getPrimaryTakeProfit(
+      signal
+    );
+
+  if (
+    !Number.isFinite(high) ||
+    !Number.isFinite(low) ||
+    !Number.isFinite(
+      stopLoss
+    ) ||
+    !Number.isFinite(target)
+  ) {
+    return null;
+  }
+
+  if (
+    signal.direction ===
+    "BUY"
+  ) {
+    const targetHit =
+      high >= target;
+
+    const stopHit =
+      low <= stopLoss;
+
+    /*
+     * Conservative handling when both TP and SL
+     * appear inside the same candle.
+     */
+    if (
+      targetHit &&
+      stopHit
+    ) {
+      return "LOSS";
+    }
+
+    if (targetHit) {
+      return "WIN";
+    }
+
+    if (stopHit) {
+      return "LOSS";
+    }
+  }
+
+  if (
+    signal.direction ===
+    "SELL"
+  ) {
+    const targetHit =
+      low <= target;
+
+    const stopHit =
+      high >= stopLoss;
+
+    if (
+      targetHit &&
+      stopHit
+    ) {
+      return "LOSS";
+    }
+
+    if (targetHit) {
+      return "WIN";
+    }
+
+    if (stopHit) {
+      return "LOSS";
+    }
+  }
+
+  return null;
+}
+
+async function resolvePendingSignals(
+  learner,
+  existingSignals,
+  candles
+) {
+  if (
+    !Array.isArray(
+      existingSignals
+    )
+  ) {
+    return existingSignals;
+  }
+
+  const resolutions = [];
+
+  for (
+    const signal of
+    existingSignals
+  ) {
+    if (
+      !signal ||
+      !OPEN_STATUSES.includes(
+        signal.status
+      )
+    ) {
+      continue;
+    }
+
+    if (
+      signal.status ===
+      "NEW"
+    ) {
+      signal.status =
+        "ACTIVE";
+
+      signal.lastUpdated =
+        nowIso();
+    }
+
+    const pairCandles =
+      candles?.[
+        signal.pair
+      ]?.[
+        signal.timeframe
+      ];
+
+    if (
+      !Array.isArray(
+        pairCandles
+      ) ||
+      pairCandles.length === 0
+    ) {
+      continue;
+    }
+
+    const latest =
+      pairCandles[
+        pairCandles.length - 1
+      ];
+
+    const outcome =
+      determineSignalOutcome(
+        signal,
+        latest
+      );
+
+    if (outcome) {
+      signal.outcome =
+        outcome;
+
+      signal.status =
+        outcome;
+
+      signal.resolvedAt =
+        nowIso();
+
+      signal.lastUpdated =
+        signal.resolvedAt;
+
+      resolutions.push({
+        id:
+          signal.id ||
+          signal.signalId ||
+          signal.timestamp,
+
+        outcome,
+
+        resolvedAt:
+          signal.resolvedAt
+      });
+
+      console.log(
+        `🎯 ${signal.pattern} ${signal.pair} ${signal.timeframe} → ${outcome}`
+      );
+
+      logAudit({
+        pair:
+          signal.pair,
+
+        timeframe:
+          signal.timeframe,
+
+        pattern:
+          signal.pattern,
+
+        decision:
+          "RESOLVED",
+
+        outcome,
+
+        reason:
+          outcome === "WIN"
+            ? "take-profit reached"
+            : "stop-loss reached"
+      });
+
+      continue;
+    }
+
+    const expiryMs =
+      EXPIRY_MAP[
+        signal.timeframe
+      ];
+
+    if (!expiryMs) {
+      continue;
+    }
+
+    const createdTime =
+      new Date(
+        getSignalTimestamp(
+          signal
+        )
+      ).getTime();
+
+    if (
+      Number.isNaN(
+        createdTime
+      )
+    ) {
+      continue;
+    }
+
+    const elapsed =
+      Date.now() -
+      createdTime;
+
+    if (
+      elapsed >= expiryMs
+    ) {
+      signal.status =
+        "EXPIRED";
+
+      signal.outcome =
+        "EXPIRED";
+
+      signal.expiredAt =
+        nowIso();
+
+      signal.lastUpdated =
+        signal.expiredAt;
+
+      console.log(
+        `⌛ ${signal.pattern} ${signal.pair} ${signal.timeframe} → EXPIRED`
+      );
+
+      logAudit({
+        pair:
+          signal.pair,
+
+        timeframe:
+          signal.timeframe,
+
+        pattern:
+          signal.pattern,
+
+        decision:
+          "EXPIRED",
+
+        reason:
+          `signal exceeded ${signal.timeframe} lifecycle limit`
+      });
+    }
+  }
+
+  if (
+    resolutions.length > 0
+  ) {
+    if (
+      typeof learner
+        .resolveSignals ===
+        "function"
+    ) {
+      learner.resolveSignals(
+        resolutions
+      );
+    } else {
+      for (
+        const resolution of
+        resolutions
+      ) {
+        learner.resolveSignal(
+          resolution.id,
+          resolution.outcome
+        );
+      }
+    }
+  }
+
+  return existingSignals;
+}
+
+// =====================================================
+// Learning Update
+// =====================================================
+
+async function updateLearning(
+  learner,
+  existingSignals,
+  newSignals,
+  candles
+) {
+  console.log(
+    "🧠 Updating learning outcomes..."
+  );
+
+  await resolvePendingSignals(
+    learner,
+    existingSignals,
+    candles
+  );
+
+  if (
+    Array.isArray(
+      newSignals
+    ) &&
+    newSignals.length > 0
+  ) {
+    learner.updateHistory(
+      newSignals
+    );
+  } else {
+    learner.updatePatternStats();
+  }
+
+  if (
+    typeof learner
+      .runLearningCycle ===
+      "function"
+  ) {
+    learner.runLearningCycle();
+  }
+
+  return existingSignals;
+}
+
+// =====================================================
+// Archive and Persistence
+// =====================================================
+
+function archiveSignals(
+  signalsToArchive
+) {
+  if (
+    !Array.isArray(
+      signalsToArchive
+    ) ||
+    signalsToArchive.length === 0
+  ) {
+    return;
+  }
+
+  try {
+    const archiveData =
+      safeReadJson(
+        ARCHIVE_FILE,
+        getDefaultArchiveData()
+      );
+
+    const existingArchive =
+      Array.isArray(
+        archiveData.signals
+      )
+        ? archiveData.signals
+        : [];
+
+    const archivedEntries =
+      signalsToArchive.map(
+        signal => ({
+          ...signal,
+
+          previousStatus:
+            signal.status,
+
+          status:
+            "ARCHIVED",
+
+          archivedAt:
+            nowIso()
+        })
+      );
+
+    const combined =
+      [
+        ...existingArchive,
+        ...archivedEntries
+      ].slice(
+        -MAX_ARCHIVE_SIGNALS
+      );
+
+    safeWriteJson(
+      ARCHIVE_FILE,
+      {
+        ...archiveData,
+
+        signals:
+          combined,
+
+        updatedAt:
+          nowIso(),
+
+        totalArchived:
+          combined.length
+      }
+    );
+
+    console.log(
+      `🗄️ Archived ${archivedEntries.length} closed signal(s)`
+    );
+  } catch (error) {
+    console.error(
+      "Error archiving signals:",
+      error.message
+    );
+  }
+}
+
+function mergeSignals(
+  newSignals,
+  existingSignals
+) {
+  const allSignals =
+    Array.isArray(
+      existingSignals
+    )
+      ? [...existingSignals]
+      : [];
+
+  for (
+    const incomingSignal of
+    newSignals || []
+  ) {
+    const signal =
+      applyLegacySignalAliases(
+        incomingSignal
+      );
+
+    const incomingId =
+      signal.id ||
+      signal.signalId;
+
+    const index =
+      allSignals.findIndex(
+        existingSignal => {
+          const existingId =
+            existingSignal.id ||
+            existingSignal.signalId;
+
+          if (
+            incomingId &&
+            existingId
+          ) {
+            return (
+              incomingId ===
+              existingId
+            );
+          }
+
+          return (
+            existingSignal.pair ===
+              signal.pair &&
+            existingSignal.timeframe ===
+              signal.timeframe &&
+            existingSignal.pattern ===
+              signal.pattern &&
+            OPEN_STATUSES.includes(
+              existingSignal.status
+            )
+          );
+        }
+      );
+
+    if (
+      index >= 0
+    ) {
+      const previous =
+        allSignals[index];
+
+      allSignals[index] = {
+        ...previous,
+        ...signal,
+
+        outcome:
+          signal.outcome ??
+          previous.outcome,
+
+        createdAt:
+          previous.createdAt ||
+          signal.createdAt,
+
+        timestamp:
+          previous.timestamp ||
+          signal.timestamp
+      };
+    } else {
+      allSignals.push(
+        signal
+      );
+    }
+  }
+
+  const uniqueMap =
+    new Map();
+
+  for (
+    const signal of
+    allSignals
+  ) {
+    if (!signal) {
+      continue;
+    }
+
+    const key =
+      signal.id ||
+      signal.signalId ||
+      [
+        signal.pair,
+        signal.timeframe,
+        signal.pattern,
+        signal.timestamp ||
+        signal.createdAt
+      ].join("_");
+
+    const previous =
+      uniqueMap.get(key);
+
+    if (!previous) {
+      uniqueMap.set(
+        key,
+        signal
+      );
+
+      continue;
+    }
+
+    const previousTime =
+      new Date(
+        previous.lastUpdated ||
+        previous.createdAt ||
+        0
+      ).getTime();
+
+    const signalTime =
+      new Date(
+        signal.lastUpdated ||
+        signal.createdAt ||
+        0
+      ).getTime();
+
+    if (
+      signalTime >=
+      previousTime
+    ) {
+      uniqueMap.set(
+        key,
+        signal
+      );
+    }
+  }
+
+  return Array.from(
+    uniqueMap.values()
+  );
+}
+
+function saveData(
+  newSignals,
+  existingSignals,
+  confidenceData,
+  learningData
+) {
+  try {
+    const uniqueSignals =
+      mergeSignals(
+        newSignals,
+        existingSignals
+      );
+
+    const openSignals =
+      uniqueSignals.filter(
+        signal =>
+          OPEN_STATUSES.includes(
+            signal.status
+          )
+      );
+
+    const closedSignals =
+      uniqueSignals
+        .filter(
+          signal =>
+            !OPEN_STATUSES.includes(
+              signal.status
+            )
+        )
+        .sort(
+          (
+            first,
+            second
+          ) =>
+            new Date(
+              first.resolvedAt ||
+              first.expiredAt ||
+              first.lastUpdated ||
+              first.createdAt ||
+              0
+            ).getTime() -
+            new Date(
+              second.resolvedAt ||
+              second.expiredAt ||
+              second.lastUpdated ||
+              second.createdAt ||
+              0
+            ).getTime()
+        );
+
+    const closedToKeep =
+      closedSignals.slice(
+        -MAX_MAIN_CLOSED_SIGNALS
+      );
+
+    const archiveCount =
+      Math.max(
+        0,
+        closedSignals.length -
+        closedToKeep.length
+      );
+
+    const closedToArchive =
+      closedSignals.slice(
+        0,
+        archiveCount
+      );
+
+    if (
+      closedToArchive.length > 0
+    ) {
+      archiveSignals(
+        closedToArchive
+      );
+    }
+
+    const keptSignals = [
+      ...openSignals,
+      ...closedToKeep
+    ];
+
+    const timestamp =
+      nowIso();
+
+    const signalsData = {
+      signals:
+        keptSignals,
+
+      updatedAt:
+        timestamp,
+
+      stale: {},
+
+      totalSignals:
+        keptSignals.length,
+
+      resolvedSignals:
+        keptSignals.filter(
+          signal =>
+            signal.status ===
+              "WIN" ||
+            signal.status ===
+              "LOSS"
+        ).length,
+
+      expiredSignals:
+        keptSignals.filter(
+          signal =>
+            signal.status ===
+            "EXPIRED"
+        ).length,
+
+      pendingSignals:
+        openSignals.length
+    };
+
+    const confidenceDataToSave = {
+      patterns:
+        confidenceData &&
+        typeof confidenceData ===
+          "object"
+          ? confidenceData
+          : {},
+
+      updatedAt:
+        timestamp
+    };
+
+    /*
+     * Save all Phase 4 fields instead of only
+     * history and stats.
+     */
+    const learningDataToSave = {
+      ...getDefaultLearningData(),
+      ...learningData,
+
+      history:
+        Array.isArray(
+          learningData?.history
+        )
+          ? learningData.history
+          : [],
+
+      stats:
+        learningData?.stats &&
+        typeof learningData.stats ===
+          "object"
+          ? learningData.stats
+          : {},
+
+      updatedAt:
+        timestamp
+    };
+
+    safeWriteJson(
+      SIGNALS_FILE,
+      signalsData
+    );
+
+    safeWriteJson(
+      CONFIDENCE_FILE,
+      confidenceDataToSave
+    );
+
+    safeWriteJson(
+      LEARNING_FILE,
+      learningDataToSave
+    );
+  } catch (error) {
+    console.error(
+      "Error saving data:",
+      error.message
+    );
+
+    throw error;
+  }
+}
+
+function saveBotResults(
+  newSignals,
+  updatedSignals,
+  learner
+) {
+  saveData(
+    newSignals,
+    updatedSignals,
+    learner.getConfidenceData(),
+    learner.getLearningData()
+  );
+}
+
+// =====================================================
+// Staleness
+// =====================================================
+
+function updateStaleness(
+  reason
+) {
+  try {
+    const data =
+      safeReadJson(
+        SIGNALS_FILE,
+        getDefaultSignalsData()
+      );
+
+    const stale = {};
+
+    for (
+      const pair of
+      SUPPORTED_PAIRS
+    ) {
+      stale[pair] =
+        true;
+    }
+
+    safeWriteJson(
+      SIGNALS_FILE,
+      {
+        ...data,
+
+        stale: {
+          ...stale,
+
+          reason,
+
+          timestamp:
+            nowIso()
+        }
+      }
+    );
+  } catch (error) {
+    console.error(
+      "Error updating staleness:",
+      error.message
+    );
+  }
+}
+
+// =====================================================
+// Main Bot Execution
+// =====================================================
+
+async function runBot() {
+  console.log(
+    "🤖 PipSight Pro AI Starting..."
+  );
+
+  console.log(
+    `⏰ Execution time: ${nowIso()}`
+  );
+
+  const totalStart =
+    Date.now();
+
+  let fetchDurationMs = 0;
+
+  let analysisDurationMs = 0;
+
+  let learningDurationMs = 0;
+
+  let saveDurationMs = 0;
+
+  try {
+    initializeFiles();
+
+    const data =
+      loadData();
+
+    const analyzer =
+      new PatternAnalyzer();
+
+    const learner =
+      new LearningSystem(
+        data.learning,
+        data.confidence
+      );
+
+    /*
+     * Important:
+     * SignalGenerator and index.js must use the same
+     * learner instance.
+     */
+    const signalGenerator =
+      new SignalGenerator({
+        learner,
+
+        minimumRiskReward:
+          1.5,
+
+        actionableThreshold:
+          MINIMUM_CONFIDENCE
+      });
+
+    /*
+     * Apply learned detector thresholds when the
+     * analyzer supports Phase 4 evolution.
+     */
+    const evolution =
+      learner
+        .getPatternEvolutionRecommendations();
+
+    if (
+      typeof analyzer
+        .applyPatternEvolution ===
+        "function"
+    ) {
+      analyzer
+        .applyPatternEvolution(
+          evolution
+        );
+    }
+
+    const fetchStart =
+      Date.now();
+
+    const candles =
+      await fetchMarketData(
+        analyzer
+      );
+
+    fetchDurationMs =
+      Date.now() -
+      fetchStart;
+
+    console.log(
+      `📊 Fetch completed in ${fetchDurationMs} ms`
+    );
+
+    if (!candles) {
+      saveAuditLog();
+
+      runHealthCheck({
+        status:
+          "CRITICAL",
+
+        reason:
+          "data-fetch-failed",
+
+        fetchDurationMs,
+
+        totalRuntimeMs:
+          Date.now() -
+          totalStart
+      });
+
+      return;
+    }
+
+    const existingSignals =
+      Array.isArray(
+        data.signals.signals
+      )
+        ? data.signals.signals
+        : [];
+
+    const analysisStart =
+      Date.now();
+
+    const newSignals =
+      analyzeMarkets(
+        candles,
+        analyzer,
+        learner,
+        signalGenerator,
+        existingSignals
+      );
+
+    analysisDurationMs =
+      Date.now() -
+      analysisStart;
+
+    console.log(
+      `🔍 Analysis completed in ${analysisDurationMs} ms`
+    );
+
+    const learningStart =
+      Date.now();
+
+    const updatedSignals =
+      await updateLearning(
+        learner,
+        existingSignals,
+        newSignals,
+        candles
+      );
+
+    learningDurationMs =
+      Date.now() -
+      learningStart;
+
+    console.log(
+      `🧠 Learning completed in ${learningDurationMs} ms`
+    );
+
+    const saveStart =
+      Date.now();
+
+    saveBotResults(
+      newSignals,
+      updatedSignals,
+      learner
+    );
+
+    saveDurationMs =
+      Date.now() -
+      saveStart;
+
+    console.log(
+      `💾 Save completed in ${saveDurationMs} ms`
+    );
+
+    const averageConfidence =
+      newSignals.length > 0
+        ? newSignals.reduce(
+            (
+              total,
+              signal
+            ) =>
+              total +
+              toNumber(
+                signal.confidence,
+                0
+              ),
+            0
+          ) /
+          newSignals.length
+        : null;
+
+    const recentlyResolved =
+      updatedSignals.filter(
+        signal =>
+          signal.status ===
+            "WIN" ||
+          signal.status ===
+            "LOSS"
+      );
+
+    const recentWins =
+      recentlyResolved.filter(
+        signal =>
+          signal.status ===
+          "WIN"
+      ).length;
+
+    const recentWinRate =
+      recentlyResolved.length > 0
+        ? (
+            recentWins /
+            recentlyResolved.length
+          ) * 100
+        : null;
+
+    const learningHealth =
+      learner.getHealthStatus();
+
+    runHealthCheck({
+      status:
+        learningHealth?.status ||
+        "HEALTHY",
+
+      signalsGenerated:
+        newSignals.length,
+
+      averageConfidence:
+        averageConfidence !== null
+          ? round(
+              averageConfidence,
+              1
+            )
+          : null,
+
+      recentWinRate:
+        recentWinRate !== null
+          ? round(
+              recentWinRate,
+              1
+            )
+          : null,
+
+      openSignals:
+        updatedSignals.filter(
+          signal =>
+            OPEN_STATUSES.includes(
+              signal.status
+            )
+        ).length,
+
+      blacklistedPatterns:
+        Object.keys(
+          learner.data
+            ?.blacklistedPatterns ||
+          {}
+        ).length,
+
+      fetchDurationMs,
+
+      analysisDurationMs,
+
+      learningDurationMs,
+
+      saveDurationMs,
+
+      totalRuntimeMs:
+        Date.now() -
+        totalStart
+    });
+
+    saveAuditLog();
+
+    console.log(
+      "\n✨ Bot execution complete"
+    );
+
+    console.log(
+      `📈 Signals generated: ${newSignals.length}`
+    );
+
+    console.log(
+      "💾 Data saved successfully"
+    );
+
+    console.log(
+      `⏱ Total runtime: ${Date.now() - totalStart} ms`
+    );
+  } catch (error) {
+    console.error(
+      "❌ Bot execution failed:",
+      error.message
+    );
+
+    console.error(
+      error.stack
+    );
+
+    runHealthCheck({
+      status:
+        "CRITICAL",
+
+      reason:
+        error.message,
+
+      fetchDurationMs,
+
+      analysisDurationMs,
+
+      learningDurationMs,
+
+      saveDurationMs,
+
+      totalRuntimeMs:
+        Date.now() -
+        totalStart
+    });
+
+    saveAuditLog();
+
+    process.exitCode = 1;
+  }
+}
+
+// =====================================================
+// Process Safety
+// =====================================================
+
+process.on(
+  "unhandledRejection",
+  error => {
+    console.error(
+      "Unhandled promise rejection:",
+      error
+    );
+
+    runHealthCheck({
+      status:
+        "CRITICAL",
+
+      reason:
+        `unhandled rejection: ${
+          error?.message ||
+          String(error)
+        }`
+    });
+
+    saveAuditLog();
+
+    process.exitCode = 1;
+  }
+);
+
+process.on(
+  "uncaughtException",
+  error => {
+    console.error(
+      "Uncaught exception:",
+      error
+    );
+
+    runHealthCheck({
+      status:
+        "CRITICAL",
+
+      reason:
+        `uncaught exception: ${error.message}`
+    });
+
+    saveAuditLog();
+
+    process.exitCode = 1;
+  }
+);
+
+// =====================================================
+// Run Bot
+// =====================================================
+
+if (
+  require.main === module
+) {
+  runBot().catch(
+    error => {
+      console.error(
+        "Fatal error:",
+        error
+      );
+
+      process.exitCode = 1;
+    }
+  );
+}
+
+// =====================================================
+// Optional Exports for Testing
+// =====================================================
+
+module.exports = {
+  runBot,
+
+  initializeFiles,
+
+  loadData,
+
+  fetchMarketData,
+
+  analyzeMarkets,
+
+  analyzePair,
+
+  scorePattern,
+
+  selectBestPattern,
+
+  updateLearning,
+
+  resolvePendingSignals,
+
+  determineSignalOutcome,
+
+  saveData,
+
+  saveBotResults,
+
+  archiveSignals,
+
+  updateStaleness,
+
+  passesSpreadVolatilityFilter,
+
+  getMarketSession,
+
+  isSignalInCooldown,
+
+  buildSignalId,
+
+  findActiveDuplicate,
+
+  applyLegacySignalAliases,
+
+  OPEN_STATUSES,
+
+  CLOSED_STATUSES,
+
+  EXPIRY_MAP,
+
+  SUPPORTED_PAIRS,
+
+  SUPPORTED_TIMEFRAMES
+};
