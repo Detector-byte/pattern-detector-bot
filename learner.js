@@ -2387,3 +2387,1332 @@ class LearningSystem {
     return this.data.stats;
   }
 
+  // =====================================================
+  // Phase 4 Confidence Calibration
+  // =====================================================
+
+  /**
+   * Build calibration bins from resolved signals.
+   *
+   * Example:
+   * Predicted confidence 70–74 is grouped into bin 70.
+   * The actual win rate is then compared with the prediction.
+   */
+  updateConfidenceCalibration() {
+
+    const calibration = {};
+
+    for (
+      const signal of
+      this.data.history
+    ) {
+
+      if (
+        !signal ||
+        (
+          signal.outcome !== "WIN" &&
+          signal.outcome !== "LOSS"
+        )
+      ) {
+        continue;
+      }
+
+      const rawConfidence =
+        Number(
+          signal.confidence ??
+          signal.aiConfidence ??
+          this.defaultConfidence
+        );
+
+      if (
+        !Number.isFinite(
+          rawConfidence
+        )
+      ) {
+        continue;
+      }
+
+      const normalizedConfidence =
+        Math.max(
+          this.minConfidence,
+          Math.min(
+            this.maxConfidence,
+            rawConfidence
+          )
+        );
+
+      const bin =
+        String(
+          Math.round(
+            normalizedConfidence / 5
+          ) * 5
+        );
+
+      if (!calibration[bin]) {
+
+        calibration[bin] = {
+
+          total: 0,
+
+          wins: 0,
+
+          losses: 0,
+
+          predictedConfidence:
+            Number(bin),
+
+          actualRate:
+            Number(bin),
+
+          calibrationError: 0,
+
+          lastUpdated: null
+
+        };
+      }
+
+      calibration[bin].total++;
+
+      if (
+        signal.outcome === "WIN"
+      ) {
+        calibration[bin].wins++;
+      }
+
+      else {
+        calibration[bin].losses++;
+      }
+
+      calibration[bin].actualRate =
+        (
+          calibration[bin].wins /
+          calibration[bin].total
+        ) * 100;
+
+      calibration[bin].calibrationError =
+        calibration[bin].actualRate -
+        calibration[bin]
+          .predictedConfidence;
+
+      calibration[bin].lastUpdated =
+        new Date().toISOString();
+    }
+
+    for (
+      const bin in
+      calibration
+    ) {
+
+      calibration[bin].actualRate =
+        Number(
+          calibration[bin]
+            .actualRate
+            .toFixed(2)
+        );
+
+      calibration[bin]
+        .calibrationError =
+        Number(
+          calibration[bin]
+            .calibrationError
+            .toFixed(2)
+        );
+    }
+
+    this.data.calibration =
+      calibration;
+
+    return {
+      ...calibration
+    };
+  }
+
+  /**
+   * Return confidence calibration data.
+   */
+  getCalibrationData() {
+
+    return {
+      ...this.data.calibration
+    };
+  }
+
+  // =====================================================
+  // Phase 4 Pattern Evolution
+  // =====================================================
+
+  /**
+   * Generate safe detector-threshold recommendations.
+   *
+   * The analyzer may apply these values through
+   * applyPatternEvolution().
+   *
+   * Every recommendation is limited to ±20%
+   * of its baseline value.
+   */
+  updatePatternEvolution() {
+
+    const existing =
+      this.data.patternEvolution ||
+      {};
+
+    const evolution = {
+      ...existing
+    };
+
+    const recommendations = {};
+
+    const patternMappings = {
+
+      "Double Top": {
+        key:
+          "doubleTopTolerance",
+        baseline:
+          0.003
+      },
+
+      "Double Bottom": {
+        key:
+          "doubleBottomTolerance",
+        baseline:
+          0.003
+      },
+
+      "Head and Shoulders": {
+        key:
+          "shoulderTolerance",
+        baseline:
+          0.015
+      },
+
+      "Inverse Head and Shoulders": {
+        key:
+          "shoulderTolerance",
+        baseline:
+          0.015
+      },
+
+      "Ascending Triangle": {
+        key:
+          "triangleTolerance",
+        baseline:
+          0.005
+      },
+
+      "Descending Triangle": {
+        key:
+          "triangleTolerance",
+        baseline:
+          0.005
+      },
+
+      "Symmetric Triangle": {
+        key:
+          "triangleTolerance",
+        baseline:
+          0.005
+      },
+
+      "Rising Wedge": {
+        key:
+          "wedgeTolerance",
+        baseline:
+          0.005
+      },
+
+      "Falling Wedge": {
+        key:
+          "wedgeTolerance",
+        baseline:
+          0.005
+      },
+
+      "Rectangle Top": {
+        key:
+          "rectangleTolerance",
+        baseline:
+          0.004
+      },
+
+      "Rectangle Bottom": {
+        key:
+          "rectangleTolerance",
+        baseline:
+          0.004
+      },
+
+      "Equal Highs": {
+        key:
+          "liquidityTolerance",
+        baseline:
+          0.002
+      },
+
+      "Equal Lows": {
+        key:
+          "liquidityTolerance",
+        baseline:
+          0.002
+      }
+
+    };
+
+    const grouped = {};
+
+    for (
+      const patternName in
+      patternMappings
+    ) {
+
+      const stats =
+        this.data.patternStats[
+          patternName
+        ];
+
+      if (!stats)
+        continue;
+
+      const resolved =
+        stats.resolved ??
+        stats.total ??
+        0;
+
+      if (
+        resolved <
+        this.minSamples
+      ) {
+        continue;
+      }
+
+      const mapping =
+        patternMappings[
+          patternName
+        ];
+
+      if (!grouped[mapping.key]) {
+
+        grouped[
+          mapping.key
+        ] = {
+
+          baseline:
+            mapping.baseline,
+
+          weightedAdjustment:
+            0,
+
+          totalWeight:
+            0,
+
+          patterns: []
+
+        };
+      }
+
+      const winRate =
+        stats.decayedWinRate ??
+        stats.winRate ??
+        stats.accuracy ??
+        50;
+
+      const reliability =
+        Math.min(
+          1,
+          resolved / 50
+        );
+
+      /*
+       * Weak performance slightly tightens tolerance.
+       * Strong performance slightly relaxes tolerance.
+       *
+       * The maximum raw adjustment here is 20%.
+       */
+      const adjustment =
+        Math.max(
+          -this.maxEvolutionChange,
+          Math.min(
+            this.maxEvolutionChange,
+            (
+              winRate - 50
+            ) / 100
+          )
+        );
+
+      grouped[
+        mapping.key
+      ].weightedAdjustment +=
+        adjustment *
+        reliability;
+
+      grouped[
+        mapping.key
+      ].totalWeight +=
+        reliability;
+
+      grouped[
+        mapping.key
+      ].patterns.push(
+        patternName
+      );
+    }
+
+    for (
+      const key in
+      grouped
+    ) {
+
+      const group =
+        grouped[key];
+
+      if (
+        group.totalWeight <= 0
+      ) {
+        continue;
+      }
+
+      const averageAdjustment =
+        group.weightedAdjustment /
+        group.totalWeight;
+
+      const minimum =
+        group.baseline *
+        (
+          1 -
+          this.maxEvolutionChange
+        );
+
+      const maximum =
+        group.baseline *
+        (
+          1 +
+          this.maxEvolutionChange
+        );
+
+      const proposed =
+        group.baseline *
+        (
+          1 +
+          averageAdjustment
+        );
+
+      const safeValue =
+        Math.max(
+          minimum,
+          Math.min(
+            maximum,
+            proposed
+          )
+        );
+
+      recommendations[key] =
+        Number(
+          safeValue.toFixed(6)
+        );
+
+      evolution[key] = {
+
+        value:
+          recommendations[key],
+
+        baseline:
+          group.baseline,
+
+        changePercent:
+          Number(
+            (
+              (
+                safeValue -
+                group.baseline
+              ) /
+              group.baseline *
+              100
+            ).toFixed(2)
+          ),
+
+        sourcePatterns:
+          group.patterns,
+
+        updatedAt:
+          new Date().toISOString()
+
+      };
+    }
+
+    evolution.recommendations =
+      recommendations;
+
+    evolution.updatedAt =
+      new Date().toISOString();
+
+    this.data.patternEvolution =
+      evolution;
+
+    return {
+      ...evolution
+    };
+  }
+
+  /**
+   * Return only analyzer-compatible
+   * threshold recommendations.
+   */
+  getPatternEvolutionRecommendations() {
+
+    const evolution =
+      this.data.patternEvolution ||
+      {};
+
+    if (
+      evolution.recommendations
+    ) {
+      return {
+        ...evolution.recommendations
+      };
+    }
+
+    const recommendations = {};
+
+    for (
+      const key in
+      evolution
+    ) {
+
+      const item =
+        evolution[key];
+
+      if (
+        item &&
+        typeof item === "object" &&
+        Number.isFinite(
+          Number(item.value)
+        )
+      ) {
+
+        recommendations[key] =
+          Number(item.value);
+      }
+    }
+
+    return recommendations;
+  }
+
+  // =====================================================
+  // Confidence Data
+  // =====================================================
+
+  /**
+   * Get confidence data for all exact setups.
+   */
+  getConfidenceData() {
+
+    const patterns = {};
+
+    for (
+      const key in
+      this.data.stats
+    ) {
+
+      const stat =
+        this.data.stats[key];
+
+      const keyParts =
+        key.split("_");
+
+      const patternName =
+        keyParts[0] ||
+        "Unknown";
+
+      const pair =
+        keyParts[1] ||
+        "UNKNOWN";
+
+      const timeframe =
+        keyParts[2] ||
+        "UNKNOWN";
+
+      const historicalAccuracy =
+        stat.decayedWinRate ??
+        stat.accuracy ??
+        this.defaultConfidence;
+
+      let confidence =
+        historicalAccuracy;
+
+      if (
+        stat.trend ===
+        "improving"
+      ) {
+
+        confidence =
+          Math.min(
+            this.maxConfidence,
+            confidence + 5
+          );
+      }
+
+      if (
+        stat.trend ===
+        "declining"
+      ) {
+
+        confidence =
+          Math.max(
+            this.minConfidence,
+            confidence - 5
+          );
+      }
+
+      const resolved =
+        stat.resolved ??
+        stat.total ??
+        0;
+
+      if (
+        resolved < 3
+      ) {
+
+        confidence =
+          Math.max(
+            this.minConfidence,
+            confidence - 10
+          );
+      }
+
+      confidence *=
+        this.getPatternWeight(
+          patternName
+        );
+
+      if (
+        this.isPatternBlacklisted(
+          patternName
+        )
+      ) {
+        confidence -= 15;
+      }
+
+      confidence =
+        this.applyConfidenceCalibration(
+          confidence
+        );
+
+      confidence =
+        Math.round(
+          Math.max(
+            this.minConfidence,
+            Math.min(
+              this.maxConfidence,
+              confidence
+            )
+          )
+        );
+
+      patterns[key] = {
+
+        pattern:
+          patternName,
+
+        pair,
+
+        timeframe,
+
+        confidence,
+
+        accuracy:
+          stat.accuracy,
+
+        decayedWinRate:
+          stat.decayedWinRate,
+
+        total:
+          stat.total,
+
+        resolved:
+          stat.resolved,
+
+        wins:
+          stat.wins,
+
+        losses:
+          stat.losses,
+
+        trend:
+          stat.trend,
+
+        patternWeight:
+          this.getPatternWeight(
+            patternName
+          ),
+
+        blacklisted:
+          this.isPatternBlacklisted(
+            patternName
+          ),
+
+        lastUpdated:
+          new Date().toISOString()
+
+      };
+    }
+
+    return patterns;
+  }
+
+  /**
+   * Get all learning data.
+   */
+  getLearningData() {
+
+    return {
+
+      history:
+        this.data.history,
+
+      stats:
+        this.data.stats,
+
+      patternStats:
+        this.data.patternStats,
+
+      pairStats:
+        this.data.pairStats,
+
+      timeframeStats:
+        this.data.timeframeStats,
+
+      regimeStats:
+        this.data.regimeStats,
+
+      patternWeights:
+        this.data.patternWeights,
+
+      calibration:
+        this.data.calibration,
+
+      patternEvolution:
+        this.data.patternEvolution,
+
+      blacklistedPatterns:
+        this.data.blacklistedPatterns,
+
+      optimization:
+        this.data.optimization,
+
+      lastLearningUpdate:
+        this.data.lastLearningUpdate
+
+    };
+  }
+
+  // =====================================================
+  // Signal Resolution
+  // =====================================================
+
+  /**
+   * Mark signal as WIN or LOSS.
+   *
+   * Supports either signal.id or signal.timestamp.
+   */
+  resolveSignal(
+    signalId,
+    outcome
+  ) {
+
+    if (
+      outcome !== "WIN" &&
+      outcome !== "LOSS"
+    ) {
+      return false;
+    }
+
+    const signal =
+      this.data.history.find(
+        historicalSignal => {
+
+          return (
+            historicalSignal.id ===
+              signalId ||
+            historicalSignal.timestamp ===
+              signalId
+          );
+        }
+      );
+
+    if (!signal)
+      return false;
+
+    signal.outcome =
+      outcome;
+
+    signal.resolvedAt =
+      new Date().toISOString();
+
+    /*
+     * Save the confidence that existed when the
+     * trade was resolved for future calibration.
+     */
+    if (
+      !Number.isFinite(
+        Number(
+          signal.confidence
+        )
+      )
+    ) {
+
+      signal.confidence =
+        this.calculateAdaptiveConfidence(
+          signal
+        );
+    }
+
+    this.updatePatternStats();
+
+    this.refreshPendingConfidence();
+
+    this.saveConfidenceSnapshot();
+
+    return true;
+  }
+
+  /**
+   * Resolve multiple signals efficiently.
+   */
+  resolveSignals(
+    resolutions
+  ) {
+
+    if (
+      !Array.isArray(
+        resolutions
+      )
+    ) {
+      return {
+        updated: 0,
+        failed: 0
+      };
+    }
+
+    let updated = 0;
+    let failed = 0;
+
+    for (
+      const resolution of
+      resolutions
+    ) {
+
+      if (
+        !resolution
+      ) {
+        failed++;
+        continue;
+      }
+
+      const signalId =
+        resolution.id ??
+        resolution.signalId ??
+        resolution.timestamp;
+
+      const outcome =
+        resolution.outcome;
+
+      const signal =
+        this.data.history.find(
+          historicalSignal => {
+
+            return (
+              historicalSignal.id ===
+                signalId ||
+              historicalSignal.timestamp ===
+                signalId
+            );
+          }
+        );
+
+      if (
+        !signal ||
+        (
+          outcome !== "WIN" &&
+          outcome !== "LOSS"
+        )
+      ) {
+        failed++;
+        continue;
+      }
+
+      signal.outcome =
+        outcome;
+
+      signal.resolvedAt =
+        resolution.resolvedAt ||
+        new Date().toISOString();
+
+      updated++;
+    }
+
+    if (updated > 0) {
+
+      this.updatePatternStats();
+
+      this.refreshPendingConfidence();
+
+      this.saveConfidenceSnapshot();
+    }
+
+    return {
+      updated,
+      failed
+    };
+  }
+
+  // =====================================================
+  // Pattern Psychology
+  // =====================================================
+
+  /**
+   * Get pattern psychology description.
+   */
+  getPatternDescription(
+    patternName
+  ) {
+
+    const descriptions = {
+
+      "Double Top":
+        "A bearish reversal pattern where price reaches the same resistance level twice. Indicates rejection of higher prices and weakening buying pressure. When confirmed below the neckline, expect a significant downside move. Risk:Reward typically 1:2+",
+
+      "Double Bottom":
+        "A bullish reversal pattern where price touches the same support level twice. Shows buyer strength and rejection of lower prices. Once price closes above the neckline, expect a significant upside move. Common in downtrends about to reverse.",
+
+      "Head and Shoulders":
+        "A classic bearish reversal pattern with 3 peaks - left shoulder, head (higher), right shoulder (similar to left). The neckline is critical support. Break below signals a strong downtrend. One of the most reliable patterns with high accuracy rate.",
+
+      "Inverse Head and Shoulders":
+        "Mirror image of H&S but bullish. Three troughs with middle one deepest. Neckline resistance break signals strong uptrend. Often found at market bottoms and precedes substantial rallies. Very reliable for identifying trend reversals.",
+
+      "Ascending Triangle":
+        "Rising lows with flat resistance highs indicate buyers stepping in at each dip. Bullish breakout pattern. When price breaks above resistance, expect strong continuation move upward. Time decay adds urgency - pattern must resolve within 2-3 weeks.",
+
+      "Descending Triangle":
+        "Falling highs with flat support lows indicate sellers pushing price lower. Bearish breakout pattern. Break below support signals strong continuation downward. Pattern suggests supply overwhelming demand, pointing to further weakness.",
+
+      "Symmetric Triangle":
+        "Converging highs and lows with narrowing range. Neutral consolidation until breakout occurs. Breakout direction determines next trend. Tighter the triangle, stronger the eventual move. Requires volume confirmation.",
+
+      "Rising Wedge":
+        "Higher lows and higher highs but highs rising faster - price rising into tighter resistance. Despite uptrend appearance, this is a bearish reversal pattern. Strong sell signal when resistance breaks. Often seen in overbought conditions before corrections.",
+
+      "Falling Wedge":
+        "Lower highs and lower lows but lows falling faster - price falling into support. Despite downtrend appearance, this is a bullish reversal pattern. Strong buy signal when support holds and resistance breaks. Often precedes strong bounces.",
+
+      "Pennant":
+        "Small symmetrical consolidation after a strong directional move. Flag of the trend. Breakout continues original direction. Very reliable with high probability continuation. Time factor important - should resolve quickly, typically within 1-2 weeks.",
+
+      "Flag":
+        "Rectangular consolidation after strong move, price oscillating slightly higher or lower than breakout level. Very bullish after an up move or bearish after a down move. High probability continuation pattern. Strong volume on breakout is critical.",
+
+      "Cup and Handle":
+        "Rounded bottom forming support followed by a shallow pullback within the cup rim. Very bullish pattern. Breakout above the rim signals substantial upside potential. Reliability improves when the structure forms gradually.",
+
+      "Rectangle Top":
+        "Flat resistance where price fails to break higher multiple times. Buyers are losing strength. Breakdown below support can signal a bearish continuation or reversal.",
+
+      "Rectangle Bottom":
+        "Flat support where price repeatedly rejects lower prices. Sellers are losing strength. Breakout above resistance can signal a bullish continuation or reversal.",
+
+      "Diamond Top":
+        "An expanding and then contracting formation near resistance. It is a rare bearish reversal structure. Confirmation below support can indicate a major trend reversal.",
+
+      "Diamond Bottom":
+        "An expanding and then contracting formation near support. It is a rare bullish reversal structure. Confirmation above resistance can precede a major upward reversal.",
+
+      "Bullish Engulfing":
+        "The second bullish candle engulfs the previous bearish candle body. It indicates buyers overpowering sellers and is strongest near support or after a decline.",
+
+      "Bearish Engulfing":
+        "The second bearish candle engulfs the previous bullish candle body. It indicates sellers overpowering buyers and is strongest near resistance or after an advance.",
+
+      "Equal Highs":
+        "Repeated highs at a similar level may represent resting buy-side liquidity. Price can sweep this liquidity before reversing or continuing.",
+
+      "Equal Lows":
+        "Repeated lows at a similar level may represent resting sell-side liquidity. Price can sweep this liquidity before reversing or continuing.",
+
+      "Liquidity Sweep":
+        "Price briefly moves beyond a known high or low to trigger orders before closing back inside the prior range. This can reveal institutional liquidity collection.",
+
+      "Break of Structure":
+        "Price breaks a significant swing point in the direction of the prevailing trend. This confirms continuation and validates directional market structure.",
+
+      "Change of Character":
+        "Price breaks structure against the prevailing trend. This is an early warning that momentum and market control may be changing.",
+
+      "Order Block":
+        "A price zone associated with the final opposing candle before a strong institutional move. Retests may provide entries when aligned with structure and liquidity.",
+
+      "Fair Value Gap":
+        "An imbalance created by rapid price displacement. Price may revisit the gap before resuming its directional move."
+
+    };
+
+    return (
+      descriptions[
+        patternName
+      ] ||
+      "Pattern detected with confirmed signal."
+    );
+  }
+
+  // =====================================================
+  // Pattern Quality
+  // =====================================================
+
+  /**
+   * Pattern Quality Score.
+   */
+  getPatternQuality(
+    pattern,
+    pair,
+    timeframe
+  ) {
+
+    const key =
+      `${pattern}_${pair}_${timeframe}`;
+
+    const stat =
+      this.data.stats[key];
+
+    if (!stat) {
+
+      return {
+
+        qualityScore: 60,
+
+        grade: "C",
+
+        recommendation:
+          "Insufficient Data",
+
+        patternWeight:
+          this.getPatternWeight(
+            pattern
+          ),
+
+        blacklisted:
+          this.isPatternBlacklisted(
+            pattern
+          )
+
+      };
+    }
+
+    const winRate =
+      stat.decayedWinRate ??
+      stat.accuracy ??
+      60;
+
+    const resolved =
+      stat.resolved ??
+      stat.total ??
+      0;
+
+    const sampleSize =
+      Math.min(
+        100,
+        resolved * 5
+      );
+
+    let trendScore = 60;
+
+    if (
+      stat.trend ===
+      "improving"
+    ) {
+      trendScore = 90;
+    }
+
+    else if (
+      stat.trend ===
+      "stable"
+    ) {
+      trendScore = 70;
+    }
+
+    else if (
+      stat.trend ===
+      "declining"
+    ) {
+      trendScore = 40;
+    }
+
+    const confidence =
+      Math.min(
+        this.maxConfidence,
+        winRate
+      );
+
+    const weightScore =
+      Math.min(
+        100,
+        this.getPatternWeight(
+          pattern
+        ) * 70
+      );
+
+    let quality =
+      (
+        winRate * 0.35
+      ) +
+      (
+        confidence * 0.20
+      ) +
+      (
+        trendScore * 0.15
+      ) +
+      (
+        sampleSize * 0.15
+      ) +
+      (
+        weightScore * 0.15
+      );
+
+    const blacklisted =
+      this.isPatternBlacklisted(
+        pattern
+      );
+
+    if (blacklisted) {
+      quality = Math.min(
+        quality,
+        40
+      );
+    }
+
+    let grade = "F";
+
+    if (quality >= 90)
+      grade = "A+";
+
+    else if (quality >= 80)
+      grade = "A";
+
+    else if (quality >= 70)
+      grade = "B";
+
+    else if (quality >= 60)
+      grade = "C";
+
+    else if (quality >= 50)
+      grade = "D";
+
+    return {
+
+      qualityScore:
+        Math.round(
+          quality
+        ),
+
+      grade,
+
+      recommendation:
+        blacklisted
+          ? "Avoid"
+          : (
+              grade === "A+" ||
+              grade === "A"
+            )
+            ? "Excellent"
+            : grade === "B"
+              ? "Good"
+              : grade === "C"
+                ? "Average"
+                : "Avoid",
+
+      accuracy:
+        Number(
+          winRate.toFixed(2)
+        ),
+
+      sampleSize:
+        resolved,
+
+      trend:
+        stat.trend,
+
+      patternWeight:
+        this.getPatternWeight(
+          pattern
+        ),
+
+      blacklisted
+
+    };
+  }
+
+  // =====================================================
+  // Risk and Reward
+  // =====================================================
+
+  /**
+   * Get risk:reward suggestion.
+   */
+  getRiskRewardData(
+    pattern,
+    entry,
+    stop,
+    target
+  ) {
+
+    const numericEntry =
+      Number(entry);
+
+    const numericStop =
+      Number(stop);
+
+    const numericTarget =
+      Number(target);
+
+    if (
+      !Number.isFinite(
+        numericEntry
+      ) ||
+      !Number.isFinite(
+        numericStop
+      ) ||
+      !Number.isFinite(
+        numericTarget
+      )
+    ) {
+
+      return {
+
+        pattern,
+
+        risk: null,
+
+        reward: null,
+
+        ratio: null,
+
+        acceptable: false,
+
+        reason:
+          "Invalid entry, stop or target"
+
+      };
+    }
+
+    const risk =
+      Math.abs(
+        numericEntry -
+        numericStop
+      );
+
+    const reward =
+      Math.abs(
+        numericTarget -
+        numericEntry
+      );
+
+    const ratio =
+      risk > 0
+        ? reward / risk
+        : 0;
+
+    return {
+
+      pattern,
+
+      risk:
+        risk.toFixed(4),
+
+      reward:
+        reward.toFixed(4),
+
+      ratio:
+        ratio.toFixed(2),
+
+      acceptable:
+        ratio >= 1.5,
+
+      quality:
+        ratio >= 3
+          ? "Excellent"
+          : ratio >= 2
+            ? "Good"
+            : ratio >= 1.5
+              ? "Acceptable"
+              : "Poor"
+
+    };
+  }
+
+  // =====================================================
+  // Phase 4 Learning Cycle
+  // =====================================================
+
+  /**
+   * Run the complete learning cycle.
+   *
+   * This method is optional and additive.
+   * Existing integrations may continue calling
+   * updateHistory() and resolveSignal().
+   */
+  runLearningCycle() {
+
+    this.cleanupHistory(
+      this.maxHistory
+    );
+
+    this.updatePatternStats();
+
+    this.refreshPendingConfidence();
+
+    const optimization =
+      this.optimizePerformance();
+
+    const confidence =
+      this.saveConfidenceSnapshot();
+
+    this.data.lastLearningUpdate =
+      new Date().toISOString();
+
+    return {
+
+      success: true,
+
+      overall:
+        this.getOverallStats(),
+
+      trend:
+        this.getPerformanceTrend(),
+
+      bestPattern:
+        this.getBestPattern(),
+
+      optimization,
+
+      patternWeights: {
+        ...this.data.patternWeights
+      },
+
+      blacklistedPatterns: {
+        ...this.data.blacklistedPatterns
+      },
+
+      patternEvolution:
+        this.getPatternEvolutionRecommendations(),
+
+      calibration:
+        this.getCalibrationData(),
+
+      confidence,
+
+      updatedAt:
+        this.data.lastLearningUpdate
+
+    };
+  }
+}
+
+module.exports = LearningSystem;
+
