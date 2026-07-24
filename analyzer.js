@@ -2845,6 +2845,230 @@ class PatternAnalyzer {
     return range < threshold;
   }
 
+  // --- Phase 2: efficient max/min helpers ---
+  // Avoid Math.max(...largeArray) and Math.min(...largeArray),
+  // which may create unnecessary call-stack and memory pressure.
+  highest(values) {
+    let max = -Infinity;
+
+    for (
+      let i = 0;
+      i < values.length;
+      i++
+    ) {
+      if (values[i] > max) {
+        max = values[i];
+      }
+    }
+
+    return max;
+  }
+
+  lowest(values) {
+    let min = Infinity;
+
+    for (
+      let i = 0;
+      i < values.length;
+      i++
+    ) {
+      if (values[i] < min) {
+        min = values[i];
+      }
+    }
+
+    return min;
+  }
+
+  // Count how many times price touched
+  // a support or resistance level.
+  countTouches(
+    values,
+    level,
+    tolerancePercent = 0.0015
+  ) {
+    if (!level) {
+      return 0;
+    }
+
+    let count = 0;
+
+    for (
+      let i = 0;
+      i < values.length;
+      i++
+    ) {
+      const distance =
+        Math.abs(
+          values[i] - level
+        ) / level;
+
+      if (
+        distance <=
+        tolerancePercent
+      ) {
+        count++;
+      }
+    }
+
+    return count;
+  }
+
+  // Calculate average synthetic volume
+  // around a historical swing point.
+  volumeAround(
+    candles,
+    index,
+    window = 3
+  ) {
+    const start =
+      Math.max(
+        0,
+        index - window
+      );
+
+    const end =
+      Math.min(
+        candles.length,
+        index + window + 1
+      );
+
+    const slice =
+      candles.slice(start, end);
+
+    if (
+      slice.length === 0 ||
+      slice[0].volume === undefined
+    ) {
+      return null;
+    }
+
+    let totalVolume = 0;
+
+    for (
+      let i = 0;
+      i < slice.length;
+      i++
+    ) {
+      totalVolume +=
+        slice[i].volume || 0;
+    }
+
+    return (
+      totalVolume /
+      slice.length
+    );
+  }
+
+  // Calculate RSI as it existed at
+  // a specific historical candle.
+  calculateRSIAtIndex(
+    candles,
+    index,
+    period = 14
+  ) {
+    if (index < period) {
+      return 50;
+    }
+
+    return this.calculateRSI(
+      candles.slice(
+        0,
+        index + 1
+      ),
+      period
+    );
+  }
+
+  // Confirm whether price revisited
+  // a neckline at least twice.
+  detectNecklineRetest(
+    candles,
+    startIdx,
+    endIdx,
+    level,
+    tolerancePercent = 0.0015
+  ) {
+    let touches = 0;
+
+    for (
+      let i = startIdx;
+      i <= endIdx &&
+      i < candles.length;
+      i++
+    ) {
+      const candle =
+        candles[i];
+
+      const lowTouch =
+        Math.abs(
+          candle.low - level
+        ) / level <=
+        tolerancePercent;
+
+      const highTouch =
+        Math.abs(
+          candle.high - level
+        ) / level <=
+        tolerancePercent;
+
+      if (
+        lowTouch ||
+        highTouch
+      ) {
+        touches++;
+      }
+    }
+
+    return touches >= 2;
+  }
+
+  // =====================================================
+  // Swing Detection Helpers
+  // =====================================================
+
+  findSwingHighs(
+    highs,
+    left = 2,
+    right = 2
+  ) {
+    const swings = [];
+
+    for (
+      let i = left;
+      i < highs.length - right;
+      i++
+    ) {
+      let isSwing = true;
+
+      for (
+        let j = i - left;
+        j <= i + right;
+        j++
+      ) {
+        if (j === i) {
+          continue;
+        }
+
+        if (
+          highs[j] >= highs[i]
+        ) {
+          isSwing = false;
+          break;
+        }
+      }
+
+      if (isSwing) {
+        swings.push({
+          index: i,
+          value: highs[i]
+        });
+      }
+    }
+
+    return swings;
+  }
+
   
 
   
