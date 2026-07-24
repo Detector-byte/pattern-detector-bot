@@ -3069,6 +3069,1196 @@ class PatternAnalyzer {
     return swings;
   }
 
+  // Find Swing Lows
+  findSwingLows(
+    lows,
+    left = 2,
+    right = 2
+  ) {
+    const swings = [];
+
+    for (
+      let i = left;
+      i < lows.length - right;
+      i++
+    ) {
+      let isSwing = true;
+
+      for (
+        let j = i - left;
+        j <= i + right;
+        j++
+      ) {
+        if (j === i) {
+          continue;
+        }
+
+        if (
+          lows[j] <= lows[i]
+        ) {
+          isSwing = false;
+          break;
+        }
+      }
+
+      if (isSwing) {
+        swings.push({
+          index: i,
+          value: lows[i]
+        });
+      }
+    }
+
+    return swings;
+  }
+
+  // =====================================================
+  // Breakout Confirmation
+  // =====================================================
+
+  isBreakoutConfirmed(
+    candles,
+    level,
+    direction
+  ) {
+    const last =
+      candles.slice(
+        -this.breakoutConfirmationCandles
+      );
+
+    if (
+      last.length <
+      this.breakoutConfirmationCandles
+    ) {
+      return false;
+    }
+
+    if (direction === 'BUY') {
+      return last.every(
+        candle =>
+          candle.close > level
+      );
+    }
+
+    return last.every(
+      candle =>
+        candle.close < level
+    );
+  }
+
+  // =====================================================
+  // Pattern Quality Score
+  // =====================================================
+
+  calculatePatternQuality(
+    strength,
+    confirmation
+  ) {
+    const score =
+      strength * 0.6 +
+      confirmation * 0.4;
+
+    return Math.max(
+      50,
+      Math.min(
+        95,
+        Math.round(score)
+      )
+    );
+  }
+
+  // =====================================================
+  // Linear Regression Helpers
+  // =====================================================
+
+  linearRegressionSlope(values) {
+    const n = values.length;
+
+    if (n < 2) {
+      return 0;
+    }
+
+    let sumX = 0;
+    let sumY = 0;
+    let sumXY = 0;
+    let sumXX = 0;
+
+    for (
+      let i = 0;
+      i < n;
+      i++
+    ) {
+      sumX += i;
+      sumY += values[i];
+      sumXY += i * values[i];
+      sumXX += i * i;
+    }
+
+    const denominator =
+      n * sumXX -
+      sumX * sumX;
+
+    if (denominator === 0) {
+      return 0;
+    }
+
+    return (
+      (
+        n * sumXY -
+        sumX * sumY
+      ) /
+      denominator
+    );
+  }
+
+  linearRegressionIntercept(
+    values,
+    slope
+  ) {
+    const n = values.length;
+
+    if (n === 0) {
+      return 0;
+    }
+
+    let sumX = 0;
+    let sumY = 0;
+
+    for (
+      let i = 0;
+      i < n;
+      i++
+    ) {
+      sumX += i;
+      sumY += values[i];
+    }
+
+    return (
+      sumY -
+      slope * sumX
+    ) / n;
+  }
+
+  predictRegressionValue(
+    index,
+    slope,
+    intercept
+  ) {
+    return (
+      slope * index +
+      intercept
+    );
+  }
+
+  // =====================================================
+  // Reliability and Confidence Labels
+  // =====================================================
+
+  getReliability(score) {
+    if (score >= 90) {
+      return 'Very High';
+    }
+
+    if (score >= 80) {
+      return 'High';
+    }
+
+    if (score >= 70) {
+      return 'Medium';
+    }
+
+    if (score >= 60) {
+      return 'Low';
+    }
+
+    return 'Very Low';
+  }
+
+  getConfidenceLabel(score) {
+    if (score >= 95) {
+      return 'Institutional';
+    }
+
+    if (score >= 90) {
+      return 'Very High';
+    }
+
+    if (score >= 80) {
+      return 'High';
+    }
+
+    if (score >= 70) {
+      return 'Medium';
+    }
+
+    return 'Low';
+  }
+
+  // =====================================================
+  // ATR
+  // =====================================================
+
+  calculateATR(
+    candles,
+    period = 14
+  ) {
+    if (
+      !candles ||
+      candles.length <
+        period + 1
+    ) {
+      return 0;
+    }
+
+    const startIndex =
+      Math.max(
+        1,
+        candles.length - period
+      );
+
+    let trueRangeTotal = 0;
+    let trueRangeCount = 0;
+
+    // Only the latest period is required.
+    // This avoids creating a full temporary TR array.
+    for (
+      let i = startIndex;
+      i < candles.length;
+      i++
+    ) {
+      const high =
+        candles[i].high;
+
+      const low =
+        candles[i].low;
+
+      const previousClose =
+        candles[i - 1].close;
+
+      const trueRange =
+        Math.max(
+          high - low,
+          Math.abs(
+            high -
+            previousClose
+          ),
+          Math.abs(
+            low -
+            previousClose
+          )
+        );
+
+      trueRangeTotal +=
+        trueRange;
+
+      trueRangeCount++;
+    }
+
+    return trueRangeCount > 0
+      ? trueRangeTotal /
+        trueRangeCount
+      : 0;
+  }
+
+  // =====================================================
+  // Synthetic FX Volume Confirmation
+  // =====================================================
+
+  confirmVolume(candles) {
+    if (
+      !candles ||
+      candles.length < 20
+    ) {
+      return true;
+    }
+
+    const last =
+      candles[
+        candles.length - 1
+      ];
+
+    // Do not reject a pattern when
+    // the candle source has no volume field.
+    if (
+      last.volume === undefined
+    ) {
+      return true;
+    }
+
+    let totalVolume = 0;
+
+    const start =
+      candles.length - 20;
+
+    for (
+      let i = start;
+      i < candles.length;
+      i++
+    ) {
+      totalVolume +=
+        candles[i].volume || 0;
+    }
+
+    const averageVolume =
+      totalVolume / 20;
+
+    return (
+      last.volume >
+      averageVolume
+    );
+  }
+
+  // =====================================================
+  // Exponential Moving Average
+  // =====================================================
+
+  calculateEMA(values, period) {
+    if (
+      !values ||
+      values.length === 0
+    ) {
+      return 0;
+    }
+
+    const multiplier =
+      2 / (period + 1);
+
+    let ema = values[0];
+
+    for (
+      let i = 1;
+      i < values.length;
+      i++
+    ) {
+      ema =
+        values[i] *
+          multiplier +
+        ema *
+          (1 - multiplier);
+    }
+
+    return ema;
+  }
+
+  // =====================================================
+  // Relative Strength Index
+  // =====================================================
+
+  calculateRSI(
+    candles,
+    period = 14
+  ) {
+    if (
+      !candles ||
+      candles.length <
+        period + 1
+    ) {
+      return 50;
+    }
+
+    let gains = 0;
+    let losses = 0;
+
+    const start =
+      candles.length -
+      period;
+
+    for (
+      let i = start;
+      i < candles.length;
+      i++
+    ) {
+      const difference =
+        candles[i].close -
+        candles[i - 1].close;
+
+      if (difference > 0) {
+        gains += difference;
+      } else {
+        losses -= difference;
+      }
+    }
+
+    if (losses === 0) {
+      return 100;
+    }
+
+    const relativeStrength =
+      gains / losses;
+
+    return (
+      100 -
+      100 /
+        (
+          1 +
+          relativeStrength
+        )
+    );
+  }
+
+  // =====================================================
+  // Phase 4: Market Regime Detection
+  // =====================================================
+
+  /**
+   * Detect the current market regime.
+   *
+   * Shared ATR and trend calculations are accepted
+   * through sharedContext so detectAllPatterns()
+   * does not calculate indicators more than once.
+   *
+   * Possible outputs:
+   * - TRENDING_UP
+   * - TRENDING_DOWN
+   * - RANGING
+   * - HIGH_VOLATILITY
+   * - LOW_VOLATILITY
+   */
+  detectMarketRegime(
+    candles,
+    sharedContext = {}
+  ) {
+    if (
+      !candles ||
+      candles.length < 20
+    ) {
+      return 'RANGING';
+    }
+
+    const sampleSize =
+      Math.min(
+        50,
+        candles.length
+      );
+
+    const start =
+      candles.length -
+      sampleSize;
+
+    let totalRange = 0;
+    let closeTotal = 0;
+
+    for (
+      let i = start;
+      i < candles.length;
+      i++
+    ) {
+      const candle =
+        candles[i];
+
+      totalRange +=
+        Math.abs(
+          candle.high -
+          candle.low
+        );
+
+      closeTotal +=
+        candle.close;
+    }
+
+    const averageClose =
+      closeTotal /
+      sampleSize;
+
+    const averageRange =
+      totalRange /
+      sampleSize;
+
+    const atr =
+      Number.isFinite(
+        sharedContext.atr
+      )
+        ? sharedContext.atr
+        : this.calculateATR(
+            candles,
+            this.atrPeriod
+          );
+
+    const atrPercent =
+      Number.isFinite(
+        sharedContext.atrPercent
+      )
+        ? sharedContext.atrPercent
+        : averageClose > 0
+          ? atr /
+            averageClose
+          : 0;
+
+    const normalizedRange =
+      averageClose > 0
+        ? averageRange /
+          averageClose
+        : 0;
+
+    // Volatility regimes take priority
+    // over directional classifications.
+    if (
+      atrPercent >=
+        this.minATRPercent *
+          2.5 ||
+      normalizedRange >=
+        this.minATRPercent *
+          3
+    ) {
+      return 'HIGH_VOLATILITY';
+    }
+
+    if (
+      atrPercent <=
+      this.minATRPercent *
+        1.15
+    ) {
+      return 'LOW_VOLATILITY';
+    }
+
+    if (
+      sharedContext.trend ===
+      'UP'
+    ) {
+      return 'TRENDING_UP';
+    }
+
+    if (
+      sharedContext.trend ===
+      'DOWN'
+    ) {
+      return 'TRENDING_DOWN';
+    }
+
+    return 'RANGING';
+  }
+
+  // =====================================================
+  // Phase 4: Pattern Evolution
+  // =====================================================
+
+  /**
+   * Apply learner-recommended detector thresholds.
+   *
+   * Every value is restricted to ±20% of its
+   * original baseline to prevent aggressive changes.
+   *
+   * Existing method signatures and detector APIs
+   * remain unchanged.
+   */
+  applyPatternEvolution(
+    recommendations = {}
+  ) {
+    const keys =
+      Object.keys(
+        this.patternEvolutionBaseline
+      );
+
+    for (
+      let i = 0;
+      i < keys.length;
+      i++
+    ) {
+      const key = keys[i];
+
+      const baseline =
+        this.patternEvolutionBaseline[
+          key
+        ];
+
+      const proposed =
+        Number(
+          recommendations[key]
+        );
+
+      if (
+        !Number.isFinite(
+          proposed
+        )
+      ) {
+        continue;
+      }
+
+      const minimum =
+        baseline * 0.8;
+
+      const maximum =
+        baseline * 1.2;
+
+      const safeValue =
+        Math.max(
+          minimum,
+          Math.min(
+            maximum,
+            proposed
+          )
+        );
+
+      this[key] =
+        safeValue;
+
+      this.patternEvolution[
+        key
+      ] = safeValue;
+    }
+
+    return {
+      ...this.patternEvolution
+    };
+  }
+
+  // =====================================================
+  // Pattern Filtering and Enrichment
+  // =====================================================
+
+  /**
+   * Enrich and validate a detected pattern.
+   *
+   * Existing filters remain active:
+   * - Pattern age
+   * - RSI
+   * - Volume
+   * - Fake breakout
+   * - Target price
+   * - Stop loss
+   * - Risk/reward
+   * - Multi-factor confirmation
+   * - Confidence
+   *
+   * Phase 4 additions:
+   * - Market regime
+   * - Signal score
+   * - Reasoning context
+   */
+  postProcessPattern(
+    pattern,
+    candles,
+    context
+  ) {
+    if (!pattern) {
+      return null;
+    }
+
+    // Pattern age rejection.
+    if (
+      pattern._ageIndex !==
+      undefined
+    ) {
+      const age =
+        (
+          candles.length - 1
+        ) -
+        pattern._ageIndex;
+
+      const maxAge =
+        pattern._maxAge ||
+        this.maxPatternAge;
+
+      if (age > maxAge) {
+        return null;
+      }
+
+      pattern.patternAge = age;
+    }
+
+    // RSI confirmation.
+    if (
+      pattern.direction ===
+        'BUY' &&
+      context.rsi >
+        this.rsiBuyMax
+    ) {
+      return null;
+    }
+
+    if (
+      pattern.direction ===
+        'SELL' &&
+      context.rsi <
+        this.rsiSellMin
+    ) {
+      return null;
+    }
+
+    // Volume confirmation.
+    if (!context.volumeOk) {
+      return null;
+    }
+
+    // Fake breakout rejection.
+    if (
+      pattern.breakoutLevel !==
+      undefined
+    ) {
+      const lastClose =
+        candles[
+          candles.length - 1
+        ].close;
+
+      if (
+        pattern.direction ===
+          'BUY' &&
+        lastClose <
+          pattern.breakoutLevel
+      ) {
+        return null;
+      }
+
+      if (
+        pattern.direction ===
+          'SELL' &&
+        lastClose >
+          pattern.breakoutLevel
+      ) {
+        return null;
+      }
+    }
+
+    const entry =
+      candles[
+        candles.length - 1
+      ].close;
+
+    pattern.entry =
+      +entry.toFixed(5);
+
+    // Generate ATR-based target and stop only
+    // when a detector has not supplied its own.
+    if (
+      pattern.direction !==
+      'NEUTRAL'
+    ) {
+      if (
+        pattern.stopLoss ===
+          undefined ||
+        pattern.targetPrice ===
+          undefined
+      ) {
+        if (
+          pattern.direction ===
+          'BUY'
+        ) {
+          pattern.stopLoss =
+            +(
+              entry -
+              context.atr *
+                this.slAtrMultiplier
+            ).toFixed(5);
+
+          pattern.targetPrice =
+            +(
+              entry +
+              context.atr *
+                this.tpAtrMultiplier
+            ).toFixed(5);
+        } else {
+          pattern.stopLoss =
+            +(
+              entry +
+              context.atr *
+                this.slAtrMultiplier
+            ).toFixed(5);
+
+          pattern.targetPrice =
+            +(
+              entry -
+              context.atr *
+                this.tpAtrMultiplier
+            ).toFixed(5);
+        }
+      }
+
+      const risk =
+        Math.abs(
+          entry -
+          pattern.stopLoss
+        );
+
+      const reward =
+        Math.abs(
+          pattern.targetPrice -
+          entry
+        );
+
+      pattern.RR =
+        risk > 0
+          ? +(
+              reward / risk
+            ).toFixed(2)
+          : null;
+    } else {
+      pattern.stopLoss = null;
+      pattern.targetPrice = null;
+      pattern.RR = null;
+    }
+
+    const trendAligned =
+      (
+        context.trend ===
+          'UP' &&
+        pattern.direction ===
+          'BUY'
+      ) ||
+      (
+        context.trend ===
+          'DOWN' &&
+        pattern.direction ===
+          'SELL'
+      );
+
+    const trendScore =
+      trendAligned
+        ? 100
+        : pattern.direction ===
+            'NEUTRAL'
+          ? 60
+          : 40;
+
+    const volumeScore =
+      context.volumeOk
+        ? 100
+        : 0;
+
+    const rsiScore =
+      pattern.direction ===
+      'BUY'
+        ? Math.max(
+            0,
+            Math.min(
+              100,
+              100 -
+                context.rsi *
+                  1.5
+            )
+          )
+        : pattern.direction ===
+          'SELL'
+          ? Math.max(
+              0,
+              Math.min(
+                100,
+                (
+                  context.rsi -
+                  50
+                ) *
+                  2
+              )
+            )
+          : 50;
+
+    const atrScore =
+      Math.min(
+        100,
+        (
+          context.atrPercent /
+          this.minATRPercent
+        ) *
+          50
+      );
+
+    // A pattern only reaches this stage when
+    // breakout checks have already passed.
+    const breakoutScore = 100;
+
+    const multiScore =
+      volumeScore * 0.15 +
+      rsiScore * 0.15 +
+      trendScore * 0.20 +
+      breakoutScore * 0.25 +
+      atrScore * 0.10 +
+      pattern.strength * 0.15;
+
+    pattern.multiScore =
+      Math.round(
+        Math.max(
+          0,
+          Math.min(
+            100,
+            multiScore
+          )
+        )
+      );
+
+    const confidence =
+      Math.round(
+        pattern.confirmationScore *
+          0.4 +
+        trendScore * 0.2 +
+        volumeScore * 0.15 +
+        rsiScore * 0.15 +
+        atrScore * 0.1
+      );
+
+    pattern.confidence =
+      Math.max(
+        40,
+        Math.min(
+          99,
+          confidence
+        )
+      );
+
+    pattern.confidenceLabel =
+      this.getConfidenceLabel(
+        pattern.confidence
+      );
+
+    // Phase 4 unified technical and
+    // Smart Money confluence score.
+    pattern.signalScore =
+      this.calculateSignalScore(
+        pattern,
+        context,
+        {
+          trendScore,
+          rsiScore,
+          atrScore,
+          volumeScore
+        }
+      );
+
+    pattern.signalLabel =
+      this.getConfidenceLabel(
+        pattern.signalScore
+      );
+
+    pattern.marketRegime =
+      context.marketRegime;
+
+    // Reusable evidence snapshot.
+    // signals.js converts this into human-readable
+    // reasoning and decisionTrace fields.
+    pattern.reasoningContext = {
+      trend: trendAligned,
+
+      ema:
+        context.ema20 !== null &&
+        context.ema50 !== null,
+
+      rsi: true,
+
+      atr:
+        context.atrPercent >=
+        this.minATRPercent,
+
+      volume:
+        context.volumeOk,
+
+      breakout:
+        pattern.breakoutLevel !==
+        undefined,
+
+      liquidity:
+        Boolean(
+          context.liquiditySweep
+        ),
+
+      bos:
+        Boolean(context.bos),
+
+      choch:
+        Boolean(context.choch),
+
+      marketRegime:
+        context.marketRegime,
+
+      ema20:
+        context.ema20,
+
+      ema50:
+        context.ema50,
+
+      rsiValue:
+        +context.rsi.toFixed(2),
+
+      atrValue:
+        +context.atr.toFixed(5),
+
+      atrPercent:
+        +(
+          context.atrPercent *
+          100
+        ).toFixed(3)
+    };
+
+    delete pattern._ageIndex;
+    delete pattern._maxAge;
+
+    return pattern;
+  }
+
+  // =====================================================
+  // Phase 4: Unified AI Signal Score
+  // =====================================================
+
+  /**
+   * Combine technical and Smart Money evidence
+   * into a single score from 0 to 100.
+   *
+   * This is the analyzer-level technical score.
+   * signals.js later combines it with historical,
+   * market, pattern and risk/reward intelligence
+   * to create the final overall AI score.
+   */
+  calculateSignalScore(
+    pattern,
+    context,
+    precomputed
+  ) {
+    const {
+      trendScore,
+      rsiScore,
+      atrScore,
+      volumeScore
+    } = precomputed;
+
+    const weights =
+      this.signalScoreWeights;
+
+    // EMA score measures trend separation.
+    let emaScore = 50;
+
+    if (
+      context.ema20 !== null &&
+      context.ema50 !== null &&
+      context.ema50 !== 0
+    ) {
+      const emaGapPercent =
+        Math.abs(
+          context.ema20 -
+          context.ema50
+        ) /
+        context.ema50;
+
+      emaScore =
+        Math.min(
+          100,
+          (
+            emaGapPercent /
+            0.005
+          ) *
+            100
+        );
+    }
+
+    // A missing SMC factor is neutral.
+    // An aligned factor receives full score,
+    // while an opposing factor is penalised.
+    const confluenceScore =
+      factor => {
+        if (!factor) {
+          return 50;
+        }
+
+        return (
+          factor.direction ===
+          pattern.direction
+        )
+          ? 100
+          : 20;
+      };
+
+    const liquidityScore =
+      confluenceScore(
+        context.liquiditySweep
+      );
+
+    const bosScore =
+      confluenceScore(
+        context.bos
+      );
+
+    const chochScore =
+      confluenceScore(
+        context.choch
+      );
+
+    const score =
+      pattern.confirmationScore *
+        weights.pattern +
+      trendScore *
+        weights.trend +
+      rsiScore *
+        weights.momentum +
+      atrScore *
+        weights.atr +
+      emaScore *
+        weights.ema +
+      volumeScore *
+        weights.volume +
+      liquidityScore *
+        weights.liquidity +
+      bosScore *
+        weights.bos +
+      chochScore *
+        weights.choch;
+
+    return Math.max(
+      0,
+      Math.min(
+        100,
+        Math.round(score)
+      )
+    );
+  }
+
+  // =====================================================
+  // Multi-Timeframe Priority Ranking
+  // =====================================================
+
+  calculateMultiTimeframeConfidence(
+    patterns
+  ) {
+    if (
+      !patterns ||
+      patterns.length === 0
+    ) {
+      return [];
+    }
+
+    return patterns.map(
+      pattern => {
+        const timeframeWeight =
+          this.timeframeWeights[
+            pattern.timeframe ||
+            'M5'
+          ] || 1;
+
+        let weightedScore =
+          pattern.strength *
+            0.20 +
+          pattern.confirmationScore *
+            0.25 +
+          (
+            pattern.multiScore ||
+            0
+          ) *
+            0.35 +
+          (
+            pattern.signalScore ||
+            0
+          ) *
+            0.15 +
+          timeframeWeight *
+            20 *
+            0.05;
+
+        if (
+          pattern.direction ===
+          'NEUTRAL'
+        ) {
+          weightedScore *= 0.85;
+        }
+
+        return {
+          ...pattern,
+          weightedScore:
+            Math.round(
+              weightedScore
+            )
+        };
+      }
+    );
+  }
+}
+
+module.exports = PatternAnalyzer;
+
   
 
   
