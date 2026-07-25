@@ -828,7 +828,7 @@ class SignalEvaluator {
         );
 
       if (
-        signal.direction ===
+        direction ===
         "BUY"
       ) {
 
@@ -859,7 +859,7 @@ class SignalEvaluator {
       }
 
       if (
-        signal.direction ===
+        direction ===
         "SELL"
       ) {
 
