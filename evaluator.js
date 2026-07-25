@@ -758,6 +758,12 @@ class SignalEvaluator {
         signal.entry
       );
 
+    const direction =
+      String(
+        signal.direction ||
+        ""
+      ).toUpperCase();
+
     const stopLoss =
       this.toFiniteNumber(
 
