@@ -1385,9 +1385,22 @@ class SignalEvaluator {
 
   }
 
-  toFiniteNumber(
+    toFiniteNumber(
     value
   ) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      (
+        typeof value === "string" &&
+        value.trim() === ""
+      )
+    ) {
+
+      return null;
+
+    }
 
     const number =
       Number(value);
@@ -1402,10 +1415,23 @@ class SignalEvaluator {
 
   }
 
-  round(
+    round(
     value,
     digits = 2
   ) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      (
+        typeof value === "string" &&
+        value.trim() === ""
+      )
+    ) {
+
+      return null;
+
+    }
 
     const number =
       Number(value);
@@ -1427,7 +1453,5 @@ class SignalEvaluator {
     );
 
   }
-
-}
 
 module.exports = SignalEvaluator;
