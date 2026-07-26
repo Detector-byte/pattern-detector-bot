@@ -1391,7 +1391,7 @@ class SignalEvaluator {
 
   }
 
-    toFiniteNumber(
+ toFiniteNumber(
     value
   ) {
 
