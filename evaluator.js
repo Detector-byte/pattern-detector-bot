@@ -1391,6 +1391,83 @@ class SignalEvaluator {
 
   }
 
+  toFiniteNumber(
+    value
+  ) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      (
+        typeof value === "string" &&
+        value.trim() === ""
+      )
+    ) {
+
+      return null;
+
+    }
+
+    const number =
+      Number(value);
+
+    if (
+      !Number.isFinite(
+        number
+      )
+    ) {
+
+      return null;
+
+    }
+
+    return number;
+
+  }
+
+  round(
+    value,
+    digits = 6
+  ) {
+
+    const number =
+      this.toFiniteNumber(
+        value
+      );
+
+    if (
+      number === null
+    ) {
+
+      return null;
+
+    }
+
+    return Number(
+      number.toFixed(
+        digits
+      )
+    );
+
+  }
+
+}
+
+
+        // Fall back to JSON-compatible cloning.
+
+      }
+
+    }
+
+    return JSON.parse(
+      JSON.stringify(
+        signal
+      )
+    );
+
+  }
+
  toFiniteNumber(
     value
   ) {
