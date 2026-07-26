@@ -1375,7 +1375,7 @@ class SignalEvaluator {
           signal
         );
 
-      } catch (_) {
+            } catch (_) {
 
         // Fall back to JSON-compatible cloning.
 
@@ -1452,89 +1452,5 @@ class SignalEvaluator {
   }
 
 }
-
-
-        // Fall back to JSON-compatible cloning.
-
-      }
-
-    }
-
-    return JSON.parse(
-      JSON.stringify(
-        signal
-      )
-    );
-
-  }
-
- toFiniteNumber(
-    value
-  ) {
-
-    if (
-      value === null ||
-      value === undefined ||
-      (
-        typeof value === "string" &&
-        value.trim() === ""
-      )
-    ) {
-
-      return null;
-
-    }
-
-    const number =
-      Number(value);
-
-    return Number.isFinite(
-      number
-    )
-
-      ? number
-
-      : null;
-
-  }
-
-    round(
-    value,
-    digits = 2
-  ) {
-
-    if (
-      value === null ||
-      value === undefined ||
-      (
-        typeof value === "string" &&
-        value.trim() === ""
-      )
-    ) {
-
-      return null;
-
-    }
-
-    const number =
-      Number(value);
-
-    if (
-      !Number.isFinite(
-        number
-      )
-    ) {
-
-      return null;
-
-    }
-
-    return Number(
-      number.toFixed(
-        digits
-      )
-    );
-
-  }
 
 module.exports = SignalEvaluator;
