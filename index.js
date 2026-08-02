@@ -3301,9 +3301,11 @@ function analyzePair(
     SUPPORTED_TIMEFRAMES
   ) {
     const timeframeCandles =
-      candles[pair][
+      getPairTimeframeCandles(
+        candles,
+        pair,
         timeframe
-      ];
+      );
 
     if (
       Array.isArray(
@@ -3326,9 +3328,11 @@ function analyzePair(
     SUPPORTED_TIMEFRAMES
   ) {
     const timeframeCandles =
-      candles[pair][
+      getPairTimeframeCandles(
+        candles,
+        pair,
         timeframe
-      ];
+      );
 
     if (
       !Array.isArray(
@@ -3364,7 +3368,8 @@ function analyzePair(
     const patterns =
       analyzer
         .detectAllPatterns(
-          timeframeCandles
+          timeframeCandles,
+          timeframe
         );
 
     if (
