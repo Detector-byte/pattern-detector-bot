@@ -405,17 +405,28 @@ class PatternAnalyzer {
       trend
     );
 
-    const choch = this.detectCHOCH(
-      candles,
-      swingHighsSMC,
-      swingLowsSMC,
-      trend
-    );
+    const choch =
+      this.detectCHOCH(
+        candles,
+        swingHighsSMC,
+        swingLowsSMC,
+        trend
+      );
 
-const context = {
-  ema20,
-  ema50,
-  trend,
+    // Detect the latest institutional Order Block once.
+    // The same result is reused by the legacy pattern
+    // pipeline and the observation-only sequence engine.
+    const orderBlock =
+      this.detectOrderBlock(
+        candles,
+        atr
+      );
+
+    const context = {
+      ema20: ema20,
+      ema50: ema50,
+      trend: trend
+    };
 
   // Institutional observation evidence.
   // Additive only: existing signal logic remains unchanged.
