@@ -3859,7 +3859,8 @@ function analyzeMarkets(
       candidates,
       pipelineStatus
     );
-
+  }
+  
   const institutionalResult =
     selectInstitutionalSignal(
       candidates,
