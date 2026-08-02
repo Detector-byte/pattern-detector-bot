@@ -968,8 +968,23 @@
       "pattern": "Change of Character",
       "decision": "REJECTED",
       "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-02T16:25:29.637Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-02T16:25:29.645Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Change of Character",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
     }
   ],
-  "updatedAt": "2026-08-02T16:20:32.474Z",
-  "totalEntries": 136
+  "updatedAt": "2026-08-02T16:25:29.652Z",
+  "totalEntries": 138
 }
