@@ -526,8 +526,22 @@
       "pattern": "Liquidity Sweep (Buy-Side)",
       "decision": "REJECTED",
       "reason": "confidence 66% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-02T13:15:27.234Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-02T13:15:27.235Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
     }
   ],
-  "updatedAt": "2026-08-02T13:10:37.728Z",
-  "totalEntries": 74
+  "updatedAt": "2026-08-02T13:15:27.241Z",
+  "totalEntries": 76
 }
