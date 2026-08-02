@@ -3514,15 +3514,6 @@ function buildPipelineStatusEntry(
             .filter(Boolean)
         )
       ),
-             .map(
-               name =>
-                 String(
-                   name || ""
-                 ).trim()
-             )
-             .filter(Boolean)
-         )
-       ),
 
     institutionalSequence:
       sequence
