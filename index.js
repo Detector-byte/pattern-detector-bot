@@ -5491,6 +5491,8 @@ module.exports = {
 
   analyzePair,
 
+  getPairTimeframeCandles,
+
   scorePattern,
 
   selectBestPattern,
