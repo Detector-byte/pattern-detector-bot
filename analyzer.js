@@ -3841,9 +3841,32 @@ class PatternAnalyzer {
   postProcessPattern(
     pattern,
     candles,
-    context
+    context,
+    diagnostics = null
   ) {
+    const recordRejection =
+      reason => {
+        if (
+          !diagnostics ||
+          !diagnostics.rejectionCounts ||
+          !Object.prototype.hasOwnProperty.call(
+            diagnostics.rejectionCounts,
+            reason
+          )
+        ) {
+          return;
+        }
+
+        diagnostics.rejectionCounts[
+          reason
+        ] += 1;
+      };
+
     if (!pattern) {
+      recordRejection(
+        "other"
+      );
+
       return null;
     }
 
@@ -3863,6 +3886,10 @@ class PatternAnalyzer {
         this.maxPatternAge;
 
       if (age > maxAge) {
+        recordRejection(
+          "patternAge"
+        );
+
         return null;
       }
 
@@ -3872,24 +3899,36 @@ class PatternAnalyzer {
     // RSI confirmation.
     if (
       pattern.direction ===
-        'BUY' &&
+        "BUY" &&
       context.rsi >
         this.rsiBuyMax
     ) {
+      recordRejection(
+        "rsiBuy"
+      );
+
       return null;
     }
 
     if (
       pattern.direction ===
-        'SELL' &&
+        "SELL" &&
       context.rsi <
         this.rsiSellMin
     ) {
+      recordRejection(
+        "rsiSell"
+      );
+
       return null;
     }
 
     // Volume confirmation.
     if (!context.volumeOk) {
+      recordRejection(
+        "volume"
+      );
+
       return null;
     }
 
@@ -3905,19 +3944,27 @@ class PatternAnalyzer {
 
       if (
         pattern.direction ===
-          'BUY' &&
+          "BUY" &&
         lastClose <
           pattern.breakoutLevel
       ) {
+        recordRejection(
+          "breakoutBuy"
+        );
+
         return null;
       }
 
       if (
         pattern.direction ===
-          'SELL' &&
+          "SELL" &&
         lastClose >
           pattern.breakoutLevel
       ) {
+        recordRejection(
+          "breakoutSell"
+        );
+
         return null;
       }
     }
