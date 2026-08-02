@@ -765,6 +765,16 @@ class PatternAnalyzer {
     diagnostics.returnedPatterns =
       finalPatterns.length;
 
+    diagnostics.returnedPatternNames =
+      finalPatterns
+        .map(
+          pattern =>
+            String(
+              pattern?.name || ""
+            ).trim()
+        )
+        .filter(Boolean);
+
     this.lastDiagnostics = {
       ...diagnostics,
 
