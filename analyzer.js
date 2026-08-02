@@ -4048,6 +4048,357 @@ class PatternAnalyzer {
   }
 
   // =====================================================
+  // Institutional Order Block Retest Evaluation
+  // =====================================================
+
+  /**
+   * Evaluate Order Block interaction using closed candles.
+   *
+   * This helper:
+   * - does not modify candles;
+   * - does not modify the Order Block;
+   * - does not approve or reject existing signals;
+   * - avoids look-ahead by scanning only after the
+   *   Order Block impulse candle.
+   */
+  evaluateOrderBlockRetest(
+    candles,
+    orderBlock
+  ) {
+    const emptyResult = {
+      evaluated:
+        false,
+
+      detected:
+        false,
+
+      confirmed:
+        false,
+
+      invalidated:
+        false,
+
+      direction:
+        "NEUTRAL",
+
+      firstRetestIndex:
+        null,
+
+      latestRetestIndex:
+        null,
+
+      confirmationIndex:
+        null,
+
+      invalidationIndex:
+        null,
+
+      touchCount:
+        0,
+
+      depthPercent:
+        null,
+
+      rejection:
+        null,
+
+      reason:
+        "Order Block retest was not evaluated"
+    };
+
+    if (
+      !Array.isArray(candles) ||
+      !orderBlock ||
+      typeof orderBlock !==
+        "object"
+    ) {
+      return emptyResult;
+    }
+
+    const direction =
+      orderBlock.direction;
+
+    const zoneHigh =
+      Number(
+        orderBlock.obHigh ??
+        orderBlock.zoneHigh
+      );
+
+    const zoneLow =
+      Number(
+        orderBlock.obLow ??
+        orderBlock.zoneLow
+      );
+
+    const originIndex =
+      Number(
+        orderBlock._ageIndex ??
+        orderBlock.originIndex
+      );
+
+    if (
+      (
+        direction !== "BUY" &&
+        direction !== "SELL"
+      ) ||
+      !Number.isFinite(zoneHigh) ||
+      !Number.isFinite(zoneLow) ||
+      zoneHigh <= zoneLow ||
+      !Number.isFinite(originIndex)
+    ) {
+      return {
+        ...emptyResult,
+
+        evaluated:
+          true,
+
+        direction:
+          direction ||
+          "NEUTRAL",
+
+        reason:
+          "Order Block contains invalid direction, zone or origin data"
+      };
+    }
+
+    const zoneWidth =
+      zoneHigh -
+      zoneLow;
+
+    const zoneMidpoint =
+      (
+        zoneHigh +
+        zoneLow
+      ) / 2;
+
+    // The candle immediately after the Order Block is
+    // the displacement candle, not a retest candle.
+    const scanStart =
+      Math.max(
+        0,
+        originIndex + 2
+      );
+
+    let firstRetestIndex =
+      null;
+
+    let latestRetestIndex =
+      null;
+
+    let confirmationIndex =
+      null;
+
+    let invalidationIndex =
+      null;
+
+    let touchCount =
+      0;
+
+    let deepestRetestPercent =
+      null;
+
+    let rejection =
+      null;
+
+    for (
+      let index = scanStart;
+      index < candles.length;
+      index++
+    ) {
+      const candle =
+        candles[index];
+
+      if (
+        !candle ||
+        !Number.isFinite(
+          Number(candle.open)
+        ) ||
+        !Number.isFinite(
+          Number(candle.high)
+        ) ||
+        !Number.isFinite(
+          Number(candle.low)
+        ) ||
+        !Number.isFinite(
+          Number(candle.close)
+        )
+      ) {
+        continue;
+      }
+
+      const open =
+        Number(candle.open);
+
+      const high =
+        Number(candle.high);
+
+      const low =
+        Number(candle.low);
+
+      const close =
+        Number(candle.close);
+
+      // A close beyond the opposite edge invalidates
+      // the institutional zone.
+      const invalidated =
+        direction === "BUY"
+          ? close < zoneLow
+          : close > zoneHigh;
+
+      if (invalidated) {
+        invalidationIndex =
+          index;
+
+        break;
+      }
+
+      const touchedZone =
+        low <= zoneHigh &&
+        high >= zoneLow;
+
+      if (!touchedZone) {
+        continue;
+      }
+
+      touchCount +=
+        1;
+
+      if (
+        firstRetestIndex === null
+      ) {
+        firstRetestIndex =
+          index;
+      }
+
+      latestRetestIndex =
+        index;
+
+      const depthPercent =
+        direction === "BUY"
+          ? (
+              (
+                zoneHigh -
+                Math.max(
+                  zoneLow,
+                  Math.min(
+                    low,
+                    zoneHigh
+                  )
+                )
+              ) /
+              zoneWidth
+            ) * 100
+          : (
+              (
+                Math.min(
+                  zoneHigh,
+                  Math.max(
+                    high,
+                    zoneLow
+                  )
+                ) -
+                zoneLow
+              ) /
+              zoneWidth
+            ) * 100;
+
+      deepestRetestPercent =
+        deepestRetestPercent ===
+          null
+          ? depthPercent
+          : Math.max(
+              deepestRetestPercent,
+              depthPercent
+            );
+
+      const bullishRejection =
+        direction === "BUY" &&
+        close > open &&
+        close >= zoneMidpoint;
+
+      const bearishRejection =
+        direction === "SELL" &&
+        close < open &&
+        close <= zoneMidpoint;
+
+      if (
+        confirmationIndex ===
+          null &&
+        (
+          bullishRejection ||
+          bearishRejection
+        )
+      ) {
+        confirmationIndex =
+          index;
+
+        rejection =
+          bullishRejection
+            ? "BULLISH_REJECTION"
+            : "BEARISH_REJECTION";
+      }
+    }
+
+    const detected =
+      firstRetestIndex !==
+      null;
+
+    const invalidated =
+      invalidationIndex !==
+      null;
+
+    const confirmed =
+      detected &&
+      !invalidated &&
+      confirmationIndex !==
+        null;
+
+    return {
+      evaluated:
+        true,
+
+      detected,
+
+      confirmed,
+
+      invalidated,
+
+      direction,
+
+      firstRetestIndex,
+
+      latestRetestIndex,
+
+      confirmationIndex,
+
+      invalidationIndex,
+
+      touchCount,
+
+      depthPercent:
+        Number.isFinite(
+          deepestRetestPercent
+        )
+          ? Number(
+              deepestRetestPercent
+                .toFixed(2)
+            )
+          : null,
+
+      rejection,
+
+      reason:
+        invalidated
+          ? "Order Block was invalidated by a candle close beyond the zone"
+          : confirmed
+            ? "Order Block retest produced directionally aligned rejection"
+            : detected
+              ? "Order Block was touched but rejection is not yet confirmed"
+              : "Order Block is fresh and has not yet been retested"
+    };
+  }
+
+  // =====================================================
   // Institutional Sequence Evidence Builder
   // =====================================================
 
