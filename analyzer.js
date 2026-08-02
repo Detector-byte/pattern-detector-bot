@@ -423,29 +423,40 @@ class PatternAnalyzer {
       );
 
     const context = {
-      ema20: ema20,
-      ema50: ema50,
-      trend: trend
-    };
+      ema20,
+      ema50,
+      trend,
 
-  // Institutional observation evidence.
-  // Additive only: existing signal logic remains unchanged.
-  marketStructure,
+      // Institutional observation evidence.
+      // Additive only: existing signal logic remains unchanged.
+      marketStructure,
 
-  // RSI, volume and ATR are calculated once and reused by all patterns.
-  rsi: this.calculateRSI(candles, this.rsiPeriod),
-      volumeOk: this.confirmVolume(candles),
+      // RSI, volume and ATR are calculated once
+      // and reused by all patterns.
+      rsi:
+        this.calculateRSI(
+          candles,
+          this.rsiPeriod
+        ),
+
+      volumeOk:
+        this.confirmVolume(
+          candles
+        ),
+
       atr,
       atrPercent,
 
-    // Smart Money Concepts confluence
+      // Smart Money Concepts confluence
       liquiditySweep,
       bos,
       choch,
       orderBlock,
 
-    // Filled immediately below
-      marketRegime: null
+      // Filled immediately below
+      marketRegime:
+        null
+    };
 
     // Detect market regime once for the complete candle set.
     context.marketRegime = this.detectMarketRegime(
