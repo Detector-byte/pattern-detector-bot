@@ -636,9 +636,41 @@ const context = {
 
     // Tag every detected pattern with its timeframe and regime.
     detectedPatterns.forEach(pattern => {
-      pattern.timeframe = timeframe;
-      pattern.marketRegime = context.marketRegime;
+        pattern.timeframe = timeframe;
+        pattern.marketRegime = context.marketRegime;
     });
+
+    // ----------------------------------------------
+    // Institutional sequence (observation only)
+    // ----------------------------------------------
+
+    const institutionalSequence =
+        this.buildInstitutionalSequence(
+            candles,
+            timeframe,
+            context,
+            detectedPatterns
+        );
+
+    context.institutionalSequence =
+        institutionalSequence;
+
+    diagnostics.institutionalSequence = {
+        stage:
+            institutionalSequence.stage,
+        score:
+            institutionalSequence.score,
+        valid:
+            institutionalSequence.valid,
+        direction:
+            institutionalSequence.direction,
+        completedStages:
+            institutionalSequence.completedStages.length,
+        missingStages:
+            institutionalSequence.missingStages.length,
+        conflicts:
+            institutionalSequence.conflicts.length
+    };
 
     // Remove duplicate patterns.
     const uniquePatterns = detectedPatterns.filter(
