@@ -466,8 +466,23 @@
       "pattern": "Diamond Top",
       "decision": "REJECTED",
       "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-02T13:03:05.748Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-02T13:03:05.753Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Liquidity Sweep (Buy-Side)",
+      "decision": "REJECTED",
+      "reason": "confidence 66% below 70% threshold"
     }
   ],
-  "updatedAt": "2026-08-02T12:00:42.366Z",
-  "totalEntries": 66
+  "updatedAt": "2026-08-02T13:03:05.760Z",
+  "totalEntries": 68
 }
