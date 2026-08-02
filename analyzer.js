@@ -412,13 +412,17 @@ class PatternAnalyzer {
       trend
     );
 
-    const context = {
-      ema20,
-      ema50,
-      trend,
+const context = {
+  ema20,
+  ema50,
+  trend,
 
-      // RSI, volume and ATR are calculated once and reused by all patterns.
-      rsi: this.calculateRSI(candles, this.rsiPeriod),
+  // Institutional observation evidence.
+  // Additive only: existing signal logic remains unchanged.
+  marketStructure,
+
+  // RSI, volume and ATR are calculated once and reused by all patterns.
+  rsi: this.calculateRSI(candles, this.rsiPeriod),
       volumeOk: this.confirmVolume(candles),
       atr,
       atrPercent,
