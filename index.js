@@ -3307,6 +3307,14 @@ function analyzePair(
         timeframe
       );
 
+    console.log(
+      `📦 ${pair} ${timeframe}: ${
+        Array.isArray(timeframeCandles)
+          ? timeframeCandles.length
+          : 0
+      } candles available`
+    );
+
     if (
       Array.isArray(
         timeframeCandles
@@ -3371,11 +3379,26 @@ function analyzePair(
           timeframeCandles,
           timeframe
         );
+    console.log(
+      `🔎 ${pair} ${timeframe}: ${
+        Array.isArray(patterns)
+          ? patterns.length
+          : 0
+      } patterns returned by analyzer`
+    );
 
     if (
       !Array.isArray(patterns) ||
       patterns.length === 0
     ) {
+      logAudit({
+        pair,
+        timeframe,
+        decision: "NO_PATTERN",
+        reason:
+          "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+      });
+
       continue;
     }
 
