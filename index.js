@@ -3302,6 +3302,240 @@ function getPairTimeframeCandles(
     : null;
 }
 
+function buildPipelineStatusEntry(
+  pair,
+  timeframe,
+  candleCount,
+  diagnostics = null,
+  overrides = {}
+) {
+  const safeDiagnostics =
+    diagnostics &&
+    typeof diagnostics ===
+      "object" &&
+    !Array.isArray(
+      diagnostics
+    )
+      ? diagnostics
+      : {};
+
+  const sequence =
+    safeDiagnostics
+      .institutionalSequence &&
+    typeof safeDiagnostics
+      .institutionalSequence ===
+      "object" &&
+    !Array.isArray(
+      safeDiagnostics
+        .institutionalSequence
+    )
+      ? safeDiagnostics
+          .institutionalSequence
+      : null;
+
+  return {
+    pair,
+
+    timeframe,
+
+    updatedAt:
+      nowIso(),
+
+    candleCount:
+      Number.isFinite(
+        Number(candleCount)
+      )
+        ? Number(candleCount)
+        : 0,
+
+    analyzerStatus:
+      safeDiagnostics.status ||
+      overrides.analyzerStatus ||
+      "UNKNOWN",
+
+    rejectionStage:
+      safeDiagnostics
+        .rejectionStage ||
+      overrides.rejectionStage ||
+      null,
+
+    reason:
+      overrides.reason ||
+      null,
+
+    atr:
+      Number.isFinite(
+        Number(
+          safeDiagnostics.atr
+        )
+      )
+        ? Number(
+            safeDiagnostics.atr
+          )
+        : null,
+
+    atrPercent:
+      Number.isFinite(
+        Number(
+          safeDiagnostics
+            .atrPercent
+        )
+      )
+        ? Number(
+            safeDiagnostics
+              .atrPercent
+          )
+        : null,
+
+    minimumATRPercent:
+      Number.isFinite(
+        Number(
+          safeDiagnostics
+            .minimumATRPercent
+        )
+      )
+        ? Number(
+            safeDiagnostics
+              .minimumATRPercent
+          )
+        : null,
+
+    rawCandidates:
+      Number.isFinite(
+        Number(
+          safeDiagnostics
+            .rawCandidates
+        )
+      )
+        ? Number(
+            safeDiagnostics
+              .rawCandidates
+          )
+        : 0,
+
+    acceptedPatterns:
+      Number.isFinite(
+        Number(
+          safeDiagnostics
+            .acceptedPatterns
+        )
+      )
+        ? Number(
+            safeDiagnostics
+              .acceptedPatterns
+          )
+        : 0,
+
+    returnedPatterns:
+      Number.isFinite(
+        Number(
+          safeDiagnostics
+            .returnedPatterns
+        )
+      )
+        ? Number(
+            safeDiagnostics
+              .returnedPatterns
+          )
+        : 0,
+
+    institutionalSequence:
+      sequence
+        ? {
+            stage:
+              sequence.stage ||
+              null,
+
+            score:
+              Number.isFinite(
+                Number(
+                  sequence.score
+                )
+              )
+                ? Number(
+                    sequence.score
+                  )
+                : 0,
+
+            valid:
+              sequence.valid ===
+              true,
+
+            direction:
+              sequence.direction ||
+              "NEUTRAL",
+
+            completedStages:
+              Number.isFinite(
+                Number(
+                  sequence
+                    .completedStages
+                )
+              )
+                ? Number(
+                    sequence
+                      .completedStages
+                  )
+                : 0,
+
+            missingStages:
+              Number.isFinite(
+                Number(
+                  sequence
+                    .missingStages
+                )
+              )
+                ? Number(
+                    sequence
+                      .missingStages
+                  )
+                : 0,
+
+            conflicts:
+              Number.isFinite(
+                Number(
+                  sequence.conflicts
+                )
+              )
+                ? Number(
+                    sequence.conflicts
+                  )
+                : 0
+          }
+        : null
+  };
+}
+
+function savePipelineStatus(
+  pipelineStatus
+) {
+  const safeStatus =
+    pipelineStatus &&
+    typeof pipelineStatus ===
+      "object" &&
+    !Array.isArray(
+      pipelineStatus
+    )
+      ? pipelineStatus
+      : getDefaultPipelineStatusData();
+
+  safeWriteJson(
+    PIPELINE_STATUS_FILE,
+    {
+      version:
+        "1.0.0",
+
+      updatedAt:
+        nowIso(),
+
+      pairs:
+        objectOrEmpty(
+          safeStatus.pairs
+        )
+    }
+  );
+}
+
 function analyzePair(
   pair,
   candles,
@@ -3309,10 +3543,31 @@ function analyzePair(
   learner,
   signalGenerator,
   existingSignals,
-  phase6Candidates = []
+  phase6Candidates = [],
+  pipelineStatus = null
 ) {
   const trendCache = {};
 
+  if (
+    pipelineStatus &&
+    typeof pipelineStatus ===
+      "object"
+  ) {
+    pipelineStatus.pairs =
+      objectOrEmpty(
+        pipelineStatus.pairs
+      );
+
+    pipelineStatus.pairs[
+      pair
+    ] =
+      objectOrEmpty(
+        pipelineStatus.pairs[
+          pair
+        ]
+      );
+  }
+  
   if (
     !candles?.[pair]
   ) {
@@ -3365,13 +3620,44 @@ function analyzePair(
         timeframe
       );
 
-    if (
+   if (
       !Array.isArray(
         timeframeCandles
       ) ||
       timeframeCandles.length <
         MINIMUM_CANDLES
     ) {
+      if (
+        pipelineStatus?.pairs?.[
+          pair
+        ]
+      ) {
+        pipelineStatus.pairs[
+          pair
+        ][timeframe] =
+          buildPipelineStatusEntry(
+            pair,
+            timeframe,
+            Array.isArray(
+              timeframeCandles
+            )
+              ? timeframeCandles
+                  .length
+              : 0,
+            null,
+            {
+              analyzerStatus:
+                "REJECTED",
+
+              rejectionStage:
+                "INSUFFICIENT_CANDLES",
+
+              reason:
+                `requires at least ${MINIMUM_CANDLES} candles`
+            }
+          );
+      }
+
       continue;
     }
 
