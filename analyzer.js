@@ -199,6 +199,12 @@ class PatternAnalyzer {
           "NEUTRAL"
       }
     };
+
+    // Latest analyzer diagnostics for the orchestrator.
+    // Observation only: this does not affect pattern
+    // detection, filtering, ranking or signal generation.
+    this.lastDiagnostics =
+      null;
     
     // --- Phase 4: AI Scoring Engine weights (must sum to 1) ---
     // Phase 4 adaptive threshold bounds. The learner may recommend small
@@ -283,6 +289,10 @@ class PatternAnalyzer {
       diagnostics.rejectionStage =
         "INSUFFICIENT_CANDLES";
 
+      this.lastDiagnostics = {
+        ...diagnostics
+      };
+
       console.log(
         `🧪 Analyzer ${timeframe}: ${JSON.stringify(
           diagnostics
@@ -332,6 +342,10 @@ class PatternAnalyzer {
 
       diagnostics.rejectionStage =
         "ATR_VOLATILITY_GATE";
+
+      this.lastDiagnostics = {
+        ...diagnostics
+      };
 
       console.log(
         `🧪 Analyzer ${timeframe}: ${JSON.stringify(
@@ -751,6 +765,23 @@ class PatternAnalyzer {
     diagnostics.returnedPatterns =
       finalPatterns.length;
 
+    this.lastDiagnostics = {
+      ...diagnostics,
+
+      rejectionCounts: {
+        ...diagnostics
+          .rejectionCounts
+      },
+
+      institutionalSequence:
+        diagnostics.institutionalSequence
+          ? {
+              ...diagnostics
+                .institutionalSequence
+            }
+          : null
+    };
+
     console.log(
       `🧪 Analyzer ${timeframe}: ${JSON.stringify(
         diagnostics
@@ -758,6 +789,7 @@ class PatternAnalyzer {
     );
 
     return finalPatterns;
+
   }
   
   // =====================================================
