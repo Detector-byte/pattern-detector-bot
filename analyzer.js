@@ -4595,6 +4595,189 @@ class PatternAnalyzer {
     }
 
     // -------------------------------------------------
+    // Stage 4: Institutional Order Block evidence
+    // -------------------------------------------------
+
+    if (orderBlock) {
+      const zoneHigh =
+        Number(
+          orderBlock.obHigh
+        );
+
+      const zoneLow =
+        Number(
+          orderBlock.obLow
+        );
+
+      const originIndex =
+        Number(
+          orderBlock._ageIndex ??
+          orderBlock.originIndex
+        );
+
+      const validZone =
+        Number.isFinite(zoneHigh) &&
+        Number.isFinite(zoneLow) &&
+        zoneHigh > zoneLow;
+
+      if (validZone) {
+        const mitigated =
+          orderBlock.mitigated ===
+          true;
+
+        result.orderBlock = {
+          ...result.orderBlock,
+
+          identified:
+            true,
+
+          direction:
+            orderBlock.direction ||
+            "NEUTRAL",
+
+          type:
+            orderBlock.name ||
+            (
+              orderBlock.direction ===
+                "BUY"
+                ? "Bullish Order Block"
+                : orderBlock.direction ===
+                    "SELL"
+                  ? "Bearish Order Block"
+                  : "Order Block"
+            ),
+
+          zoneHigh,
+
+          zoneLow,
+
+          zoneMidpoint:
+            (
+              zoneHigh +
+              zoneLow
+            ) / 2,
+
+          originIndex:
+            Number.isFinite(
+              originIndex
+            )
+              ? originIndex
+              : null,
+
+          fresh:
+            !mitigated,
+
+          mitigated,
+
+          strength:
+            Number.isFinite(
+              Number(
+                orderBlock.strength
+              )
+            )
+              ? Number(
+                  orderBlock.strength
+                )
+              : null,
+
+          confirmationScore:
+            Number.isFinite(
+              Number(
+                orderBlock
+                  .confirmationScore
+              )
+            )
+              ? Number(
+                  orderBlock
+                    .confirmationScore
+                )
+              : null
+        };
+
+        result.completedStages.push(
+          "ORDER_BLOCK"
+        );
+
+        result.missingStages =
+          result.missingStages.filter(
+            stage =>
+              stage !==
+              "ORDER_BLOCK"
+          );
+
+        result.score +=
+          mitigated
+            ? 10
+            : 20;
+
+        result.stage =
+          mitigated
+            ? (
+                states.retestInProgress ||
+                "RETEST_IN_PROGRESS"
+              )
+            : (
+                states.waitingForRetest ||
+                "WAITING_FOR_RETEST"
+              );
+
+        result.reasons.push(
+          mitigated
+            ? `${result.orderBlock.type} has already been mitigated`
+            : `${result.orderBlock.type} is fresh and waiting for its first valid retest`
+        );
+
+        if (
+          result.direction ===
+            "NEUTRAL" &&
+          (
+            orderBlock.direction ===
+              "BUY" ||
+            orderBlock.direction ===
+              "SELL"
+          )
+        ) {
+          result.direction =
+            orderBlock.direction;
+        } else if (
+          result.direction !==
+            "NEUTRAL" &&
+          orderBlock.direction &&
+          orderBlock.direction !==
+            result.direction
+        ) {
+          result.conflicts.push(
+            "Order Block direction conflicts with the established institutional direction"
+          );
+        }
+
+        if (
+          result.structureShift
+            .confirmed === true &&
+          result.structureShift
+            .direction !==
+            "NEUTRAL" &&
+          orderBlock.direction &&
+          orderBlock.direction !==
+            result.structureShift
+              .direction
+        ) {
+          result.conflicts.push(
+            "Order Block direction conflicts with the confirmed BOS or CHOCH direction"
+          );
+        }
+      } else {
+        result.reasons.push(
+          "Order Block was detected but its zone prices are invalid"
+        );
+      }
+    } else {
+      result.reasons.push(
+        "No valid institutional Order Block is currently available"
+      );
+    }
+
+    // -------------------------------------------------
     // Observation diagnostics only
     // -------------------------------------------------
 
