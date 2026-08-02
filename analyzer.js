@@ -4828,6 +4828,21 @@ class PatternAnalyzer {
         0;
 
     if (
+      result.orderBlock
+        .identified === true
+    ) {
+      result.stage =
+        result.orderBlock
+          .mitigated === true
+          ? (
+              states.retestInProgress ||
+              "RETEST_IN_PROGRESS"
+            )
+          : (
+              states.waitingForRetest ||
+              "WAITING_FOR_RETEST"
+            );
+    } else if (
       result.structureShift
         .confirmed === true
     ) {
@@ -4837,7 +4852,7 @@ class PatternAnalyzer {
         "STRUCTURE_SHIFT_CONFIRMED";
 
       result.reasons.push(
-        "Waiting for a valid order block and retest before entry confirmation"
+        "Waiting for a directionally aligned Order Block"
       );
     } else if (
       result.liquidity.swept ===
