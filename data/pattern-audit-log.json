@@ -652,8 +652,23 @@
       "timeframe": "5m",
       "decision": "REJECTED",
       "reason": "extreme volatility: current 0.65178, average 0.07302"
+    },
+    {
+      "timestamp": "2026-08-02T14:25:23.976Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-02T14:25:23.984Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
     }
   ],
-  "updatedAt": "2026-08-02T14:20:28.283Z",
-  "totalEntries": 92
+  "updatedAt": "2026-08-02T14:25:23.989Z",
+  "totalEntries": 94
 }
