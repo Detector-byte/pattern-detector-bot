@@ -68,7 +68,7 @@ class PatternAnalyzer {
 
     // --- New professional-grade config ---
     this.atrPeriod = 14;
-    this.minATRPercent = 0.003;   // reject dead/low-volatility markets
+    this.minATRPercent = 0.00005;   // reject dead/low-volatility markets
 
     this.rsiPeriod = 14;
     this.rsiBuyMax = 35;          // BUY patterns need RSI below this
