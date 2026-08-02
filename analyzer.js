@@ -534,14 +534,40 @@ class PatternAnalyzer {
         uniquePatterns
       );
 
-    return ranked
-      .sort(
-        (a, b) =>
-          (b.signalScore - a.signalScore) ||
-          (b.weightedScore - a.weightedScore)
-      )
-      .slice(0, 5);
-  }
+    const finalPatterns =
+      ranked
+        .sort(
+          (a, b) =>
+            (
+              b.signalScore -
+              a.signalScore
+            ) ||
+            (
+              b.weightedScore -
+              a.weightedScore
+            )
+        )
+        .slice(0, 5);
+
+    diagnostics.status =
+      "COMPLETED";
+
+    diagnostics.rejectionStage =
+      null;
+
+    diagnostics.uniquePatterns =
+      uniquePatterns.length;
+
+    diagnostics.returnedPatterns =
+      finalPatterns.length;
+
+    console.log(
+      `🧪 Analyzer ${timeframe}: ${JSON.stringify(
+        diagnostics
+      )}`
+    );
+
+    return finalPatterns;
 
   // =====================================================
   // Step 3: Swing-based Double Top / Double Bottom
