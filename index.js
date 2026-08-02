@@ -3492,6 +3492,23 @@ function buildPipelineStatusEntry(
           )
         : 0,
 
+    returnedPatternNames:
+      Array.from(
+        new Set(
+          safeArray(
+            overrides
+              .returnedPatternNames
+          )
+            .map(
+              name =>
+                String(
+                  name || ""
+                ).trim()
+            )
+            .filter(Boolean)
+        )
+      ),
+
     institutionalSequence:
       sequence
         ? {
