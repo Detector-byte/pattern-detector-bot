@@ -3252,6 +3252,44 @@ class PatternAnalyzer {
     return swings;
   }
 
+  // Return the latest confirmed swing strictly before
+  // the supplied candle index.
+  getLatestSwingBeforeIndex(
+    swings,
+    beforeIndex
+  ) {
+    if (
+      !Array.isArray(swings) ||
+      swings.length === 0 ||
+      !Number.isFinite(beforeIndex)
+    ) {
+      return null;
+    }
+
+    for (
+      let index =
+        swings.length - 1;
+      index >= 0;
+      index--
+    ) {
+      const swing =
+        swings[index];
+
+      if (
+        swing &&
+        Number.isFinite(
+          swing.index
+        ) &&
+        swing.index <
+          beforeIndex
+      ) {
+        return swing;
+      }
+    }
+
+    return null;
+  }
+
   // =====================================================
   // Breakout Confirmation
   // =====================================================
