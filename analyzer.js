@@ -568,7 +568,8 @@ class PatternAnalyzer {
     );
 
     return finalPatterns;
-
+  }
+  
   // =====================================================
   // Step 3: Swing-based Double Top / Double Bottom
   // =====================================================
