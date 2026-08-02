@@ -3715,6 +3715,32 @@ function analyzePair(
           timeframeCandles,
           timeframe
         );
+
+    const diagnostics =
+      typeof analyzer
+        .getLastDiagnostics ===
+        "function"
+        ? analyzer
+            .getLastDiagnostics()
+        : null;
+
+    if (
+      pipelineStatus?.pairs?.[
+        pair
+      ]
+    ) {
+      pipelineStatus.pairs[
+        pair
+      ][timeframe] =
+        buildPipelineStatusEntry(
+          pair,
+          timeframe,
+          timeframeCandles
+            .length,
+          diagnostics
+        );
+    }
+
     console.log(
       `🔎 ${pair} ${timeframe}: ${
         Array.isArray(patterns)
@@ -3810,7 +3836,8 @@ function analyzeMarkets(
   analyzer,
   learner,
   signalGenerator,
-  existingSignals
+  existingSignals,
+  pipelineStatus = null
 ) {
   console.log(
     "🔍 Analyzing patterns with Phase 6 institutional layer..."
