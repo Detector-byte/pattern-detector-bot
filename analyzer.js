@@ -648,9 +648,7 @@ class PatternAnalyzer {
     collect(bos);
     collect(choch);
 
-    collect(
-      this.detectOrderBlock(candles, atr)
-    );
+    collect(orderBlock);
 
     collect(
       this.detectFairValueGap(candles)
