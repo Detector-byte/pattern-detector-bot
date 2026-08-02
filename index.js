@@ -3496,8 +3496,14 @@ function buildPipelineStatusEntry(
       Array.from(
         new Set(
           safeArray(
-            overrides
-              .returnedPatternNames
+            Array.isArray(
+              safeDiagnostics
+                .returnedPatternNames
+            )
+              ? safeDiagnostics
+                  .returnedPatternNames
+              : overrides
+                  .returnedPatternNames
           )
             .map(
               name =>
@@ -3508,6 +3514,15 @@ function buildPipelineStatusEntry(
             .filter(Boolean)
         )
       ),
+             .map(
+               name =>
+                 String(
+                   name || ""
+                 ).trim()
+             )
+             .filter(Boolean)
+         )
+       ),
 
     institutionalSequence:
       sequence
