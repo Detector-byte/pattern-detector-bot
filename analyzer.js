@@ -3405,6 +3405,337 @@ class PatternAnalyzer {
   }
 
   // =====================================================
+  // Institutional Market Structure Classification
+  // =====================================================
+
+  /**
+   * Classify confirmed swing structure without using
+   * future candles or modifying existing detectors.
+   *
+   * Structure rules:
+   * - Higher High + Higher Low = bullish continuation
+   * - Lower High + Lower Low = bearish continuation
+   * - Mixed swing conditions = transition or range
+   */
+  classifyMarketStructure(
+    swingHighs,
+    swingLows
+  ) {
+    const neutralResult = {
+      available:
+        false,
+
+      direction:
+        "NEUTRAL",
+
+      state:
+        "INSUFFICIENT_STRUCTURE",
+
+      trend:
+        "SIDEWAYS",
+
+      highStructure:
+        "UNKNOWN",
+
+      lowStructure:
+        "UNKNOWN",
+
+      latestHigh:
+        null,
+
+      previousHigh:
+        null,
+
+      latestLow:
+        null,
+
+      previousLow:
+        null,
+
+      confirmedAtIndex:
+        null,
+
+      strength:
+        0,
+
+      reasons: [
+        "At least two confirmed swing highs and two confirmed swing lows are required"
+      ]
+    };
+
+    if (
+      !Array.isArray(
+        swingHighs
+      ) ||
+      !Array.isArray(
+        swingLows
+      ) ||
+      swingHighs.length < 2 ||
+      swingLows.length < 2
+    ) {
+      return neutralResult;
+    }
+
+    const previousHigh =
+      swingHighs[
+        swingHighs.length - 2
+      ];
+
+    const latestHigh =
+      swingHighs[
+        swingHighs.length - 1
+      ];
+
+    const previousLow =
+      swingLows[
+        swingLows.length - 2
+      ];
+
+    const latestLow =
+      swingLows[
+        swingLows.length - 1
+      ];
+
+    const swingPoints = [
+      previousHigh,
+      latestHigh,
+      previousLow,
+      latestLow
+    ];
+
+    const validSwingPoints =
+      swingPoints.every(
+        swing =>
+          swing &&
+          Number.isFinite(
+            Number(swing.index)
+          ) &&
+          Number.isFinite(
+            Number(swing.value)
+          )
+      );
+
+    if (!validSwingPoints) {
+      return {
+        ...neutralResult,
+
+        state:
+          "INVALID_STRUCTURE_DATA",
+
+        reasons: [
+          "One or more confirmed swing points contain invalid index or price data"
+        ]
+      };
+    }
+
+    const higherHigh =
+      Number(latestHigh.value) >
+      Number(previousHigh.value);
+
+    const lowerHigh =
+      Number(latestHigh.value) <
+      Number(previousHigh.value);
+
+    const equalHigh =
+      Number(latestHigh.value) ===
+      Number(previousHigh.value);
+
+    const higherLow =
+      Number(latestLow.value) >
+      Number(previousLow.value);
+
+    const lowerLow =
+      Number(latestLow.value) <
+      Number(previousLow.value);
+
+    const equalLow =
+      Number(latestLow.value) ===
+      Number(previousLow.value);
+
+    const highStructure =
+      higherHigh
+        ? "HIGHER_HIGH"
+        : lowerHigh
+          ? "LOWER_HIGH"
+          : equalHigh
+            ? "EQUAL_HIGH"
+            : "UNKNOWN";
+
+    const lowStructure =
+      higherLow
+        ? "HIGHER_LOW"
+        : lowerLow
+          ? "LOWER_LOW"
+          : equalLow
+            ? "EQUAL_LOW"
+            : "UNKNOWN";
+
+    let direction =
+      "NEUTRAL";
+
+    let state =
+      "RANGE_OR_TRANSITION";
+
+    let trend =
+      "SIDEWAYS";
+
+    let strength =
+      40;
+
+    const reasons = [];
+
+    if (
+      higherHigh &&
+      higherLow
+    ) {
+      direction =
+        "BUY";
+
+      state =
+        "BULLISH_STRUCTURE";
+
+      trend =
+        "UP";
+
+      strength =
+        100;
+
+      reasons.push(
+        "Latest confirmed swing high is higher than the previous swing high"
+      );
+
+      reasons.push(
+        "Latest confirmed swing low is higher than the previous swing low"
+      );
+    } else if (
+      lowerHigh &&
+      lowerLow
+    ) {
+      direction =
+        "SELL";
+
+      state =
+        "BEARISH_STRUCTURE";
+
+      trend =
+        "DOWN";
+
+      strength =
+        100;
+
+      reasons.push(
+        "Latest confirmed swing high is lower than the previous swing high"
+      );
+
+      reasons.push(
+        "Latest confirmed swing low is lower than the previous swing low"
+      );
+    } else if (
+      higherHigh &&
+      lowerLow
+    ) {
+      state =
+        "EXPANDING_RANGE";
+
+      strength =
+        55;
+
+      reasons.push(
+        "Price formed both a higher high and a lower low, indicating expansion without directional control"
+      );
+    } else if (
+      lowerHigh &&
+      higherLow
+    ) {
+      state =
+        "CONTRACTING_RANGE";
+
+      strength =
+        55;
+
+      reasons.push(
+        "Price formed a lower high and a higher low, indicating compression"
+      );
+    } else if (
+      equalHigh ||
+      equalLow
+    ) {
+      state =
+        "LIQUIDITY_RANGE";
+
+      strength =
+        50;
+
+      reasons.push(
+        "Equal swing levels may represent resting liquidity"
+      );
+    } else {
+      reasons.push(
+        "Confirmed swing sequence is mixed and does not establish directional control"
+      );
+    }
+
+    const confirmedAtIndex =
+      Math.max(
+        Number(latestHigh.index),
+        Number(latestLow.index)
+      );
+
+    return {
+      available:
+        true,
+
+      direction,
+
+      state,
+
+      trend,
+
+      highStructure,
+
+      lowStructure,
+
+      latestHigh: {
+        index:
+          Number(latestHigh.index),
+
+        value:
+          Number(latestHigh.value)
+      },
+
+      previousHigh: {
+        index:
+          Number(previousHigh.index),
+
+        value:
+          Number(previousHigh.value)
+      },
+
+      latestLow: {
+        index:
+          Number(latestLow.index),
+
+        value:
+          Number(latestLow.value)
+      },
+
+      previousLow: {
+        index:
+          Number(previousLow.index),
+
+        value:
+          Number(previousLow.value)
+      },
+
+      confirmedAtIndex,
+
+      strength,
+
+      reasons
+    };
+  }
+
+  // =====================================================
   // Breakout Confirmation
   // =====================================================
 
