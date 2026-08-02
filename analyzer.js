@@ -5316,6 +5316,20 @@ class PatternAnalyzer {
         0;
 
     if (
+      result.invalidation
+        .invalidated === true
+    ) {
+      result.stage =
+        states.invalidated ||
+        "INVALIDATED";
+    } else if (
+      result.retest
+        .confirmed === true
+    ) {
+      result.stage =
+        states.retestConfirmed ||
+        "RETEST_CONFIRMED";
+    } else if (
       result.orderBlock
         .identified === true
     ) {
