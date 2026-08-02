@@ -86,6 +86,120 @@ class PatternAnalyzer {
     this.fvgLookback = 15;              // candles to scan back for a fair value gap
     this.maxSMCPatternAge = 20;         // SMC patterns stay relevant longer than classic swing patterns
 
+    // =====================================================
+    // Institutional Sequence Engine
+    // =====================================================
+    //
+    // Observation mode is intentionally non-invasive:
+    // - Existing detectors continue to operate normally.
+    // - Existing signals are not blocked.
+    // - Existing confidence is not changed.
+    // - Existing JSON schemas remain backward compatible.
+    //
+    // The sequence engine will first observe and explain
+    // market structure in the same order a professional
+    // discretionary trader would review it.
+
+    this.institutionalSequenceConfig = {
+      version:
+        "1.0.0",
+
+      enabled:
+        true,
+
+      mode:
+        "OBSERVATION",
+
+      hardGateEnabled:
+        false,
+
+      confidenceInfluenceEnabled:
+        false,
+
+      requireClosedCandles:
+        true,
+
+      stages: [
+        "MARKET_STRUCTURE",
+        "LIQUIDITY",
+        "LIQUIDITY_SWEEP",
+        "DISPLACEMENT",
+        "BOS_OR_CHOCH",
+        "ORDER_BLOCK",
+        "RETEST",
+        "CONTINUATION",
+        "CONFIRMATION",
+        "ENTRY_READY"
+      ],
+
+      requiredStages: [
+        "MARKET_STRUCTURE",
+        "BOS_OR_CHOCH",
+        "ORDER_BLOCK",
+        "RETEST",
+        "CONFIRMATION"
+      ],
+
+      supportiveStages: [
+        "LIQUIDITY",
+        "LIQUIDITY_SWEEP",
+        "DISPLACEMENT",
+        "CONTINUATION"
+      ],
+
+      states: {
+        searchingStructure:
+          "SEARCHING_STRUCTURE",
+
+        searchingLiquidity:
+          "SEARCHING_LIQUIDITY",
+
+        liquidityIdentified:
+          "LIQUIDITY_IDENTIFIED",
+
+        liquiditySwept:
+          "LIQUIDITY_SWEPT",
+
+        structureShiftConfirmed:
+          "STRUCTURE_SHIFT_CONFIRMED",
+
+        orderBlockIdentified:
+          "ORDER_BLOCK_IDENTIFIED",
+
+        waitingForRetest:
+          "WAITING_FOR_RETEST",
+
+        retestInProgress:
+          "RETEST_IN_PROGRESS",
+
+        retestConfirmed:
+          "RETEST_CONFIRMED",
+
+        entryConfirmed:
+          "ENTRY_CONFIRMED",
+
+        invalidated:
+          "INVALIDATED",
+
+        expired:
+          "EXPIRED",
+
+        incomplete:
+          "INCOMPLETE"
+      },
+
+      directions: {
+        bullish:
+          "BUY",
+
+        bearish:
+          "SELL",
+
+        neutral:
+          "NEUTRAL"
+      }
+    };
+    
     // --- Phase 4: AI Scoring Engine weights (must sum to 1) ---
     // Phase 4 adaptive threshold bounds. The learner may recommend small
     // changes, but the analyzer always clamps them to ±20% of baseline.
