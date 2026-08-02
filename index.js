@@ -3281,12 +3281,50 @@ function getPairTimeframeCandles(
   const pairData =
     candles?.[pair];
 
+  /*
+   * Current PipSight worker schema:
+   *
+   * {
+   *   XAUUSD: [...M5 candles],
+   *   GBPJPY: [...M5 candles],
+   *   derivedCandles: {
+   *     XAUUSD: {
+   *       "15m": [...],
+   *       "30m": [...],
+   *       "1H": [...],
+   *       "4H": [...]
+   *     }
+   *   }
+   * }
+   */
   if (Array.isArray(pairData)) {
-    return timeframe === "5m"
-      ? pairData
+    if (timeframe === "5m") {
+      return pairData;
+    }
+
+    const derivedRows =
+      candles
+        ?.derivedCandles
+        ?.[pair]
+        ?.[timeframe];
+
+    return Array.isArray(
+      derivedRows
+    )
+      ? derivedRows
       : null;
   }
 
+  /*
+   * Preserve the existing legacy/nested schema:
+   *
+   * {
+   *   XAUUSD: {
+   *     "5m": [...],
+   *     "15m": [...]
+   *   }
+   * }
+   */
   if (
     !pairData ||
     typeof pairData !== "object"
@@ -3297,8 +3335,23 @@ function getPairTimeframeCandles(
   const rows =
     pairData[timeframe];
 
-  return Array.isArray(rows)
-    ? rows
+  if (Array.isArray(rows)) {
+    return rows;
+  }
+
+  /*
+   * Defensive additive fallback for mixed payloads.
+   */
+  const derivedRows =
+    candles
+      ?.derivedCandles
+      ?.[pair]
+      ?.[timeframe];
+
+  return Array.isArray(
+    derivedRows
+  )
+    ? derivedRows
     : null;
 }
 
