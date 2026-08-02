@@ -3679,6 +3679,33 @@ function analyzePair(
           filter.reason
       });
 
+      if (
+        pipelineStatus?.pairs?.[
+          pair
+        ]
+      ) {
+        pipelineStatus.pairs[
+          pair
+        ][timeframe] =
+          buildPipelineStatusEntry(
+            pair,
+            timeframe,
+            timeframeCandles
+              .length,
+            null,
+            {
+              analyzerStatus:
+                "REJECTED",
+
+              rejectionStage:
+                "SPREAD_VOLATILITY_FILTER",
+
+              reason:
+                filter.reason
+            }
+          );
+      }
+
       continue;
     }
 
