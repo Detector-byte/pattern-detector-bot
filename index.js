@@ -5587,8 +5587,10 @@ async function runBot() {
         data.signals.signals
       );
 
+    const pipelineStatus =
+      getDefaultPipelineStatusData();
+
     const analysisStart =
-      Date.now();
 
     const newSignals =
       analyzeMarkets(
@@ -5596,7 +5598,8 @@ async function runBot() {
         analyzer,
         learner,
         signalGenerator,
-        existingSignals
+        existingSignals,
+        pipelineStatus
       );
 
     analysisDurationMs =
