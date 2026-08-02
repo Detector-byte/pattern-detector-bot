@@ -3237,6 +3237,47 @@ function refreshExistingSignal(
 // =====================================================
 // Pair and Market Analysis
 // =====================================================
+/**
+ * Return candles for one pair/timeframe while preserving both supported
+ * source schemas:
+ *
+ * 1. Current PipSight worker schema:
+ *    { XAUUSD: [...M5 candles], GBPJPY: [...M5 candles] }
+ *
+ * 2. Legacy/nested Pattern Detector schema:
+ *    { XAUUSD: { "5m": [...], "15m": [...] } }
+ *
+ * A direct pair array is M5 data only. It must never be reused as a
+ * fabricated higher timeframe.
+ */
+function getPairTimeframeCandles(
+  candles,
+  pair,
+  timeframe
+) {
+  const pairData =
+    candles?.[pair];
+
+  if (Array.isArray(pairData)) {
+    return timeframe === "5m"
+      ? pairData
+      : null;
+  }
+
+  if (
+    !pairData ||
+    typeof pairData !== "object"
+  ) {
+    return null;
+  }
+
+  const rows =
+    pairData[timeframe];
+
+  return Array.isArray(rows)
+    ? rows
+    : null;
+}
 
 function analyzePair(
   pair,
