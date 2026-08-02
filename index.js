@@ -96,6 +96,12 @@ const OPTIMIZER_FILE =
     "phase6-optimizer.json"
   );
 
+const PIPELINE_STATUS_FILE =
+  path.join(
+    DATA_DIR,
+    "pattern-pipeline-status.json"
+  );
+
 // =====================================================
 // Bot Configuration
 // =====================================================
@@ -572,6 +578,18 @@ function getDefaultWeeklyReport() {
   };
 }
 
+function getDefaultPipelineStatusData() {
+  return {
+    version:
+      "1.0.0",
+
+    updatedAt:
+      nowIso(),
+
+    pairs: {}
+  };
+}
+
 // =====================================================
 // File Initialization and Loading
 // =====================================================
@@ -634,19 +652,23 @@ function initializeFiles() {
       getDefaultWeeklyReport()
     ],
 
-    [
-      OPTIMIZER_FILE,
-      {
-        version:
-          "6.0.0",
+[
+  OPTIMIZER_FILE,
+  {
+    version:
+      "6.0.0",
 
-        updatedAt:
-          nowIso(),
+    updatedAt:
+      nowIso(),
 
-        recommendations: []
-      }
-    ]
-  ];
+    recommendations: []
+  }
+],
+
+[
+  PIPELINE_STATUS_FILE,
+  getDefaultPipelineStatusData()
+]
 
   for (
     const [
