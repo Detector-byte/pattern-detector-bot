@@ -5627,6 +5627,10 @@ async function runBot() {
       learner
     );
 
+    savePipelineStatus(
+      pipelineStatus
+    );
+
     saveDurationMs =
       Date.now() -
       saveStart;
