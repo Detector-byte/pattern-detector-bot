@@ -3856,9 +3856,9 @@ function analyzeMarkets(
       learner,
       signalGenerator,
       existingSignals,
-      candidates
+      candidates,
+      pipelineStatus
     );
-  }
 
   const institutionalResult =
     selectInstitutionalSignal(
@@ -5591,6 +5591,7 @@ async function runBot() {
       getDefaultPipelineStatusData();
 
     const analysisStart =
+      Date.now();
 
     const newSignals =
       analyzeMarkets(
