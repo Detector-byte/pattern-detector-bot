@@ -1105,8 +1105,23 @@
       "pattern": "Fair Value Gap (Bullish)",
       "decision": "REJECTED",
       "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-02T17:00:36.855Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-02T17:00:36.860Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
     }
   ],
-  "updatedAt": "2026-08-02T16:55:23.005Z",
-  "totalEntries": 154
+  "updatedAt": "2026-08-02T17:00:36.864Z",
+  "totalEntries": 156
 }
