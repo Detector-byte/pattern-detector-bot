@@ -122,14 +122,109 @@ class PatternAnalyzer {
   }
 
   // Detect all patterns in candles
-  detectAllPatterns(candles, timeframe = "M5") {
-    if (!candles || candles.length < 30) return [];
+    detectAllPatterns(candles, timeframe = "M5") {
+    const diagnostics = {
+      timeframe,
+      candleCount:
+        Array.isArray(candles)
+          ? candles.length
+          : 0,
+
+      status: "RUNNING",
+      rejectionStage: null,
+
+      atr: null,
+      atrPercent: null,
+      minimumATRPercent:
+        this.minATRPercent,
+
+      rawCandidates: 0,
+      detectorNulls: 0,
+      postProcessRejected: 0,
+      acceptedPatterns: 0,
+
+      rejectionCounts: {
+        patternAge: 0,
+        rsiBuy: 0,
+        rsiSell: 0,
+        volume: 0,
+        breakoutBuy: 0,
+        breakoutSell: 0,
+        invalidTarget: 0,
+        invalidStopLoss: 0,
+        invalidRiskReward: 0,
+        confirmation: 0,
+        confidence: 0,
+        other: 0
+      }
+    };
+
+    if (
+      !Array.isArray(candles) ||
+      candles.length < 30
+    ) {
+      diagnostics.status =
+        "REJECTED";
+
+      diagnostics.rejectionStage =
+        "INSUFFICIENT_CANDLES";
+
+      console.log(
+        `🧪 Analyzer ${timeframe}: ${JSON.stringify(
+          diagnostics
+        )}`
+      );
+
+      return [];
+    }
 
     // --- 1. ATR volatility gate: skip dead markets entirely ---
-    const atr = this.calculateATR(candles, this.atrPeriod);
-    const lastClose = candles[candles.length - 1].close;
-    const atrPercent = lastClose > 0 ? atr / lastClose : 0;
-    if (atrPercent < this.minATRPercent) {
+    const atr =
+      this.calculateATR(
+        candles,
+        this.atrPeriod
+      );
+
+    const lastClose =
+      Number(
+        candles[
+          candles.length - 1
+        ]?.close
+      );
+
+    const atrPercent =
+      Number.isFinite(lastClose) &&
+      lastClose > 0
+        ? atr / lastClose
+        : 0;
+
+    diagnostics.atr =
+      Number.isFinite(atr)
+        ? Number(atr.toFixed(8))
+        : null;
+
+    diagnostics.atrPercent =
+      Number.isFinite(atrPercent)
+        ? Number(atrPercent.toFixed(8))
+        : null;
+
+    if (
+      !Number.isFinite(atrPercent) ||
+      atrPercent <
+        this.minATRPercent
+    ) {
+      diagnostics.status =
+        "REJECTED";
+
+      diagnostics.rejectionStage =
+        "ATR_VOLATILITY_GATE";
+
+      console.log(
+        `🧪 Analyzer ${timeframe}: ${JSON.stringify(
+          diagnostics
+        )}`
+      );
+
       return [];
     }
 
