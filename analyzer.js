@@ -4170,6 +4170,14 @@ class PatternAnalyzer {
         ? safeContext.choch
         : null;
 
+    const orderBlock =
+      safeContext.orderBlock &&
+      typeof safeContext
+        .orderBlock ===
+        "object"
+        ? safeContext.orderBlock
+        : null;
+
     // -------------------------------------------------
     // Stage 1: Confirmed market structure
     // -------------------------------------------------
