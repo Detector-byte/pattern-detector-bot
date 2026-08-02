@@ -5129,6 +5129,143 @@ class PatternAnalyzer {
     }
 
     // -------------------------------------------------
+    // Stage 5: Order Block retest and rejection
+    // -------------------------------------------------
+
+    if (
+      result.orderBlock
+        .identified === true
+    ) {
+      const retestEvidence =
+        this.evaluateOrderBlockRetest(
+          safeCandles,
+          orderBlock
+        );
+
+      result.retest = {
+        ...result.retest,
+
+        evaluated:
+          retestEvidence.evaluated,
+
+        detected:
+          retestEvidence.detected,
+
+        confirmed:
+          retestEvidence.confirmed,
+
+        direction:
+          retestEvidence.direction,
+
+        candleIndex:
+          retestEvidence
+            .latestRetestIndex,
+
+        firstRetestIndex:
+          retestEvidence
+            .firstRetestIndex,
+
+        confirmationIndex:
+          retestEvidence
+            .confirmationIndex,
+
+        touchCount:
+          retestEvidence.touchCount,
+
+        depthPercent:
+          retestEvidence
+            .depthPercent,
+
+        rejection:
+          retestEvidence.rejection
+      };
+
+      if (
+        retestEvidence
+          .invalidated === true
+      ) {
+        result.invalidation = {
+          invalidated:
+            true,
+
+          reason:
+            retestEvidence.reason,
+
+          level:
+            result.direction ===
+              "BUY"
+              ? result.orderBlock
+                  .zoneLow
+              : result.orderBlock
+                  .zoneHigh,
+
+          candleIndex:
+            retestEvidence
+              .invalidationIndex
+        };
+
+        result.stage =
+          states.invalidated ||
+          "INVALIDATED";
+
+        result.conflicts.push(
+          "Order Block was invalidated before a valid entry confirmation"
+        );
+
+        result.reasons.push(
+          retestEvidence.reason
+        );
+      } else if (
+        retestEvidence
+          .confirmed === true
+      ) {
+        result.completedStages.push(
+          "RETEST"
+        );
+
+        result.missingStages =
+          result.missingStages.filter(
+            stage =>
+              stage !==
+              "RETEST"
+          );
+
+        result.stage =
+          states.retestConfirmed ||
+          "RETEST_CONFIRMED";
+
+        result.score +=
+          20;
+
+        result.reasons.push(
+          retestEvidence.reason
+        );
+      } else if (
+        retestEvidence
+          .detected === true
+      ) {
+        result.stage =
+          states.retestInProgress ||
+          "RETEST_IN_PROGRESS";
+
+        result.score +=
+          8;
+
+        result.reasons.push(
+          retestEvidence.reason
+        );
+      } else {
+        result.stage =
+          states.waitingForRetest ||
+          "WAITING_FOR_RETEST";
+
+        result.reasons.push(
+          retestEvidence.reason
+        );
+      }
+    }
+
+    // -------------------------------------------------
     // Observation diagnostics only
     // -------------------------------------------------
 
