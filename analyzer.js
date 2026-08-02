@@ -438,14 +438,14 @@ class PatternAnalyzer {
       atr,
       atrPercent,
 
-      // Smart Money Concepts confluence
+    // Smart Money Concepts confluence
       liquiditySweep,
       bos,
       choch,
+      orderBlock,
 
-      // Filled immediately below
+    // Filled immediately below
       marketRegime: null
-    };
 
     // Detect market regime once for the complete candle set.
     context.marketRegime = this.detectMarketRegime(
