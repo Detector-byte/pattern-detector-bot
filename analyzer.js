@@ -369,10 +369,30 @@ class PatternAnalyzer {
 
     // --- Phase 4: Swing highs/lows are used by every SMC detector.
     // Calculate them only once and reuse the results.
-    const swingHighsSMC = this.findSwingHighs(highs);
-    const swingLowsSMC = this.findSwingLows(lows);
+    const swingHighsSMC =
+      this.findSwingHighs(
+        highs
+      );
 
-    const liquiditySweep = this.detectLiquiditySweep(
+    const swingLowsSMC =
+      this.findSwingLows(
+        lows
+      );
+
+    // Classify confirmed market structure once and
+    // reuse it throughout the institutional sequence.
+    //
+    // Observation mode only:
+    // this result does not block, boost or modify
+    // any existing pattern or signal.
+    const marketStructure =
+      this.classifyMarketStructure(
+        swingHighsSMC,
+        swingLowsSMC
+      );
+
+    const liquiditySweep =
+      this.detectLiquiditySweep(
       candles,
       swingHighsSMC,
       swingLowsSMC
