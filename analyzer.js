@@ -307,15 +307,33 @@ class PatternAnalyzer {
     // Common pattern collection helper.
     // Existing patterns pass through the same filters and enrichment logic.
     const collect = pattern => {
-      const enriched = this.postProcessPattern(
-        pattern,
-        candles,
-        context
-      );
+      if (!pattern) {
+        diagnostics.detectorNulls += 1;
+
+        return;
+      }
+
+      diagnostics.rawCandidates += 1;
+
+      const enriched =
+        this.postProcessPattern(
+          pattern,
+          candles,
+          context,
+          diagnostics
+        );
 
       if (enriched) {
-        detectedPatterns.push(enriched);
+        detectedPatterns.push(
+          enriched
+        );
+
+        diagnostics.acceptedPatterns += 1;
+
+        return;
       }
+
+      diagnostics.postProcessRejected += 1;
     };
 
     // Triangle and wedge detectors use the same 30-candle window.
