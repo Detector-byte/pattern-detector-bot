@@ -755,8 +755,23 @@
       "pattern": "Diamond Bottom",
       "decision": "REJECTED",
       "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-02T15:10:32.049Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-02T15:10:32.061Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
     }
   ],
-  "updatedAt": "2026-08-02T15:05:28.757Z",
-  "totalEntries": 106
+  "updatedAt": "2026-08-02T15:10:32.068Z",
+  "totalEntries": 108
 }
