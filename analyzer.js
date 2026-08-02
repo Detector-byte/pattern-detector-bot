@@ -3760,6 +3760,251 @@ const context = {
   }
 
   // =====================================================
+  // Institutional Sequence Default Builder
+  // =====================================================
+
+  /**
+   * Create a stable, backward-compatible institutional
+   * sequence result.
+   *
+   * This method does not detect, approve or reject a trade.
+   * It only provides a deterministic observation structure
+   * that later sequence stages can safely populate.
+   */
+  createInstitutionalSequenceResult(
+    timeframe = "M5"
+  ) {
+    const config =
+      this.institutionalSequenceConfig ||
+      {};
+
+    const states =
+      config.states ||
+      {};
+
+    return {
+      version:
+        config.version ||
+        "1.0.0",
+
+      enabled:
+        config.enabled === true,
+
+      mode:
+        config.mode ||
+        "OBSERVATION",
+
+      timeframe:
+        String(
+          timeframe ||
+          "M5"
+        ).toUpperCase(),
+
+      evaluated:
+        false,
+
+      valid:
+        false,
+
+      direction:
+        "NEUTRAL",
+
+      stage:
+        states.searchingStructure ||
+        "SEARCHING_STRUCTURE",
+
+      score:
+        0,
+
+      structure: {
+        available:
+          false,
+
+        direction:
+          "NEUTRAL",
+
+        state:
+          "INSUFFICIENT_STRUCTURE",
+
+        trend:
+          "SIDEWAYS",
+
+        highStructure:
+          "UNKNOWN",
+
+        lowStructure:
+          "UNKNOWN",
+
+        confirmedAtIndex:
+          null,
+
+        strength:
+          0
+      },
+
+      liquidity: {
+        identified:
+          false,
+
+        swept:
+          false,
+
+        direction:
+          "NEUTRAL",
+
+        type:
+          null,
+
+        level:
+          null,
+
+        candleIndex:
+          null
+      },
+
+      displacement: {
+        confirmed:
+          false,
+
+        direction:
+          "NEUTRAL",
+
+        candleIndex:
+          null,
+
+        bodyToATR:
+          null
+      },
+
+      structureShift: {
+        confirmed:
+          false,
+
+        direction:
+          "NEUTRAL",
+
+        type:
+          null,
+
+        level:
+          null,
+
+        candleIndex:
+          null
+      },
+
+      orderBlock: {
+        identified:
+          false,
+
+        direction:
+          "NEUTRAL",
+
+        type:
+          null,
+
+        zoneHigh:
+          null,
+
+        zoneLow:
+          null,
+
+        originIndex:
+          null,
+
+        fresh:
+          null,
+
+        mitigated:
+          null
+      },
+
+      retest: {
+        detected:
+          false,
+
+        confirmed:
+          false,
+
+        direction:
+          "NEUTRAL",
+
+        candleIndex:
+          null,
+
+        depthPercent:
+          null,
+
+        rejection:
+          null
+      },
+
+      continuation: {
+        detected:
+          false,
+
+        direction:
+          "NEUTRAL",
+
+        pattern:
+          null,
+
+        candleIndex:
+          null
+      },
+
+      confirmation: {
+        confirmed:
+          false,
+
+        direction:
+          "NEUTRAL",
+
+        pattern:
+          null,
+
+        candleIndex:
+          null
+      },
+
+      invalidation: {
+        invalidated:
+          false,
+
+        reason:
+          null,
+
+        level:
+          null,
+
+        candleIndex:
+          null
+      },
+
+      completedStages:
+        [],
+
+      missingStages: [
+        "MARKET_STRUCTURE",
+        "BOS_OR_CHOCH",
+        "ORDER_BLOCK",
+        "RETEST",
+        "CONFIRMATION"
+      ],
+
+      supportiveStages:
+        [],
+
+      conflicts:
+        [],
+
+      reasons: [
+        "Institutional sequence has not been evaluated"
+      ]
+    };
+  }
+
+  // =====================================================
   // Breakout Confirmation
   // =====================================================
 
