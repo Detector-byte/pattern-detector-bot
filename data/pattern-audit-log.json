@@ -582,8 +582,22 @@
       "timeframe": "5m",
       "decision": "REJECTED",
       "reason": "extreme volatility: current 0.29135, average 0.01050"
+    },
+    {
+      "timestamp": "2026-08-02T14:01:59.047Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-02T14:01:59.054Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
     }
   ],
-  "updatedAt": "2026-08-02T13:30:35.666Z",
-  "totalEntries": 82
+  "updatedAt": "2026-08-02T14:01:59.059Z",
+  "totalEntries": 84
 }
