@@ -647,28 +647,29 @@ function initializeFiles() {
       getDefaultDashboardData()
     ],
 
-    [
+        [
       WEEKLY_REPORT_FILE,
       getDefaultWeeklyReport()
     ],
 
-[
-  OPTIMIZER_FILE,
-  {
-    version:
-      "6.0.0",
+    [
+      OPTIMIZER_FILE,
+      {
+        version:
+          "6.0.0",
 
-    updatedAt:
-      nowIso(),
+        updatedAt:
+          nowIso(),
 
-    recommendations: []
-  }
-],
+        recommendations: []
+      }
+    ],
 
-[
-  PIPELINE_STATUS_FILE,
-  getDefaultPipelineStatusData()
-]
+    [
+      PIPELINE_STATUS_FILE,
+      getDefaultPipelineStatusData()
+    ]
+  ];
 
   for (
     const [
