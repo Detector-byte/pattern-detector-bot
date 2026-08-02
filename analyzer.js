@@ -4005,6 +4005,630 @@ const context = {
   }
 
   // =====================================================
+  // Institutional Sequence Evidence Builder
+  // =====================================================
+
+  /**
+   * Build the first institutional sequence stages from
+   * already-computed market evidence.
+   *
+   * Current observation stages:
+   * 1. Confirmed market structure
+   * 2. Liquidity identification / sweep
+   * 3. BOS or CHOCH structure shift
+   *
+   * This method does not block signals, change confidence,
+   * alter ranking or execute any detector again.
+   */
+  buildInstitutionalSequence(
+    candles,
+    timeframe,
+    context,
+    detectedPatterns = []
+  ) {
+    const result =
+      this.createInstitutionalSequenceResult(
+        timeframe
+      );
+
+    const config =
+      this.institutionalSequenceConfig ||
+      {};
+
+    const states =
+      config.states ||
+      {};
+
+    const safeCandles =
+      Array.isArray(candles)
+        ? candles
+        : [];
+
+    const safeContext =
+      context &&
+      typeof context ===
+        "object"
+        ? context
+        : {};
+
+    const safePatterns =
+      Array.isArray(
+        detectedPatterns
+      )
+        ? detectedPatterns
+        : [];
+
+    if (
+      config.enabled !== true
+    ) {
+      result.enabled =
+        false;
+
+      result.stage =
+        states.incomplete ||
+        "INCOMPLETE";
+
+      result.reasons = [
+        "Institutional sequence engine is disabled"
+      ];
+
+      return result;
+    }
+
+    if (
+      safeCandles.length < 5
+    ) {
+      result.stage =
+        states.incomplete ||
+        "INCOMPLETE";
+
+      result.reasons = [
+        "Insufficient candle history for institutional sequence evaluation"
+      ];
+
+      return result;
+    }
+
+    result.evaluated =
+      true;
+
+    result.reasons =
+      [];
+
+    const structure =
+      safeContext.marketStructure &&
+      typeof safeContext
+        .marketStructure ===
+        "object"
+        ? safeContext
+            .marketStructure
+        : null;
+
+    const liquiditySweep =
+      safeContext.liquiditySweep &&
+      typeof safeContext
+        .liquiditySweep ===
+        "object"
+        ? safeContext
+            .liquiditySweep
+        : null;
+
+    const bos =
+      safeContext.bos &&
+      typeof safeContext.bos ===
+        "object"
+        ? safeContext.bos
+        : null;
+
+    const choch =
+      safeContext.choch &&
+      typeof safeContext.choch ===
+        "object"
+        ? safeContext.choch
+        : null;
+
+    // -------------------------------------------------
+    // Stage 1: Confirmed market structure
+    // -------------------------------------------------
+
+    if (
+      structure &&
+      structure.available === true
+    ) {
+      result.structure = {
+        ...result.structure,
+
+        available:
+          true,
+
+        direction:
+          structure.direction ||
+          "NEUTRAL",
+
+        state:
+          structure.state ||
+          "RANGE_OR_TRANSITION",
+
+        trend:
+          structure.trend ||
+          "SIDEWAYS",
+
+        highStructure:
+          structure.highStructure ||
+          "UNKNOWN",
+
+        lowStructure:
+          structure.lowStructure ||
+          "UNKNOWN",
+
+        latestHigh:
+          structure.latestHigh ||
+          null,
+
+        previousHigh:
+          structure.previousHigh ||
+          null,
+
+        latestLow:
+          structure.latestLow ||
+          null,
+
+        previousLow:
+          structure.previousLow ||
+          null,
+
+        confirmedAtIndex:
+          Number.isFinite(
+            Number(
+              structure
+                .confirmedAtIndex
+            )
+          )
+            ? Number(
+                structure
+                  .confirmedAtIndex
+              )
+            : null,
+
+        strength:
+          Number.isFinite(
+            Number(
+              structure.strength
+            )
+          )
+            ? Number(
+                structure.strength
+              )
+            : 0,
+
+        reasons:
+          Array.isArray(
+            structure.reasons
+          )
+            ? [
+                ...structure.reasons
+              ]
+            : []
+      };
+
+      result.completedStages.push(
+        "MARKET_STRUCTURE"
+      );
+
+      result.missingStages =
+        result.missingStages.filter(
+          stage =>
+            stage !==
+            "MARKET_STRUCTURE"
+        );
+
+      result.direction =
+        structure.direction ||
+        "NEUTRAL";
+
+      result.stage =
+        states.searchingLiquidity ||
+        "SEARCHING_LIQUIDITY";
+
+      result.score +=
+        structure.direction ===
+          "BUY" ||
+        structure.direction ===
+          "SELL"
+          ? 20
+          : 10;
+
+      result.reasons.push(
+        `Market structure classified as ${
+          structure.state ||
+          "RANGE_OR_TRANSITION"
+        }`
+      );
+    } else {
+      result.reasons.push(
+        "Confirmed swing structure is not yet sufficient"
+      );
+    }
+
+    // -------------------------------------------------
+    // Stage 2: Liquidity sweep evidence
+    // -------------------------------------------------
+
+    if (liquiditySweep) {
+      const liquidityName =
+        String(
+          liquiditySweep.name ||
+          ""
+        );
+
+      const liquidityType =
+        liquidityName.includes(
+          "Buy-Side"
+        )
+          ? "BUY_SIDE_LIQUIDITY"
+          : liquidityName.includes(
+                "Sell-Side"
+              )
+            ? "SELL_SIDE_LIQUIDITY"
+            : "LIQUIDITY_SWEEP";
+
+      const liquidityLevel =
+        Number(
+          liquiditySweep
+            .liquidityLevel ??
+          liquiditySweep
+            .sweptLevel ??
+          liquiditySweep
+            .breakoutLevel
+        );
+
+      const liquidityIndex =
+        Number(
+          liquiditySweep
+            ._ageIndex ??
+          liquiditySweep
+            .candleIndex
+        );
+
+      result.liquidity = {
+        ...result.liquidity,
+
+        identified:
+          true,
+
+        swept:
+          true,
+
+        direction:
+          liquiditySweep
+            .direction ||
+          "NEUTRAL",
+
+        type:
+          liquidityType,
+
+        level:
+          Number.isFinite(
+            liquidityLevel
+          )
+            ? liquidityLevel
+            : null,
+
+        candleIndex:
+          Number.isFinite(
+            liquidityIndex
+          )
+            ? liquidityIndex
+            : null,
+
+        pattern:
+          liquiditySweep.name ||
+          "Liquidity Sweep"
+      };
+
+      result.completedStages.push(
+        "LIQUIDITY",
+        "LIQUIDITY_SWEEP"
+      );
+
+      result.supportiveStages.push(
+        "LIQUIDITY",
+        "LIQUIDITY_SWEEP"
+      );
+
+      result.stage =
+        states.liquiditySwept ||
+        "LIQUIDITY_SWEPT";
+
+      result.score +=
+        15;
+
+      result.reasons.push(
+        `${liquidityType} was swept with ${
+          liquiditySweep.direction ||
+          "NEUTRAL"
+        } reaction`
+      );
+
+      if (
+        result.direction !==
+          "NEUTRAL" &&
+        liquiditySweep.direction &&
+        liquiditySweep.direction !==
+          result.direction
+      ) {
+        result.conflicts.push(
+          "Liquidity sweep direction conflicts with confirmed market structure"
+        );
+      }
+    } else {
+      result.reasons.push(
+        "No confirmed liquidity sweep is present on the latest closed candle"
+      );
+    }
+
+    // -------------------------------------------------
+    // Stage 3: BOS / CHOCH evidence
+    // -------------------------------------------------
+
+    let structureShift =
+      null;
+
+    if (choch) {
+      structureShift = {
+        source:
+          choch,
+
+        type:
+          choch.structureType ||
+          "CHOCH",
+
+        priority:
+          "CHOCH"
+      };
+    } else if (bos) {
+      structureShift = {
+        source:
+          bos,
+
+        type:
+          bos.structureType ||
+          "BOS",
+
+        priority:
+          "BOS"
+      };
+    }
+
+    if (structureShift) {
+      const shift =
+        structureShift.source;
+
+      const shiftLevel =
+        Number(
+          shift.breakoutLevel ??
+          shift.structureLevel ??
+          shift.level
+        );
+
+      const shiftIndex =
+        Number(
+          shift._ageIndex ??
+          shift.candleIndex
+        );
+
+      result.structureShift = {
+        ...result.structureShift,
+
+        confirmed:
+          true,
+
+        direction:
+          shift.direction ||
+          "NEUTRAL",
+
+        type:
+          structureShift.type,
+
+        event:
+          structureShift.priority,
+
+        level:
+          Number.isFinite(
+            shiftLevel
+          )
+            ? shiftLevel
+            : null,
+
+        candleIndex:
+          Number.isFinite(
+            shiftIndex
+          )
+            ? shiftIndex
+            : null,
+
+        brokenSwingIndex:
+          Number.isFinite(
+            Number(
+              shift
+                .brokenSwingIndex
+            )
+          )
+            ? Number(
+                shift
+                  .brokenSwingIndex
+              )
+            : null,
+
+        strength:
+          Number.isFinite(
+            Number(
+              shift.strength
+            )
+          )
+            ? Number(
+                shift.strength
+              )
+            : null,
+
+        confirmationScore:
+          Number.isFinite(
+            Number(
+              shift
+                .confirmationScore
+            )
+          )
+            ? Number(
+                shift
+                  .confirmationScore
+              )
+            : null
+      };
+
+      result.completedStages.push(
+        "BOS_OR_CHOCH"
+      );
+
+      result.missingStages =
+        result.missingStages.filter(
+          stage =>
+            stage !==
+            "BOS_OR_CHOCH"
+        );
+
+      result.stage =
+        states
+          .structureShiftConfirmed ||
+        "STRUCTURE_SHIFT_CONFIRMED";
+
+      result.score +=
+        structureShift.priority ===
+          "CHOCH"
+          ? 25
+          : 20;
+
+      result.reasons.push(
+        `${structureShift.priority} confirmed in ${
+          shift.direction ||
+          "NEUTRAL"
+        } direction`
+      );
+
+      if (
+        result.direction ===
+          "NEUTRAL" &&
+        (
+          shift.direction ===
+            "BUY" ||
+          shift.direction ===
+            "SELL"
+        )
+      ) {
+        result.direction =
+          shift.direction;
+      } else if (
+        result.direction !==
+          "NEUTRAL" &&
+        shift.direction &&
+        shift.direction !==
+          result.direction
+      ) {
+        result.conflicts.push(
+          `${structureShift.priority} direction conflicts with the established swing structure`
+        );
+      }
+    } else {
+      result.reasons.push(
+        "No current BOS or CHOCH confirmation is available"
+      );
+    }
+
+    // -------------------------------------------------
+    // Observation diagnostics only
+    // -------------------------------------------------
+
+    result.observation = {
+      candleCount:
+        safeCandles.length,
+
+      detectedPatternCount:
+        safePatterns.length,
+
+      marketRegime:
+        safeContext.marketRegime ||
+        null,
+
+      emaTrend:
+        safeContext.trend ||
+        "SIDEWAYS",
+
+      atrPercent:
+        Number.isFinite(
+          Number(
+            safeContext.atrPercent
+          )
+        )
+          ? Number(
+              safeContext.atrPercent
+            )
+          : null
+    };
+
+    result.score =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          Math.round(
+            result.score
+          )
+        )
+      );
+
+    result.valid =
+      result.structure.available ===
+        true &&
+      result.structureShift
+        .confirmed === true &&
+      result.conflicts.length ===
+        0;
+
+    if (
+      result.structureShift
+        .confirmed === true
+    ) {
+      result.stage =
+        states
+          .structureShiftConfirmed ||
+        "STRUCTURE_SHIFT_CONFIRMED";
+
+      result.reasons.push(
+        "Waiting for a valid order block and retest before entry confirmation"
+      );
+    } else if (
+      result.liquidity.swept ===
+        true
+    ) {
+      result.stage =
+        states.liquiditySwept ||
+        "LIQUIDITY_SWEPT";
+    } else if (
+      result.structure.available ===
+        true
+    ) {
+      result.stage =
+        states.searchingLiquidity ||
+        "SEARCHING_LIQUIDITY";
+    } else {
+      result.stage =
+        states.searchingStructure ||
+        "SEARCHING_STRUCTURE";
+    }
+
+    return result;
+  }
+
+  // =====================================================
   // Breakout Confirmation
   // =====================================================
 
