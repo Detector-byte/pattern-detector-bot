@@ -13015,8 +13015,107 @@
       "timeframe": "4H",
       "decision": "REJECTED",
       "reason": "extreme volatility: current 4.31905, average 1.00920"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.768Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.775Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Liquidity Sweep (Buy-Side)",
+      "decision": "REJECTED",
+      "reason": "confidence 67% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.775Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Diamond Top",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.775Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Bearish Engulfing",
+      "decision": "REJECTED",
+      "reason": "against higher-timeframe trend (DOWN)"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.775Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.776Z",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "pattern": "Fair Value Gap (Bearish)",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.776Z",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "pattern": "Bearish Order Block",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.777Z",
+      "pair": "XAUUSD",
+      "timeframe": "4H",
+      "decision": "REJECTED",
+      "reason": "extreme volatility: current 30.78670, average 6.91281"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.779Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Symmetric Triangle",
+      "decision": "REJECTED",
+      "reason": "confidence 69% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.781Z",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.782Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.783Z",
+      "pair": "GBPJPY",
+      "timeframe": "1H",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T05:05:25.783Z",
+      "pair": "GBPJPY",
+      "timeframe": "4H",
+      "decision": "REJECTED",
+      "reason": "extreme volatility: current 4.31905, average 1.00920"
     }
   ],
-  "updatedAt": "2026-08-03T05:00:39.643Z",
-  "totalEntries": 1766
+  "updatedAt": "2026-08-03T05:05:25.790Z",
+  "totalEntries": 1779
 }
