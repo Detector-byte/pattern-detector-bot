@@ -1,48 +1,56 @@
 "use strict";
 
 /**
- * PipSight Pro — MT5 Replay Store
+ * PipSight Pro — MT5 Bridge Authentication
  *
- * Isolated in-memory replay and ordering protection for authenticated MT5
- * bridge requests.
+ * HMAC-SHA256 request authentication for the MT5 bridge receiver.
  *
  * Responsibilities:
- * - Nonce replay detection
- * - Request idempotency
- * - Bridge session tracking
- * - Monotonic sequence enforcement
- * - Bridge restart handling through sessionId
- * - Bounded storage and automatic cleanup
- * - Lightweight health/statistics reporting
+ * - Canonical body hashing
+ * - Canonical request-string construction
+ * - HMAC signature generation
+ * - Constant-time signature comparison
+ * - Timestamp/replay-window validation
+ * - Nonce format validation
+ * - Header extraction
  *
- * This file does not change Pattern Detector, Signal Engine, Pattern Detection,
- * AI confidence, learning, Telegram, tracker behavior, or existing JSON schemas.
+ * This module is isolated and additive. It does not change Pattern Detector,
+ * Signal Engine, Pattern Detection, AI confidence, learning, Telegram,
+ * tracker behavior, or any existing JSON schema.
  */
 
-const {
-  buildReplayKey,
-  normalizeBridgeId,
-  normalizeNonce
-} = require("./mt5-auth");
+const crypto = require("crypto");
 
-const DEFAULTS = Object.freeze({
-  replayWindowMs: 5 * 60 * 1000,
-  requestRetentionMs: 10 * 60 * 1000,
-  sessionRetentionMs: 24 * 60 * 60 * 1000,
-  cleanupIntervalMs: 60 * 1000,
-  maxNonceEntries: 10_000,
-  maxRequestEntries: 10_000,
-  maxSessionEntries: 1_000
+const AUTH_VERSION = "1.0.0";
+const SIGNATURE_ALGORITHM = "sha256";
+
+const HEADER_NAMES = Object.freeze({
+  bridgeId: "x-bridge-id",
+  timestamp: "x-timestamp",
+  nonce: "x-nonce",
+  signature: "x-signature",
+  payloadHash: "x-payload-hash",
+  authVersion: "x-auth-version"
 });
 
-class Mt5ReplayStoreError extends Error {
+const DEFAULTS = Object.freeze({
+  replayWindowSeconds: 300,
+  maxFutureSkewSeconds: 30,
+  minimumSecretLength: 32,
+  minimumNonceLength: 16,
+  maximumNonceLength: 128,
+  maximumBridgeIdLength: 128,
+  maximumRequestPathLength: 2048
+});
+
+class Mt5AuthError extends Error {
   constructor(
     message,
-    code = "REPLAY_STORE_ERROR",
+    code = "AUTH_ERROR",
     details = {}
   ) {
     super(message);
-    this.name = "Mt5ReplayStoreError";
+    this.name = "Mt5AuthError";
     this.code = code;
     this.details =
       details &&
@@ -53,828 +61,1062 @@ class Mt5ReplayStoreError extends Error {
   }
 }
 
-function normalizeNonEmptyString(
+function normalizeNonEmptyString(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalized = value.trim();
+
+  return normalized.length > 0
+    ? normalized
+    : null;
+}
+
+function normalizeHeaderName(value) {
+  const normalized =
+    normalizeNonEmptyString(value);
+
+  return normalized
+    ? normalized.toLowerCase()
+    : null;
+}
+
+function normalizeMethod(value) {
+  const method =
+    normalizeNonEmptyString(value)
+      ?.toUpperCase() ||
+    null;
+
+  if (
+    !method ||
+    !/^[A-Z]+$/.test(method)
+  ) {
+    throw new Mt5AuthError(
+      "HTTP method is invalid",
+      "INVALID_METHOD"
+    );
+  }
+
+  return method;
+}
+
+function normalizeRequestPath(value) {
+  const path =
+    normalizeNonEmptyString(value);
+
+  if (!path) {
+    throw new Mt5AuthError(
+      "Request path is required",
+      "INVALID_REQUEST_PATH"
+    );
+  }
+
+  if (
+    path.length >
+    DEFAULTS.maximumRequestPathLength
+  ) {
+    throw new Mt5AuthError(
+      "Request path is too long",
+      "INVALID_REQUEST_PATH"
+    );
+  }
+
+  if (!path.startsWith("/")) {
+    throw new Mt5AuthError(
+      "Request path must start with /",
+      "INVALID_REQUEST_PATH"
+    );
+  }
+
+  if (
+    path.includes("\r") ||
+    path.includes("\n")
+  ) {
+    throw new Mt5AuthError(
+      "Request path contains invalid characters",
+      "INVALID_REQUEST_PATH"
+    );
+  }
+
+  return path;
+}
+
+function normalizeBridgeId(value) {
+  const bridgeId =
+    normalizeNonEmptyString(value);
+
+  if (!bridgeId) {
+    throw new Mt5AuthError(
+      "Bridge ID is required",
+      "MISSING_BRIDGE_ID"
+    );
+  }
+
+  if (
+    bridgeId.length >
+    DEFAULTS.maximumBridgeIdLength
+  ) {
+    throw new Mt5AuthError(
+      "Bridge ID is too long",
+      "INVALID_BRIDGE_ID"
+    );
+  }
+
+  if (
+    !/^[A-Za-z0-9._:-]+$/.test(
+      bridgeId
+    )
+  ) {
+    throw new Mt5AuthError(
+      "Bridge ID contains invalid characters",
+      "INVALID_BRIDGE_ID"
+    );
+  }
+
+  return bridgeId;
+}
+
+function normalizeSecret(
   value,
+  options = {}
+) {
+  const secret =
+    normalizeNonEmptyString(value);
+
+  const minimumLength =
+    Number.isInteger(
+      options.minimumSecretLength
+    )
+      ? Math.max(
+          1,
+          options.minimumSecretLength
+        )
+      : DEFAULTS.minimumSecretLength;
+
+  if (!secret) {
+    throw new Mt5AuthError(
+      "Shared secret is required",
+      "MISSING_SECRET"
+    );
+  }
+
+  if (
+    secret.length <
+    minimumLength
+  ) {
+    throw new Mt5AuthError(
+      `Shared secret must be at least ${minimumLength} characters`,
+      "WEAK_SECRET"
+    );
+  }
+
+  return secret;
+}
+
+function normalizeNonce(value) {
+  const nonce =
+    normalizeNonEmptyString(value);
+
+  if (!nonce) {
+    throw new Mt5AuthError(
+      "Nonce is required",
+      "MISSING_NONCE"
+    );
+  }
+
+  if (
+    nonce.length <
+      DEFAULTS.minimumNonceLength ||
+    nonce.length >
+      DEFAULTS.maximumNonceLength
+  ) {
+    throw new Mt5AuthError(
+      "Nonce length is invalid",
+      "INVALID_NONCE",
+      {
+        minimum:
+          DEFAULTS.minimumNonceLength,
+        maximum:
+          DEFAULTS.maximumNonceLength
+      }
+    );
+  }
+
+  if (
+    !/^[A-Za-z0-9._~:-]+$/.test(
+      nonce
+    )
+  ) {
+    throw new Mt5AuthError(
+      "Nonce contains invalid characters",
+      "INVALID_NONCE"
+    );
+  }
+
+  return nonce;
+}
+
+function normalizeHex(
+  value,
+  expectedLength,
   fieldName
 ) {
+  const normalized =
+    normalizeNonEmptyString(value)
+      ?.toLowerCase() ||
+    null;
+
   if (
-    typeof value !== "string" ||
-    value.trim().length === 0
+    !normalized ||
+    !/^[a-f0-9]+$/.test(
+      normalized
+    ) ||
+    normalized.length !==
+      expectedLength
   ) {
-    throw new Mt5ReplayStoreError(
-      `${fieldName} is required`,
+    throw new Mt5AuthError(
+      `${fieldName} must be ${expectedLength} lowercase hexadecimal characters`,
       `INVALID_${fieldName
         .toUpperCase()
-        .replace(/[^A-Z0-9]+/g, "_")}`
+        .replace(
+          /[^A-Z0-9]+/g,
+          "_"
+        )}`
     );
   }
 
-  return value.trim();
+  return normalized;
 }
 
-function normalizeSessionId(value) {
-  const sessionId =
+function normalizeBody(body) {
+  if (Buffer.isBuffer(body)) {
+    return body;
+  }
+
+  if (
+    typeof body === "string"
+  ) {
+    return Buffer.from(
+      body,
+      "utf8"
+    );
+  }
+
+  if (
+    body === undefined ||
+    body === null
+  ) {
+    return Buffer.alloc(0);
+  }
+
+  throw new Mt5AuthError(
+    "Body must be a Buffer or string",
+    "INVALID_BODY"
+  );
+}
+
+function normalizeTimestamp(value) {
+  const raw =
     normalizeNonEmptyString(
-      value,
-      "sessionId"
+      String(value ?? "")
     );
 
-  if (
-    sessionId.length > 128 ||
-    !/^[A-Za-z0-9._~:-]+$/.test(
-      sessionId
-    )
-  ) {
-    throw new Mt5ReplayStoreError(
-      "sessionId is invalid",
-      "INVALID_SESSION_ID"
+  if (!raw) {
+    throw new Mt5AuthError(
+      "Timestamp is required",
+      "MISSING_TIMESTAMP"
     );
   }
 
-  return sessionId;
-}
+  let date;
 
-function normalizeRequestId(value) {
-  const requestId =
-    normalizeNonEmptyString(
-      value,
-      "requestId"
-    );
+  if (/^\d{10,13}$/.test(raw)) {
+    const numeric =
+      Number(raw);
 
-  if (
-    requestId.length > 128 ||
-    !/^[A-Za-z0-9._~:-]+$/.test(
-      requestId
-    )
-  ) {
-    throw new Mt5ReplayStoreError(
-      "requestId is invalid",
-      "INVALID_REQUEST_ID"
-    );
+    if (!Number.isFinite(numeric)) {
+      throw new Mt5AuthError(
+        "Timestamp is invalid",
+        "INVALID_TIMESTAMP"
+      );
+    }
+
+    date =
+      raw.length === 10
+        ? new Date(
+            numeric * 1000
+          )
+        : new Date(numeric);
+  } else {
+    date =
+      new Date(raw);
   }
-
-  return requestId;
-}
-
-function normalizeSequence(value) {
-  const sequence =
-    Number(value);
-
-  if (
-    !Number.isSafeInteger(
-      sequence
-    ) ||
-    sequence < 0
-  ) {
-    throw new Mt5ReplayStoreError(
-      "sequence must be a non-negative safe integer",
-      "INVALID_SEQUENCE"
-    );
-  }
-
-  return sequence;
-}
-
-function normalizeTimestampMs(
-  value,
-  fieldName = "timestamp"
-) {
-  const date =
-    value instanceof Date
-      ? new Date(
-          value.getTime()
-        )
-      : new Date(value);
 
   if (
     Number.isNaN(
       date.getTime()
     )
   ) {
-    throw new Mt5ReplayStoreError(
-      `${fieldName} is invalid`,
+    throw new Mt5AuthError(
+      "Timestamp is invalid",
       "INVALID_TIMESTAMP"
     );
   }
 
-  return date.getTime();
+  return date.toISOString();
 }
 
-function normalizePositiveInteger(
-  value,
-  fallback,
-  fieldName
+function validateTimestamp(
+  timestamp,
+  options = {}
 ) {
-  if (
-    value === undefined ||
-    value === null
-  ) {
-    return fallback;
-  }
+  const normalized =
+    normalizeTimestamp(timestamp);
 
-  const number =
-    Number(value);
+  const now =
+    options.now instanceof Date
+      ? new Date(
+          options.now.getTime()
+        )
+      : options.now
+        ? new Date(options.now)
+        : new Date();
 
   if (
-    !Number.isSafeInteger(
-      number
-    ) ||
-    number <= 0
+    Number.isNaN(
+      now.getTime()
+    )
   ) {
-    throw new Mt5ReplayStoreError(
-      `${fieldName} must be a positive safe integer`,
-      "INVALID_CONFIGURATION"
+    throw new Mt5AuthError(
+      "Current time is invalid",
+      "INVALID_CURRENT_TIME"
     );
   }
 
-  return number;
-}
-
-function buildRequestKey({
-  bridgeId,
-  sessionId,
-  requestId
-}) {
-  return [
-    normalizeBridgeId(
-      bridgeId
-    ),
-    normalizeSessionId(
-      sessionId
-    ),
-    normalizeRequestId(
-      requestId
+  const replayWindowSeconds =
+    Number.isFinite(
+      Number(
+        options.replayWindowSeconds
+      )
     )
-  ].join("|");
-}
-
-function buildSessionKey({
-  bridgeId,
-  sessionId
-}) {
-  return [
-    normalizeBridgeId(
-      bridgeId
-    ),
-    normalizeSessionId(
-      sessionId
-    )
-  ].join("|");
-}
-
-class Mt5ReplayStore {
-  constructor(options = {}) {
-    this.options = Object.freeze({
-      replayWindowMs:
-        normalizePositiveInteger(
-          options.replayWindowMs,
-          DEFAULTS.replayWindowMs,
-          "replayWindowMs"
-        ),
-
-      requestRetentionMs:
-        normalizePositiveInteger(
-          options.requestRetentionMs,
-          DEFAULTS.requestRetentionMs,
-          "requestRetentionMs"
-        ),
-
-      sessionRetentionMs:
-        normalizePositiveInteger(
-          options.sessionRetentionMs,
-          DEFAULTS.sessionRetentionMs,
-          "sessionRetentionMs"
-        ),
-
-      cleanupIntervalMs:
-        normalizePositiveInteger(
-          options.cleanupIntervalMs,
-          DEFAULTS.cleanupIntervalMs,
-          "cleanupIntervalMs"
-        ),
-
-      maxNonceEntries:
-        normalizePositiveInteger(
-          options.maxNonceEntries,
-          DEFAULTS.maxNonceEntries,
-          "maxNonceEntries"
-        ),
-
-      maxRequestEntries:
-        normalizePositiveInteger(
-          options.maxRequestEntries,
-          DEFAULTS.maxRequestEntries,
-          "maxRequestEntries"
-        ),
-
-      maxSessionEntries:
-        normalizePositiveInteger(
-          options.maxSessionEntries,
-          DEFAULTS.maxSessionEntries,
-          "maxSessionEntries"
+      ? Math.max(
+          1,
+          Number(
+            options.replayWindowSeconds
+          )
         )
+      : DEFAULTS.replayWindowSeconds;
+
+  const maxFutureSkewSeconds =
+    Number.isFinite(
+      Number(
+        options.maxFutureSkewSeconds
+      )
+    )
+      ? Math.max(
+          0,
+          Number(
+            options.maxFutureSkewSeconds
+          )
+        )
+      : DEFAULTS.maxFutureSkewSeconds;
+
+  const timestampMs =
+    new Date(
+      normalized
+    ).getTime();
+
+  const nowMs =
+    now.getTime();
+
+  const ageSeconds =
+    (
+      nowMs -
+      timestampMs
+    ) /
+    1000;
+
+  if (
+    ageSeconds <
+    -maxFutureSkewSeconds
+  ) {
+    throw new Mt5AuthError(
+      "Timestamp is too far in the future",
+      "TIMESTAMP_IN_FUTURE",
+      {
+        timestamp:
+          normalized,
+        now:
+          now.toISOString(),
+        maxFutureSkewSeconds
+      }
+    );
+  }
+
+  if (
+    ageSeconds >
+    replayWindowSeconds
+  ) {
+    throw new Mt5AuthError(
+      "Timestamp is outside the replay window",
+      "TIMESTAMP_EXPIRED",
+      {
+        timestamp:
+          normalized,
+        now:
+          now.toISOString(),
+        replayWindowSeconds,
+        ageSeconds:
+          Number(
+            ageSeconds.toFixed(3)
+          )
+      }
+    );
+  }
+
+  return {
+    timestamp:
+      normalized,
+    ageSeconds:
+      Number(
+        ageSeconds.toFixed(3)
+      ),
+    replayWindowSeconds,
+    maxFutureSkewSeconds
+  };
+}
+
+function hashBody(body) {
+  return crypto
+    .createHash(
+      SIGNATURE_ALGORITHM
+    )
+    .update(
+      normalizeBody(body)
+    )
+    .digest("hex");
+}
+
+function createCanonicalString({
+  method,
+  requestPath,
+  timestamp,
+  nonce,
+  payloadHash
+}) {
+  const normalizedMethod =
+    normalizeMethod(method);
+
+  const normalizedPath =
+    normalizeRequestPath(
+      requestPath
+    );
+
+  const normalizedTimestamp =
+    normalizeTimestamp(
+      timestamp
+    );
+
+  const normalizedNonce =
+    normalizeNonce(
+      nonce
+    );
+
+  const normalizedPayloadHash =
+    normalizeHex(
+      payloadHash,
+      64,
+      "payload hash"
+    );
+
+  return [
+    normalizedMethod,
+    normalizedPath,
+    normalizedTimestamp,
+    normalizedNonce,
+    normalizedPayloadHash
+  ].join("\n");
+}
+
+function signCanonicalString(
+  canonicalString,
+  secret,
+  options = {}
+) {
+  const normalizedCanonical =
+    normalizeNonEmptyString(
+      canonicalString
+    );
+
+  if (!normalizedCanonical) {
+    throw new Mt5AuthError(
+      "Canonical string is required",
+      "INVALID_CANONICAL_STRING"
+    );
+  }
+
+  const normalizedSecret =
+    normalizeSecret(
+      secret,
+      options
+    );
+
+  return crypto
+    .createHmac(
+      SIGNATURE_ALGORITHM,
+      normalizedSecret
+    )
+    .update(
+      normalizedCanonical,
+      "utf8"
+    )
+    .digest("hex");
+}
+
+function createRequestSignature({
+  method,
+  requestPath,
+  timestamp,
+  nonce,
+  body,
+  payloadHash,
+  secret,
+  minimumSecretLength
+}) {
+  const normalizedBody =
+    normalizeBody(body);
+
+  const calculatedPayloadHash =
+    hashBody(
+      normalizedBody
+    );
+
+  if (payloadHash) {
+    const suppliedPayloadHash =
+      normalizeHex(
+        payloadHash,
+        64,
+        "payload hash"
+      );
+
+    if (
+      !safeEqualHex(
+        calculatedPayloadHash,
+        suppliedPayloadHash
+      )
+    ) {
+      throw new Mt5AuthError(
+        "Supplied payload hash does not match the body",
+        "PAYLOAD_HASH_MISMATCH"
+      );
+    }
+  }
+
+  const canonicalString =
+    createCanonicalString({
+      method,
+      requestPath,
+      timestamp,
+      nonce,
+      payloadHash:
+        calculatedPayloadHash
     });
 
-    this.nonces = new Map();
-    this.requests = new Map();
-    this.sessions = new Map();
+  const signature =
+    signCanonicalString(
+      canonicalString,
+      secret,
+      {
+        minimumSecretLength
+      }
+    );
 
-    this.stats = {
-      accepted: 0,
-      duplicateRequests: 0,
-      replayRejected: 0,
-      sequenceRejected: 0,
-      staleRejected: 0,
-      cleanupRuns: 0,
-      evictedNonces: 0,
-      evictedRequests: 0,
-      evictedSessions: 0
-    };
+  return {
+    authVersion:
+      AUTH_VERSION,
+    payloadHash:
+      calculatedPayloadHash,
+    canonicalString,
+    signature
+  };
+}
 
-    this.lastCleanupAtMs = 0;
+function safeEqualBuffers(
+  first,
+  second
+) {
+  if (
+    !Buffer.isBuffer(first) ||
+    !Buffer.isBuffer(second)
+  ) {
+    return false;
   }
 
-  checkAndRecord(input) {
-    const nowMs =
-      normalizeTimestampMs(
-        input?.now ??
-        new Date(),
-        "now"
+  if (
+    first.length !==
+    second.length
+  ) {
+    const maximumLength =
+      Math.max(
+        first.length,
+        second.length,
+        1
       );
 
-    this.cleanupIfDue(
-      nowMs
+    const paddedFirst =
+      Buffer.alloc(
+        maximumLength
+      );
+
+    const paddedSecond =
+      Buffer.alloc(
+        maximumLength
+      );
+
+    first.copy(
+      paddedFirst
     );
 
-    const bridgeId =
-      normalizeBridgeId(
-        input?.bridgeId
-      );
-
-    const sessionId =
-      normalizeSessionId(
-        input?.sessionId
-      );
-
-    const requestId =
-      normalizeRequestId(
-        input?.requestId
-      );
-
-    const nonce =
-      normalizeNonce(
-        input?.nonce
-      );
-
-    const sequence =
-      normalizeSequence(
-        input?.sequence
-      );
-
-    const timestampMs =
-      normalizeTimestampMs(
-        input?.timestamp,
-        "timestamp"
-      );
-
-    const replayAgeMs =
-      nowMs -
-      timestampMs;
-
-    if (
-      replayAgeMs >
-      this.options.replayWindowMs
-    ) {
-      this.stats.staleRejected += 1;
-
-      throw new Mt5ReplayStoreError(
-        "Request timestamp is outside the replay window",
-        "REPLAY_WINDOW_EXPIRED",
-        {
-          bridgeId,
-          sessionId,
-          requestId,
-          replayAgeMs,
-          replayWindowMs:
-            this.options
-              .replayWindowMs
-        }
-      );
-    }
-
-    const requestKey =
-      buildRequestKey({
-        bridgeId,
-        sessionId,
-        requestId
-      });
-
-    const existingRequest =
-      this.requests.get(
-        requestKey
-      );
-
-    if (existingRequest) {
-      this.stats
-        .duplicateRequests += 1;
-
-      return {
-        accepted: true,
-        duplicate: true,
-        reason:
-          "DUPLICATE_REQUEST",
-        bridgeId,
-        sessionId,
-        requestId,
-        sequence,
-        firstAcceptedAt:
-          new Date(
-            existingRequest
-              .acceptedAtMs
-          ).toISOString()
-      };
-    }
-
-    const nonceKey =
-      buildReplayKey({
-        bridgeId,
-        nonce
-      });
-
-    const existingNonce =
-      this.nonces.get(
-        nonceKey
-      );
-
-    if (
-      existingNonce &&
-      existingNonce.expiresAtMs >
-        nowMs
-    ) {
-      this.stats
-        .replayRejected += 1;
-
-      throw new Mt5ReplayStoreError(
-        "Nonce has already been used",
-        "NONCE_REPLAY",
-        {
-          bridgeId,
-          nonce,
-          firstRequestId:
-            existingNonce
-              .requestId,
-          firstAcceptedAt:
-            new Date(
-              existingNonce
-                .acceptedAtMs
-            ).toISOString()
-        }
-      );
-    }
-
-    const sessionKey =
-      buildSessionKey({
-        bridgeId,
-        sessionId
-      });
-
-    const existingSession =
-      this.sessions.get(
-        sessionKey
-      );
-
-    if (
-      existingSession &&
-      sequence <=
-        existingSession
-          .lastSequence
-    ) {
-      this.stats
-        .sequenceRejected += 1;
-
-      throw new Mt5ReplayStoreError(
-        "Sequence is not greater than the last accepted sequence",
-        "OUT_OF_ORDER_SEQUENCE",
-        {
-          bridgeId,
-          sessionId,
-          requestId,
-          sequence,
-          lastSequence:
-            existingSession
-              .lastSequence
-        }
-      );
-    }
-
-    this.nonces.set(
-      nonceKey,
-      {
-        bridgeId,
-        nonce,
-        requestId,
-        acceptedAtMs:
-          nowMs,
-        expiresAtMs:
-          nowMs +
-          this.options
-            .replayWindowMs
-      }
+    second.copy(
+      paddedSecond
     );
 
-    this.requests.set(
-      requestKey,
-      {
-        bridgeId,
-        sessionId,
-        requestId,
-        sequence,
-        nonce,
-        timestampMs,
-        acceptedAtMs:
-          nowMs,
-        expiresAtMs:
-          nowMs +
-          this.options
-            .requestRetentionMs
-      }
+    crypto.timingSafeEqual(
+      paddedFirst,
+      paddedSecond
     );
 
-    this.sessions.set(
-      sessionKey,
-      {
-        bridgeId,
-        sessionId,
-        lastSequence:
-          sequence,
-        lastRequestId:
-          requestId,
-        lastNonce:
-          nonce,
-        updatedAtMs:
-          nowMs,
-        expiresAtMs:
-          nowMs +
-          this.options
-            .sessionRetentionMs
-      }
-    );
-
-    this.stats.accepted += 1;
-
-    this.enforceLimits();
-
-    return {
-      accepted: true,
-      duplicate: false,
-      reason:
-        "ACCEPTED",
-      bridgeId,
-      sessionId,
-      requestId,
-      sequence,
-      acceptedAt:
-        new Date(
-          nowMs
-        ).toISOString()
-    };
+    return false;
   }
 
-  hasNonce({
+  return crypto.timingSafeEqual(
+    first,
+    second
+  );
+}
+
+function safeEqualHex(
+  first,
+  second
+) {
+  try {
+    const normalizedFirst =
+      normalizeHex(
+        first,
+        64,
+        "hex value"
+      );
+
+    const normalizedSecond =
+      normalizeHex(
+        second,
+        64,
+        "hex value"
+      );
+
+    return safeEqualBuffers(
+      Buffer.from(
+        normalizedFirst,
+        "hex"
+      ),
+      Buffer.from(
+        normalizedSecond,
+        "hex"
+      )
+    );
+  } catch {
+    return false;
+  }
+}
+
+function getHeader(
+  headers,
+  name
+) {
+  if (
+    !headers ||
+    typeof headers !==
+      "object"
+  ) {
+    return null;
+  }
+
+  const targetName =
+    normalizeHeaderName(name);
+
+  if (!targetName) {
+    return null;
+  }
+
+  if (
+    typeof headers.get ===
+    "function"
+  ) {
+    const direct =
+      headers.get(
+        targetName
+      ) ??
+      headers.get(name);
+
+    if (
+      Array.isArray(direct)
+    ) {
+      return normalizeNonEmptyString(
+        direct[0]
+      );
+    }
+
+    return normalizeNonEmptyString(
+      direct
+    );
+  }
+
+  for (
+    const [
+      key,
+      value
+    ] of Object.entries(
+      headers
+    )
+  ) {
+    if (
+      normalizeHeaderName(key) !==
+      targetName
+    ) {
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      return normalizeNonEmptyString(
+        value[0]
+      );
+    }
+
+    return normalizeNonEmptyString(
+      String(value)
+    );
+  }
+
+  return null;
+}
+
+function extractAuthHeaders(headers) {
+  return {
+    bridgeId:
+      getHeader(
+        headers,
+        HEADER_NAMES.bridgeId
+      ),
+
+    timestamp:
+      getHeader(
+        headers,
+        HEADER_NAMES.timestamp
+      ),
+
+    nonce:
+      getHeader(
+        headers,
+        HEADER_NAMES.nonce
+      ),
+
+    signature:
+      getHeader(
+        headers,
+        HEADER_NAMES.signature
+      ),
+
+    payloadHash:
+      getHeader(
+        headers,
+        HEADER_NAMES.payloadHash
+      ),
+
+    authVersion:
+      getHeader(
+        headers,
+        HEADER_NAMES.authVersion
+      )
+  };
+}
+
+function validateAuthHeaders(
+  input
+) {
+  if (
+    !input ||
+    typeof input !==
+      "object" ||
+    Array.isArray(input)
+  ) {
+    throw new Mt5AuthError(
+      "Authentication headers are invalid",
+      "INVALID_AUTH_HEADERS"
+    );
+  }
+
+  const bridgeId =
+    normalizeBridgeId(
+      input.bridgeId
+    );
+
+  const timestamp =
+    normalizeTimestamp(
+      input.timestamp
+    );
+
+  const nonce =
+    normalizeNonce(
+      input.nonce
+    );
+
+  const signature =
+    normalizeHex(
+      input.signature,
+      64,
+      "signature"
+    );
+
+  const payloadHash =
+    normalizeHex(
+      input.payloadHash,
+      64,
+      "payload hash"
+    );
+
+  const authVersion =
+    normalizeNonEmptyString(
+      input.authVersion
+    ) ||
+    AUTH_VERSION;
+
+  if (
+    authVersion !==
+    AUTH_VERSION
+  ) {
+    throw new Mt5AuthError(
+      `Unsupported auth version: ${authVersion}`,
+      "UNSUPPORTED_AUTH_VERSION",
+      {
+        expected:
+          AUTH_VERSION
+      }
+    );
+  }
+
+  return {
     bridgeId,
+    timestamp,
     nonce,
-    now = new Date()
-  }) {
-    const nowMs =
-      normalizeTimestampMs(
+    signature,
+    payloadHash,
+    authVersion
+  };
+}
+
+function verifyRequestAuthentication({
+  method,
+  requestPath,
+  headers,
+  body,
+  secret,
+  now,
+  replayWindowSeconds,
+  maxFutureSkewSeconds,
+  minimumSecretLength
+}) {
+  const extracted =
+    extractAuthHeaders(
+      headers
+    );
+
+  const auth =
+    validateAuthHeaders(
+      extracted
+    );
+
+  const timestampValidation =
+    validateTimestamp(
+      auth.timestamp,
+      {
         now,
-        "now"
-      );
+        replayWindowSeconds,
+        maxFutureSkewSeconds
+      }
+    );
 
-    const nonceKey =
-      buildReplayKey({
-        bridgeId,
-        nonce
-      });
+  const normalizedBody =
+    normalizeBody(body);
 
-    const entry =
-      this.nonces.get(
-        nonceKey
-      );
+  const calculatedPayloadHash =
+    hashBody(
+      normalizedBody
+    );
 
-    return Boolean(
-      entry &&
-      entry.expiresAtMs >
-        nowMs
+  if (
+    !safeEqualHex(
+      calculatedPayloadHash,
+      auth.payloadHash
+    )
+  ) {
+    throw new Mt5AuthError(
+      "Payload hash does not match the request body",
+      "PAYLOAD_HASH_MISMATCH"
     );
   }
 
-  getRequest({
-    bridgeId,
-    sessionId,
-    requestId
-  }) {
-    const requestKey =
-      buildRequestKey({
-        bridgeId,
-        sessionId,
-        requestId
-      });
+  const canonicalString =
+    createCanonicalString({
+      method,
+      requestPath,
+      timestamp:
+        auth.timestamp,
+      nonce:
+        auth.nonce,
+      payloadHash:
+        auth.payloadHash
+    });
 
-    const entry =
-      this.requests.get(
-        requestKey
-      );
+  const expectedSignature =
+    signCanonicalString(
+      canonicalString,
+      secret,
+      {
+        minimumSecretLength
+      }
+    );
 
-    return entry
-      ? {
-          bridgeId:
-            entry.bridgeId,
-          sessionId:
-            entry.sessionId,
-          requestId:
-            entry.requestId,
-          sequence:
-            entry.sequence,
-          nonce:
-            entry.nonce,
-          timestamp:
-            new Date(
-              entry.timestampMs
-            ).toISOString(),
-          acceptedAt:
-            new Date(
-              entry.acceptedAtMs
-            ).toISOString(),
-          expiresAt:
-            new Date(
-              entry.expiresAtMs
-            ).toISOString()
-        }
-      : null;
-  }
-
-  getSession({
-    bridgeId,
-    sessionId
-  }) {
-    const sessionKey =
-      buildSessionKey({
-        bridgeId,
-        sessionId
-      });
-
-    const entry =
-      this.sessions.get(
-        sessionKey
-      );
-
-    return entry
-      ? {
-          bridgeId:
-            entry.bridgeId,
-          sessionId:
-            entry.sessionId,
-          lastSequence:
-            entry.lastSequence,
-          lastRequestId:
-            entry.lastRequestId,
-          lastNonce:
-            entry.lastNonce,
-          updatedAt:
-            new Date(
-              entry.updatedAtMs
-            ).toISOString(),
-          expiresAt:
-            new Date(
-              entry.expiresAtMs
-            ).toISOString()
-        }
-      : null;
-  }
-
-  cleanupIfDue(
-    now = new Date()
+  if (
+    !safeEqualHex(
+      expectedSignature,
+      auth.signature
+    )
   ) {
-    const nowMs =
-      normalizeTimestampMs(
-        now,
-        "now"
-      );
-
-    if (
-      nowMs -
-      this.lastCleanupAtMs <
-      this.options
-        .cleanupIntervalMs
-    ) {
-      return {
-        ran: false,
-        removedNonces: 0,
-        removedRequests: 0,
-        removedSessions: 0
-      };
-    }
-
-    return this.cleanup(
-      nowMs
+    throw new Mt5AuthError(
+      "Request signature is invalid",
+      "INVALID_SIGNATURE"
     );
   }
 
-  cleanup(
-    now = new Date()
-  ) {
-    const nowMs =
-      typeof now === "number"
-        ? now
-        : normalizeTimestampMs(
-            now,
-            "now"
-          );
+  return {
+    authenticated: true,
+    authVersion:
+      auth.authVersion,
+    bridgeId:
+      auth.bridgeId,
+    timestamp:
+      auth.timestamp,
+    nonce:
+      auth.nonce,
+    payloadHash:
+      auth.payloadHash,
+    signature:
+      auth.signature,
+    canonicalString,
+    timestampValidation
+  };
+}
 
-    let removedNonces = 0;
-    let removedRequests = 0;
-    let removedSessions = 0;
+function createSignedHeaders({
+  bridgeId,
+  method,
+  requestPath,
+  timestamp = new Date(),
+  nonce = crypto
+    .randomBytes(24)
+    .toString("hex"),
+  body,
+  secret,
+  minimumSecretLength
+}) {
+  const normalizedBridgeId =
+    normalizeBridgeId(
+      bridgeId
+    );
 
-    for (
-      const [
-        key,
-        entry
-      ] of this.nonces
-    ) {
-      if (
-        entry.expiresAtMs <=
-        nowMs
-      ) {
-        this.nonces.delete(
-          key
-        );
+  const normalizedTimestamp =
+    normalizeTimestamp(
+      timestamp
+    );
 
-        removedNonces += 1;
-      }
-    }
+  const normalizedNonce =
+    normalizeNonce(
+      nonce
+    );
 
-    for (
-      const [
-        key,
-        entry
-      ] of this.requests
-    ) {
-      if (
-        entry.expiresAtMs <=
-        nowMs
-      ) {
-        this.requests.delete(
-          key
-        );
+  const signed =
+    createRequestSignature({
+      method,
+      requestPath,
+      timestamp:
+        normalizedTimestamp,
+      nonce:
+        normalizedNonce,
+      body,
+      secret,
+      minimumSecretLength
+    });
 
-        removedRequests += 1;
-      }
-    }
+  return Object.freeze({
+    [HEADER_NAMES.bridgeId]:
+      normalizedBridgeId,
 
-    for (
-      const [
-        key,
-        entry
-      ] of this.sessions
-    ) {
-      if (
-        entry.expiresAtMs <=
-        nowMs
-      ) {
-        this.sessions.delete(
-          key
-        );
+    [HEADER_NAMES.timestamp]:
+      normalizedTimestamp,
 
-        removedSessions += 1;
-      }
-    }
+    [HEADER_NAMES.nonce]:
+      normalizedNonce,
 
-    this.lastCleanupAtMs =
-      nowMs;
+    [HEADER_NAMES.signature]:
+      signed.signature,
 
-    this.stats.cleanupRuns += 1;
+    [HEADER_NAMES.payloadHash]:
+      signed.payloadHash,
 
-    return {
-      ran: true,
-      removedNonces,
-      removedRequests,
-      removedSessions
-    };
-  }
+    [HEADER_NAMES.authVersion]:
+      AUTH_VERSION
+  });
+}
 
-  enforceLimits() {
-    this.stats.evictedNonces +=
-      this.evictOldest(
-        this.nonces,
-        this.options
-          .maxNonceEntries
-      );
-
-    this.stats.evictedRequests +=
-      this.evictOldest(
-        this.requests,
-        this.options
-          .maxRequestEntries
-      );
-
-    this.stats.evictedSessions +=
-      this.evictOldest(
-        this.sessions,
-        this.options
-          .maxSessionEntries
-      );
-  }
-
-  evictOldest(
-    map,
-    maximumSize
-  ) {
-    let removed = 0;
-
-    while (
-      map.size >
-      maximumSize
-    ) {
-      const firstKey =
-        map.keys()
-          .next()
-          .value;
-
-      if (
-        firstKey ===
-        undefined
-      ) {
-        break;
-      }
-
-      map.delete(
-        firstKey
-      );
-
-      removed += 1;
-    }
-
-    return removed;
-  }
-
-  clear() {
-    this.nonces.clear();
-    this.requests.clear();
-    this.sessions.clear();
-
-    this.lastCleanupAtMs = 0;
-
-    return true;
-  }
-
-  getStats() {
-    return {
-      ...this.stats,
-      nonceEntries:
-        this.nonces.size,
-      requestEntries:
-        this.requests.size,
-      sessionEntries:
-        this.sessions.size,
-      lastCleanupAt:
-        this.lastCleanupAtMs > 0
-          ? new Date(
-              this.lastCleanupAtMs
-            ).toISOString()
-          : null,
-      limits: {
-        replayWindowMs:
-          this.options
-            .replayWindowMs,
-        requestRetentionMs:
-          this.options
-            .requestRetentionMs,
-        sessionRetentionMs:
-          this.options
-            .sessionRetentionMs,
-        maxNonceEntries:
-          this.options
-            .maxNonceEntries,
-        maxRequestEntries:
-          this.options
-            .maxRequestEntries,
-        maxSessionEntries:
-          this.options
-            .maxSessionEntries
-      }
-    };
-  }
+function buildReplayKey({
+  bridgeId,
+  nonce
+}) {
+  return [
+    normalizeBridgeId(
+      bridgeId
+    ),
+    normalizeNonce(
+      nonce
+    )
+  ].join("|");
 }
 
 module.exports = Object.freeze({
+  AUTH_VERSION,
+  SIGNATURE_ALGORITHM,
+  HEADER_NAMES,
   DEFAULTS,
-  Mt5ReplayStoreError,
-  Mt5ReplayStore,
-  normalizeSessionId,
-  normalizeRequestId,
-  normalizeSequence,
-  normalizeTimestampMs,
-  buildRequestKey,
-  buildSessionKey
+  Mt5AuthError,
+  normalizeMethod,
+  normalizeRequestPath,
+  normalizeBridgeId,
+  normalizeSecret,
+  normalizeNonce,
+  normalizeTimestamp,
+  validateTimestamp,
+  normalizeBody,
+  hashBody,
+  createCanonicalString,
+  signCanonicalString,
+  createRequestSignature,
+  safeEqualBuffers,
+  safeEqualHex,
+  getHeader,
+  extractAuthHeaders,
+  validateAuthHeaders,
+  verifyRequestAuthentication,
+  createSignedHeaders,
+  buildReplayKey
 });
