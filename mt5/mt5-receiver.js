@@ -15,6 +15,7 @@
  * - POST /v1/ingest/mt5
  * - GET  /v1/market-data
  * - GET  /v1/market-data/:symbol
+ * - GET  /v1/market-history
  * - GET  /v1/health
  *
  * This receiver is additive and does not alter the existing Pattern Detector
@@ -60,6 +61,7 @@ const DEFAULTS = Object.freeze({
   port: 8787,
   ingestPath: "/v1/ingest/mt5",
   marketDataPath: "/v1/market-data",
+  marketHistoryPath: "/v1/market-history",
   healthPath: "/v1/health",
   maximumBodyBytes: 512 * 1024,
   requestTimeoutMs: 15_000,
@@ -669,6 +671,12 @@ class Mt5Receiver {
             DEFAULTS.marketDataPath
           ),
 
+        marketHistoryPath:
+          normalizePath(
+            options.marketHistoryPath,
+            DEFAULTS.marketHistoryPath
+          ),
+
         healthPath:
           normalizePath(
             options.healthPath,
@@ -878,6 +886,29 @@ class Mt5Receiver {
         }
 
         this.handleMarketData(
+          response
+        );
+
+        return;
+      }
+
+      if (
+        pathname ===
+        this.options.marketHistoryPath
+      ) {
+        if (
+          request.method !==
+          "GET"
+        ) {
+          sendMethodNotAllowed(
+            response,
+            ["GET"]
+          );
+
+          return;
+        }
+
+        this.handleMarketHistory(
           response
         );
 
@@ -1198,6 +1229,52 @@ class Mt5Receiver {
     );
   }
 
+  handleMarketHistory(
+    response
+  ) {
+    if (
+      !this.options
+        .publicReadEnabled
+    ) {
+      sendJson(
+        response,
+        403,
+        {
+          ok: false,
+          error: {
+            code:
+              "PUBLIC_READ_DISABLED",
+            message:
+              "Public market-history reads are disabled"
+          }
+        }
+      );
+
+      return;
+    }
+
+    this.stats.readRequests += 1;
+
+    const history =
+      this.historyStore
+        .getSnapshot({
+          now:
+            new Date(),
+          includeFreshness:
+            true
+        });
+
+    sendJson(
+      response,
+      200,
+      history,
+      {
+        "cache-control":
+          "no-store, max-age=0"
+      }
+    );
+  }
+
   handleSymbol(
     response,
     symbol
@@ -1459,6 +1536,9 @@ class Mt5Receiver {
               marketDataPath:
                 this.options
                   .marketDataPath,
+              marketHistoryPath:
+                this.options
+                  .marketHistoryPath,
               healthPath:
                 this.options
                   .healthPath
@@ -1582,6 +1662,10 @@ async function startFromEnvironment() {
 
   console.log(
     `Market-data endpoint: ${address.marketDataPath}`
+  );
+
+  console.log(
+    `Market-history endpoint: ${address.marketHistoryPath}`
   );
 
   console.log(
