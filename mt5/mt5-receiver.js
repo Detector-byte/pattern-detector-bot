@@ -8,6 +8,7 @@
  * - Replay and ordering protection
  * - MT5 payload contract validation
  * - In-memory state management
+ * - Persistent rolling candle-history management
  * - Atomic snapshot publication
  *
  * Default endpoints:
@@ -38,6 +39,11 @@ const {
   Mt5StateStore,
   Mt5StateStoreError
 } = require("./mt5-state-store");
+
+const {
+  Mt5HistoryStore,
+  Mt5HistoryStoreError
+} = require("./mt5-history-store");
 
 const {
   Mt5SnapshotWriter,
@@ -610,6 +616,8 @@ function mapError(error) {
     error instanceof
       Mt5StateStoreError ||
     error instanceof
+      Mt5HistoryStoreError ||
+    error instanceof
       Mt5SnapshotWriterError
   ) {
     return {
@@ -744,6 +752,15 @@ class Mt5Receiver {
     this.stateStore =
       options.stateStore ||
       new Mt5StateStore();
+
+    this.historyStore =
+      options.historyStore ||
+      new Mt5HistoryStore({
+        outputPath:
+          options.historyOutputPath,
+        autoPersist:
+          false
+      });
 
     this.snapshotWriter =
       options.snapshotWriter ||
@@ -1048,15 +1065,32 @@ class Mt5Receiver {
       return;
     }
 
+    const ingestionTime =
+      new Date();
+
     const merge =
       this.stateStore
         .ingestPayload(
           payload,
           {
             now:
-              new Date(),
+              ingestionTime,
             receivedAtUtc:
-              new Date()
+              ingestionTime
+          }
+        );
+
+    const historyMerge =
+      this.historyStore
+        .ingestPayload(
+          payload,
+          {
+            now:
+              ingestionTime,
+            receivedAtUtc:
+              ingestionTime,
+            persist:
+              false
           }
         );
 
@@ -1066,9 +1100,16 @@ class Mt5Receiver {
           this.stateStore,
           {
             now:
-              new Date()
+              ingestionTime
           }
         );
+
+    const historyWrite =
+      this.historyStore
+        .persist({
+          now:
+            ingestionTime
+        });
 
     this.stats
       .ingestAccepted += 1;
@@ -1086,6 +1127,7 @@ class Mt5Receiver {
         duplicate: false,
         replay,
         merge,
+        historyMerge,
         publication: {
           written:
             write.written,
@@ -1097,6 +1139,16 @@ class Mt5Receiver {
             write.updatedAt,
           stale:
             write.stale
+        },
+        historyPublication: {
+          written:
+            historyWrite.written,
+          outputPath:
+            historyWrite.outputPath,
+          bytes:
+            historyWrite.bytes,
+          updatedAt:
+            historyWrite.updatedAt
         }
       }
     );
@@ -1262,6 +1314,9 @@ class Mt5Receiver {
             .getStats(),
         stateStore:
           this.stateStore
+            .getStats(),
+        historyStore:
+          this.historyStore
             .getStats(),
         snapshotWriter:
           this.snapshotWriter
@@ -1503,6 +1558,10 @@ async function startFromEnvironment() {
       outputPath:
         process.env
           .MT5_SNAPSHOT_OUTPUT_PATH,
+
+      historyOutputPath:
+        process.env
+          .MT5_HISTORY_OUTPUT_PATH,
 
       publicReadEnabled:
         process.env
