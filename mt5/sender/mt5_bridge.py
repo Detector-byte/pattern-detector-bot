@@ -67,6 +67,7 @@ TIMEFRAME_MINUTES: Mapping[str, int] = {
     "30m": 30,
     "1H": 60,
     "4H": 240,
+    "D1": 1440,
 }
 
 HEADER_NAMES: Mapping[str, str] = {
@@ -448,6 +449,7 @@ class MetaTraderAdapter:
             "30m": mt5.TIMEFRAME_M30,
             "1H": mt5.TIMEFRAME_H1,
             "4H": mt5.TIMEFRAME_H4,
+            "D1": mt5.TIMEFRAME_D1,
         }
 
         terminal_info = mt5.terminal_info()
