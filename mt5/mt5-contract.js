@@ -7,7 +7,7 @@
  *
  * Scope:
  * - Canonical symbols: GBPJPY, XAUUSD
- * - Supported timeframes: 5m, 15m, 30m, 1H, 4H
+ * - Supported timeframes: 5m, 15m, 30m, 1H, 4H, D1
  * - Live bid/ask ticks
  * - Fully closed candles only
  * - UTC timestamps
@@ -33,7 +33,8 @@ const SUPPORTED_TIMEFRAMES = Object.freeze([
   "15m",
   "30m",
   "1H",
-  "4H"
+  "4H",
+  "D1"
 ]);
 
 const TIMEFRAME_MINUTES = Object.freeze({
@@ -41,7 +42,8 @@ const TIMEFRAME_MINUTES = Object.freeze({
   "15m": 15,
   "30m": 30,
   "1H": 60,
-  "4H": 240
+  "4H": 240,
+  "D1": 1440
 });
 
 const MT5_TIMEFRAME_NAMES = Object.freeze({
@@ -49,7 +51,8 @@ const MT5_TIMEFRAME_NAMES = Object.freeze({
   "15m": "TIMEFRAME_M15",
   "30m": "TIMEFRAME_M30",
   "1H": "TIMEFRAME_H1",
-  "4H": "TIMEFRAME_H4"
+  "4H": "TIMEFRAME_H4",
+  "D1": "TIMEFRAME_D1"
 });
 
 const FRESHNESS = Object.freeze({
@@ -156,7 +159,11 @@ function normalizeTimeframe(value) {
     "60M": "1H",
     "4H": "4H",
     "H4": "4H",
-    "240M": "4H"
+    "240M": "4H",
+    "1D": "D1",
+    "D1": "D1",
+    "DAILY": "D1",
+    "1440M": "D1"
   };
 
   const canonical =
@@ -1399,4 +1406,3 @@ module.exports = Object.freeze({
   normalizeBridgePayload,
   buildEmptyPublishedSnapshot
 });
-  
