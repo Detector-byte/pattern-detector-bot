@@ -1,81 +1,6 @@
 {
   "entries": [
     {
-      "timestamp": "2026-08-03T00:35:25.421Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Liquidity Sweep (Sell-Side)",
-      "decision": "REJECTED",
-      "reason": "confidence 69% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-03T00:35:25.421Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Diamond Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-03T00:35:25.422Z",
-      "pair": "XAUUSD",
-      "timeframe": "30m",
-      "pattern": "Bearish Engulfing",
-      "decision": "PHASE6_REJECTED",
-      "aiScore": 65.7,
-      "reason": "AI score 65.7 below 70"
-    },
-    {
-      "timestamp": "2026-08-03T00:40:30.243Z",
-      "pair": "XAUUSD",
-      "timeframe": "5m",
-      "pattern": "Symmetric Triangle",
-      "decision": "REJECTED",
-      "reason": "confidence 69% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-03T00:40:30.245Z",
-      "pair": "XAUUSD",
-      "timeframe": "15m",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
-      "timestamp": "2026-08-03T00:40:30.250Z",
-      "pair": "XAUUSD",
-      "timeframe": "1H",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
-      "timestamp": "2026-08-03T00:40:30.250Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "decision": "REJECTED",
-      "reason": "extreme volatility: current 66.16130, average 4.99775"
-    },
-    {
-      "timestamp": "2026-08-03T00:40:30.251Z",
-      "pair": "GBPJPY",
-      "timeframe": "5m",
-      "decision": "REJECTED",
-      "reason": "extreme volatility: current 2.24021, average 0.16389"
-    },
-    {
-      "timestamp": "2026-08-03T00:40:30.251Z",
-      "pair": "GBPJPY",
-      "timeframe": "15m",
-      "decision": "REJECTED",
-      "reason": "extreme volatility: current 2.24021, average 0.35760"
-    },
-    {
-      "timestamp": "2026-08-03T00:40:30.251Z",
-      "pair": "GBPJPY",
-      "timeframe": "30m",
-      "decision": "REJECTED",
-      "reason": "extreme volatility: current 2.24021, average 0.48078"
-    },
-    {
       "timestamp": "2026-08-03T00:40:30.251Z",
       "pair": "GBPJPY",
       "timeframe": "1H",
@@ -14770,8 +14695,81 @@
       "timeframe": "4H",
       "decision": "NO_PATTERN",
       "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:28.993Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:28.995Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:28.997Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:28.998Z",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:28.998Z",
+      "pair": "XAUUSD",
+      "timeframe": "4H",
+      "pattern": "Symmetric Triangle",
+      "decision": "REJECTED",
+      "reason": "confidence 69% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:29.000Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:29.000Z",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:29.001Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Symmetric Triangle",
+      "decision": "REJECTED",
+      "reason": "confidence 69% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:29.001Z",
+      "pair": "GBPJPY",
+      "timeframe": "1H",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-03T15:40:29.002Z",
+      "pair": "GBPJPY",
+      "timeframe": "4H",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
     }
   ],
-  "updatedAt": "2026-08-03T15:35:24.717Z",
+  "updatedAt": "2026-08-03T15:40:29.008Z",
   "totalEntries": 2000
 }
