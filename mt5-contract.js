@@ -697,14 +697,13 @@ function normalizeClosedCandle(
     );
   }
 
-  const expectedCloseTimeMs =
-  const expectedCloseTimeMs =
-    getEpochMs(
-      openTimeUtc
-    ) +
-    getTimeframeDurationMs(
-      timeframe
-    );
+const expectedCloseTimeMs =
+  getEpochMs(
+    openTimeUtc
+  ) +
+  getTimeframeDurationMs(
+    timeframe
+  );
 
   if (
     getEpochMs(
@@ -946,8 +945,7 @@ function normalizeSymbolSnapshot(
   input,
   context = {}
 ) {
-
-if (!isPlainObject(input)) {
+  if (!isPlainObject(input)) {
     throw new Mt5ContractError(
       "symbol snapshot must be an object"
     );
