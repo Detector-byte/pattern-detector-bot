@@ -4123,13 +4123,20 @@ class PatternAnalyzer {
       completedStages:
         [],
 
-      missingStages: [
-        "MARKET_STRUCTURE",
-        "BOS_OR_CHOCH",
-        "ORDER_BLOCK",
-        "RETEST",
-        "CONFIRMATION"
-      ],
+      missingStages:
+        Array.isArray(
+          config.requiredStages
+        )
+          ? [
+              ...config.requiredStages
+            ]
+          : [
+              "MARKET_STRUCTURE",
+              "BOS_OR_CHOCH",
+              "ORDER_BLOCK",
+              "RETEST",
+              "CONFIRMATION"
+            ],
 
       supportiveStages:
         [],
@@ -4709,17 +4716,6 @@ class PatternAnalyzer {
             : []
       };
 
-      result.completedStages.push(
-        "MARKET_STRUCTURE"
-      );
-
-      result.missingStages =
-        result.missingStages.filter(
-          stage =>
-            stage !==
-            "MARKET_STRUCTURE"
-        );
-
       result.direction =
         structure.direction ||
         "NEUTRAL";
@@ -4983,17 +4979,6 @@ class PatternAnalyzer {
             : null
       };
 
-      result.completedStages.push(
-        "BOS_OR_CHOCH"
-      );
-
-      result.missingStages =
-        result.missingStages.filter(
-          stage =>
-            stage !==
-            "BOS_OR_CHOCH"
-        );
-
       result.stage =
         states
           .structureShiftConfirmed ||
@@ -5140,17 +5125,6 @@ class PatternAnalyzer {
                 )
               : null
         };
-
-        result.completedStages.push(
-          "ORDER_BLOCK"
-        );
-
-        result.missingStages =
-          result.missingStages.filter(
-            stage =>
-              stage !==
-              "ORDER_BLOCK"
-          );
 
         result.score +=
           mitigated
@@ -5315,17 +5289,6 @@ class PatternAnalyzer {
         retestEvidence
           .confirmed === true
       ) {
-        result.completedStages.push(
-          "RETEST"
-        );
-
-        result.missingStages =
-          result.missingStages.filter(
-            stage =>
-              stage !==
-              "RETEST"
-          );
-
         result.stage =
           states.retestConfirmed ||
           "RETEST_CONFIRMED";
@@ -5357,6 +5320,121 @@ class PatternAnalyzer {
 
         result.reasons.push(
           retestEvidence.reason
+        );
+      }
+    }
+
+    // -------------------------------------------------
+    // Stage 6: Directional pattern confirmation
+    // -------------------------------------------------
+
+    if (
+      result.retest.confirmed ===
+        true &&
+      result.invalidation
+        .invalidated !== true &&
+      (
+        result.direction ===
+          "BUY" ||
+        result.direction ===
+          "SELL"
+      )
+    ) {
+      const structuralPatternNames =
+        new Set([
+          "Liquidity Sweep (Buy-Side)",
+          "Liquidity Sweep (Sell-Side)",
+          "Break of Structure",
+          "Change of Character",
+          "Bullish Order Block",
+          "Bearish Order Block",
+          "Fair Value Gap (Bullish)",
+          "Fair Value Gap (Bearish)"
+        ]);
+
+      const confirmationPattern =
+        safePatterns.find(
+          pattern => {
+            if (
+              !pattern ||
+              typeof pattern !==
+                "object"
+            ) {
+              return false;
+            }
+
+            const patternName =
+              String(
+                pattern.name ||
+                ""
+              ).trim();
+
+            const patternDirection =
+              String(
+                pattern.direction ||
+                "NEUTRAL"
+              ).toUpperCase();
+
+            const patternAge =
+              Number(
+                pattern.patternAge
+              );
+
+            return (
+              patternName.length > 0 &&
+              !structuralPatternNames.has(
+                patternName
+              ) &&
+              patternDirection ===
+                result.direction &&
+              Number.isFinite(
+                patternAge
+              ) &&
+              patternAge === 0
+            );
+          }
+        ) ||
+        null;
+
+      if (confirmationPattern) {
+        result.confirmation = {
+          ...result.confirmation,
+
+          confirmed:
+            true,
+
+          direction:
+            result.direction,
+
+          pattern:
+            confirmationPattern.name,
+
+          candleIndex:
+            safeCandles.length - 1,
+
+          confirmationScore:
+            Number.isFinite(
+              Number(
+                confirmationPattern
+                  .confirmationScore
+              )
+            )
+              ? Number(
+                  confirmationPattern
+                    .confirmationScore
+                )
+              : null
+        };
+
+        result.score +=
+          15;
+
+        result.reasons.push(
+          `${confirmationPattern.name} confirmed the ${result.direction} institutional sequence on the latest closed candle`
+        );
+      } else {
+        result.reasons.push(
+          `Waiting for a latest-candle ${result.direction} confirmation pattern`
         );
       }
     }
@@ -5403,11 +5481,67 @@ class PatternAnalyzer {
         )
       );
 
+    // -------------------------------------------------
+    // Canonical sequence state synchronization
+    // -------------------------------------------------
+
+    const requiredStages =
+      Array.isArray(
+        config.requiredStages
+      ) &&
+      config.requiredStages.length > 0
+        ? [
+            ...config.requiredStages
+          ]
+        : [
+            "MARKET_STRUCTURE",
+            "BOS_OR_CHOCH",
+            "ORDER_BLOCK",
+            "RETEST",
+            "CONFIRMATION"
+          ];
+
+    const requiredStageEvidence = {
+      MARKET_STRUCTURE:
+        result.structure.available ===
+        true,
+
+      BOS_OR_CHOCH:
+        result.structureShift
+          .confirmed === true,
+
+      ORDER_BLOCK:
+        result.orderBlock
+          .identified === true,
+
+      RETEST:
+        result.retest.confirmed ===
+        true,
+
+      CONFIRMATION:
+        result.confirmation
+          .confirmed === true
+    };
+
+    result.completedStages =
+      requiredStages.filter(
+        stage =>
+          requiredStageEvidence[stage] ===
+          true
+      );
+
+    result.missingStages =
+      requiredStages.filter(
+        stage =>
+          requiredStageEvidence[stage] !==
+          true
+      );
+
     result.valid =
-      result.structure.available ===
-        true &&
-      result.structureShift
-        .confirmed === true &&
+      result.missingStages.length ===
+        0 &&
+      result.invalidation
+        .invalidated !== true &&
       result.conflicts.length ===
         0;
 
@@ -5418,6 +5552,14 @@ class PatternAnalyzer {
       result.stage =
         states.invalidated ||
         "INVALIDATED";
+    } else if (
+      result.valid === true &&
+      result.confirmation
+        .confirmed === true
+    ) {
+      result.stage =
+        states.entryConfirmed ||
+        "ENTRY_CONFIRMED";
     } else if (
       result.retest
         .confirmed === true
@@ -6668,7 +6810,3 @@ class PatternAnalyzer {
 }
 
 module.exports = PatternAnalyzer;
-
-  
-
-  
