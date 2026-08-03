@@ -11,6 +11,8 @@
     "check:index": "node --check index.js",
     "check:core": "node --check analyzer.js && node --check learner.js && node --check signals.js",
     "check:lifecycle": "node --check resolver.js && node --check evaluator.js",
+    "start:mt5": "node mt5/mt5-receiver-start.js",
+    "check:mt5": "node --check mt5/mt5-contract.js && node --check mt5/mt5-auth.js && node --check mt5/mt5-replay-store.js && node --check mt5/mt5-state-store.js && node --check mt5/mt5-snapshot-writer.js && node --check mt5/mt5-receiver.js && node --check mt5/mt5-receiver-start.js",
     "test": "npm run check"
   },
   "keywords": [
