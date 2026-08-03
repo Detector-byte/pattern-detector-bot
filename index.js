@@ -3386,6 +3386,36 @@ function buildPipelineStatusEntry(
           .institutionalSequence
       : null;
 
+  const rejectionReason =
+    safeDiagnostics
+      .rejectionCounts &&
+    typeof safeDiagnostics
+      .rejectionCounts ===
+      "object" &&
+    !Array.isArray(
+      safeDiagnostics
+        .rejectionCounts
+    )
+      ? Object.entries(
+          safeDiagnostics
+            .rejectionCounts
+        )
+          .filter(
+            ([, count]) =>
+              Number.isFinite(
+                Number(count)
+              ) &&
+              Number(count) > 0
+          )
+          .map(
+            ([reason, count]) =>
+              `${reason}: ${Number(
+                count
+              )}`
+          )
+          .join(", ")
+      : "";
+
   return {
     pair,
 
@@ -3414,6 +3444,7 @@ function buildPipelineStatusEntry(
 
     reason:
       overrides.reason ||
+      rejectionReason ||
       null,
 
     atr:
