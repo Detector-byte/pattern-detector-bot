@@ -1,78 +1,6 @@
 {
   "entries": [
     {
-      "timestamp": "2026-08-04T06:55:32.963Z",
-      "pair": "XAUUSD",
-      "timeframe": "1H",
-      "pattern": "Liquidity Sweep (Buy-Side)",
-      "decision": "REJECTED",
-      "reason": "confidence 67% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-04T06:55:32.964Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
-      "timestamp": "2026-08-04T06:55:32.966Z",
-      "pair": "GBPJPY",
-      "timeframe": "5m",
-      "pattern": "Bearish Order Block",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-04T06:55:32.967Z",
-      "pair": "GBPJPY",
-      "timeframe": "15m",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
-      "timestamp": "2026-08-04T06:55:32.967Z",
-      "pair": "GBPJPY",
-      "timeframe": "30m",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
-      "timestamp": "2026-08-04T06:55:32.968Z",
-      "pair": "GBPJPY",
-      "timeframe": "1H",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
-      "timestamp": "2026-08-04T06:55:32.969Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
-      "timestamp": "2026-08-04T07:00:50.090Z",
-      "pair": "XAUUSD",
-      "timeframe": "5m",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
-      "timestamp": "2026-08-04T07:00:50.092Z",
-      "pair": "XAUUSD",
-      "timeframe": "15m",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
-      "timestamp": "2026-08-04T07:00:50.094Z",
-      "pair": "XAUUSD",
-      "timeframe": "30m",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
-    },
-    {
       "timestamp": "2026-08-04T07:00:50.096Z",
       "pair": "XAUUSD",
       "timeframe": "1H",
@@ -14494,8 +14422,79 @@
       "timeframe": "4H",
       "decision": "NO_PATTERN",
       "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.787Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "decision": "REJECTED",
+      "reason": "extreme volatility: current 1.78628, average 0.55788"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.793Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.794Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.794Z",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.795Z",
+      "pair": "XAUUSD",
+      "timeframe": "4H",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.800Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.802Z",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "pattern": "Diamond Top",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.802Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.803Z",
+      "pair": "GBPJPY",
+      "timeframe": "1H",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+    },
+    {
+      "timestamp": "2026-08-04T22:40:33.803Z",
+      "pair": "GBPJPY",
+      "timeframe": "4H",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
     }
   ],
-  "updatedAt": "2026-08-04T22:35:24.942Z",
+  "updatedAt": "2026-08-04T22:40:33.810Z",
   "totalEntries": 2000
 }
