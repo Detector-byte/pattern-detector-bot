@@ -1,18 +1,18 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-08-04T17:40:31.213Z",
+  "updatedAt": "2026-08-04T17:45:27.714Z",
   "pairs": {
     "XAUUSD": {
       "5m": {
         "pair": "XAUUSD",
         "timeframe": "5m",
-        "updatedAt": "2026-08-04T17:40:31.075Z",
+        "updatedAt": "2026-08-04T17:45:27.700Z",
         "candleCount": 1500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
-        "reason": "rsiBuy: 3, breakoutSell: 1",
-        "atr": 4.27947357,
-        "atrPercent": 0.00104476,
+        "reason": "patternAge: 1, rsiBuy: 2, rsiSell: 1",
+        "atr": 4.19809643,
+        "atrPercent": 0.00102512,
         "minimumATRPercent": 0.00005,
         "rawCandidates": 4,
         "acceptedPatterns": 0,
@@ -31,8 +31,8 @@
       "15m": {
         "pair": "XAUUSD",
         "timeframe": "15m",
-        "updatedAt": "2026-08-04T17:40:31.077Z",
-        "candleCount": 500,
+        "updatedAt": "2026-08-04T17:45:27.703Z",
+        "candleCount": 499,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "rsiBuy: 5, rsiSell: 2",
@@ -56,8 +56,8 @@
       "30m": {
         "pair": "XAUUSD",
         "timeframe": "30m",
-        "updatedAt": "2026-08-04T17:40:31.078Z",
-        "candleCount": 250,
+        "updatedAt": "2026-08-04T17:45:27.704Z",
+        "candleCount": 249,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "rsiBuy: 3",
@@ -81,7 +81,7 @@
       "1H": {
         "pair": "XAUUSD",
         "timeframe": "1H",
-        "updatedAt": "2026-08-04T17:40:31.079Z",
+        "updatedAt": "2026-08-04T17:45:27.705Z",
         "candleCount": 124,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -108,7 +108,7 @@
       "4H": {
         "pair": "XAUUSD",
         "timeframe": "4H",
-        "updatedAt": "2026-08-04T17:40:31.083Z",
+        "updatedAt": "2026-08-04T17:45:27.706Z",
         "candleCount": 30,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -135,13 +135,13 @@
       "5m": {
         "pair": "GBPJPY",
         "timeframe": "5m",
-        "updatedAt": "2026-08-04T17:40:31.085Z",
+        "updatedAt": "2026-08-04T17:45:27.708Z",
         "candleCount": 1500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "rsiBuy: 2, rsiSell: 3",
-        "atr": 0.06228857,
-        "atrPercent": 0.00029399,
+        "atr": 0.05556857,
+        "atrPercent": 0.00026224,
         "minimumATRPercent": 0.00005,
         "rawCandidates": 5,
         "acceptedPatterns": 0,
@@ -149,9 +149,9 @@
         "returnedPatternNames": [],
         "institutionalSequence": {
           "stage": "SEARCHING_LIQUIDITY",
-          "score": 20,
+          "score": 10,
           "valid": false,
-          "direction": "BUY",
+          "direction": "NEUTRAL",
           "completedStages": 1,
           "missingStages": 4,
           "conflicts": 0
@@ -160,8 +160,8 @@
       "15m": {
         "pair": "GBPJPY",
         "timeframe": "15m",
-        "updatedAt": "2026-08-04T17:40:31.085Z",
-        "candleCount": 500,
+        "updatedAt": "2026-08-04T17:45:27.709Z",
+        "candleCount": 499,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "rsiBuy: 3, rsiSell: 2",
@@ -185,8 +185,8 @@
       "30m": {
         "pair": "GBPJPY",
         "timeframe": "30m",
-        "updatedAt": "2026-08-04T17:40:31.086Z",
-        "candleCount": 250,
+        "updatedAt": "2026-08-04T17:45:27.709Z",
+        "candleCount": 249,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "rsiSell: 3, breakoutBuy: 1",
@@ -213,7 +213,7 @@
       "1H": {
         "pair": "GBPJPY",
         "timeframe": "1H",
-        "updatedAt": "2026-08-04T17:40:31.087Z",
+        "updatedAt": "2026-08-04T17:45:27.710Z",
         "candleCount": 124,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -238,7 +238,7 @@
       "4H": {
         "pair": "GBPJPY",
         "timeframe": "4H",
-        "updatedAt": "2026-08-04T17:40:31.088Z",
+        "updatedAt": "2026-08-04T17:45:27.711Z",
         "candleCount": 30,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
