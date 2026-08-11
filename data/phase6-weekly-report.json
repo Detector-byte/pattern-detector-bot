@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-11T19:40:32.061Z",
+  "generatedAt": "2026-08-11T19:45:32.225Z",
   "period": {
-    "start": "2026-08-04T19:40:32.060Z",
-    "end": "2026-08-11T19:40:32.060Z"
+    "start": "2026-08-04T19:45:32.224Z",
+    "end": "2026-08-11T19:45:32.224Z"
   },
   "metrics": {
     "totalSignals": 4,
@@ -29,14 +29,6 @@
       }
     },
     "pairAccuracy": {
-      "XAUUSD": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "GBPJPY": {
         "total": 3,
         "wins": 0,
@@ -44,17 +36,17 @@
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.83
-      }
-    },
-    "timeframeAccuracy": {
-      "5m": {
+      },
+      "XAUUSD": {
         "total": 1,
         "wins": 0,
         "losses": 1,
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 2
-      },
+      }
+    },
+    "timeframeAccuracy": {
       "30m": {
         "total": 2,
         "wins": 0,
@@ -62,6 +54,14 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.75
+      },
+      "5m": {
+        "total": 1,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
       },
       "15m": {
         "total": 1,
@@ -73,14 +73,6 @@
       }
     },
     "sessionAccuracy": {
-      "LONDON_NY_OVERLAP": {
-        "total": 2,
-        "wins": 0,
-        "losses": 1,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "NEWYORK": {
         "total": 2,
         "wins": 0,
@@ -88,17 +80,17 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.75
+      },
+      "LONDON_NY_OVERLAP": {
+        "total": 2,
+        "wins": 0,
+        "losses": 1,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 2
       }
     },
     "marketRegimeAccuracy": {
-      "RANGING": {
-        "total": 3,
-        "wins": 0,
-        "losses": 1,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "COMPRESSION": {
         "total": 1,
         "wins": 0,
@@ -106,6 +98,14 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "RANGING": {
+        "total": 3,
+        "wins": 0,
+        "losses": 1,
+        "expired": 2,
+        "winRate": 0,
+        "averageRiskReward": 2
       }
     },
     "learningProgress": "insufficient-data",
