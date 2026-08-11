@@ -3707,12 +3707,19 @@ function analyzePair(
       timeframeCandles.length >=
         MINIMUM_CANDLES
     ) {
-      trendCache[
-        `${pair}_${timeframe}`
-      ] =
+      const detectedTrend =
         analyzer.detectTrend(
           timeframeCandles
         );
+
+      trendCache[
+        `${pair}_${timeframe}`
+      ] =
+        detectedTrend === "UP"
+          ? "BUY"
+          : detectedTrend === "DOWN"
+            ? "SELL"
+            : detectedTrend;
     }
   }
 
@@ -3865,7 +3872,7 @@ function analyzePair(
         timeframe,
         decision: "NO_PATTERN",
         reason:
-          "analyzer returned zero patterns after internal ATR, RSI, volume, age and breakout filters"
+          "analyzer returned zero patterns after detector and post-processing filters"
       });
 
       continue;
