@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-11T17:15:32.566Z",
+  "updatedAt": "2026-08-11T17:20:32.742Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -37,19 +37,19 @@
       }
     },
     "pair": {
-      "XAUUSD": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "GBPJPY": {
         "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 2
+      },
+      "XAUUSD": {
+        "total": 1,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
         "winRate": 0,
         "averageRiskReward": 2
       }
@@ -65,14 +65,6 @@
       }
     },
     "session": {
-      "LONDON_NY_OVERLAP": {
-        "total": 2,
-        "wins": 0,
-        "losses": 1,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "NEWYORK": {
         "total": 1,
         "wins": 0,
@@ -80,22 +72,30 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 2
-      }
-    },
-    "patternRanking": {
-      "Bullish Engulfing": {
+      },
+      "LONDON_NY_OVERLAP": {
         "total": 2,
         "wins": 0,
         "losses": 1,
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 2
-      },
+      }
+    },
+    "patternRanking": {
       "Risk-Adjusted Trend Momentum": {
         "total": 1,
         "wins": 0,
         "losses": 0,
         "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
+      },
+      "Bullish Engulfing": {
+        "total": 2,
+        "wins": 0,
+        "losses": 1,
+        "expired": 1,
         "winRate": 0,
         "averageRiskReward": 2
       }
@@ -104,16 +104,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 1,
-    "averageConfidence": 68.2,
-    "averageAIScore": 70.9,
+    "signalsGenerated": 0,
+    "averageConfidence": 0,
+    "averageAIScore": 0,
     "recentWinRate": 0,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 437,
-    "analysisDurationMs": 22,
-    "learningDurationMs": 3,
-    "saveDurationMs": 2,
-    "totalRuntimeMs": 466
+    "fetchDurationMs": 174,
+    "analysisDurationMs": 38,
+    "learningDurationMs": 5,
+    "saveDurationMs": 3,
+    "totalRuntimeMs": 222
   }
 }
