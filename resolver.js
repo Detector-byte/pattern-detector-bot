@@ -345,13 +345,68 @@ class SignalResolver {
       signal.timestamp ||
       timestamp;
 
+    const normalizedDirection =
+      String(
+        signal.direction ||
+        signal.signal ||
+        ""
+      ).toUpperCase();
+
+    if (
+      [
+        "BUY",
+        "SELL",
+        "NEUTRAL"
+      ].includes(
+        normalizedDirection
+      )
+    ) {
+
+      signal.direction =
+        normalizedDirection;
+
+    } else if (
+      normalizedDirection ===
+      "HOLD"
+    ) {
+
+      signal.direction =
+        "NEUTRAL";
+
+    }
+
+    const normalizedOutcome =
+      String(
+        signal.outcome ||
+        ""
+      ).toUpperCase();
+
+    const legacyFinalOutcome =
+      [
+        this.outcomes.WIN,
+        this.outcomes.LOSS,
+        this.outcomes.BREAK_EVEN,
+        this.outcomes.EXPIRED,
+        this.outcomes.NO_TRADE
+      ].includes(
+        normalizedOutcome
+      );
+
     signal.tradeStatus =
       signal.tradeStatus ||
-      this.statuses.ACTIVE;
+      (
+        legacyFinalOutcome
+          ? this.statuses.CLOSED
+          : this.statuses.ACTIVE
+      );
 
     signal.status =
       signal.status ||
-      this.statuses.ACTIVE;
+      (
+        legacyFinalOutcome
+          ? normalizedOutcome
+          : this.statuses.ACTIVE
+      );
 
     signal.targetProgress = {
 
@@ -533,6 +588,8 @@ class SignalResolver {
       levels.tp1;
 
     const tp2Hit =
+      levels.hasExplicitTp2 ===
+        true &&
       Number.isFinite(
         levels.tp2
       ) &&
@@ -540,6 +597,8 @@ class SignalResolver {
       levels.tp2;
 
     const tp3Hit =
+      levels.hasExplicitTp3 ===
+        true &&
       Number.isFinite(
         levels.tp3
       ) &&
@@ -615,6 +674,8 @@ class SignalResolver {
       levels.tp1;
 
     const tp2Hit =
+      levels.hasExplicitTp2 ===
+        true &&
       Number.isFinite(
         levels.tp2
       ) &&
@@ -622,6 +683,8 @@ class SignalResolver {
       levels.tp2;
 
     const tp3Hit =
+      levels.hasExplicitTp3 ===
+        true &&
       Number.isFinite(
         levels.tp3
       ) &&
@@ -734,7 +797,19 @@ class SignalResolver {
       )
     ) {
 
+      const finalTarget =
+        this.getFinalTargetNumber(
+          levels
+        );
+
+      const resolvedTarget =
+        Math.min(
+          highestTarget,
+          finalTarget
+        );
+
       const outcome =
+        finalTarget === 1 ||
         highestTarget >= 2
 
           ? this.outcomes.WIN
@@ -743,7 +818,7 @@ class SignalResolver {
 
       this.recordTargetProgress(
         signal,
-        highestTarget,
+        resolvedTarget,
         timestamp
       );
 
@@ -754,11 +829,11 @@ class SignalResolver {
           outcome,
 
           reason:
-            `TP${highestTarget}`,
+            `TP${resolvedTarget}`,
 
           price:
             levels[
-              `tp${highestTarget}`
+              `tp${resolvedTarget}`
             ],
 
           timestamp
@@ -1437,6 +1512,17 @@ class SignalResolver {
         signal.strategy ||
         null,
 
+      strategyModel:
+        signal.metadata
+          ?.strategy ||
+        signal.strategy ||
+        null,
+
+      strategyEvidence:
+        signal.metadata
+          ?.strategyEvidence ||
+        null,
+
       aiScore:
         this.toFiniteNumber(
           signal.aiScore
@@ -1528,18 +1614,36 @@ class SignalResolver {
 
         signal.takeProfit1 ??
 
-        signal.takeProfit
+        signal.target1 ??
+
+        signal.targetPrice ??
+
+        signal.takeProfit ??
+
+        signal.tp1
 
       );
 
     const explicitTp2 =
       this.toFiniteNumber(
-        signal.takeProfit2
+
+        signal.takeProfit2 ??
+
+        signal.target2 ??
+
+        signal.tp2
+
       );
 
     const explicitTp3 =
       this.toFiniteNumber(
-        signal.takeProfit3
+
+        signal.takeProfit3 ??
+
+        signal.target3 ??
+
+        signal.tp3
+
       );
 
     return {
