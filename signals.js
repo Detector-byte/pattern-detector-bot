@@ -242,7 +242,7 @@ class SignalGenerator {
     }
 
     const description =
-      this.learner.getPatternDescription(
+      this.getPatternDescription(
         normalizedPattern.name
       );
 
@@ -482,6 +482,15 @@ class SignalGenerator {
         patternVersion:
           normalizedPattern.version ||
           null,
+
+        strategy:
+          normalizedPattern.strategy ||
+          null,
+
+        strategyEvidence:
+          this.getStrategyEvidence(
+            normalizedPattern
+          ),
 
         evolvedThresholds:
           this.learner
@@ -765,6 +774,28 @@ class SignalGenerator {
     let target3;
     let risk;
 
+    // Preserve analyzer-authored price objectives.
+    // Legacy analyzers often expose the primary target as
+    // targetPrice, while newer strategies expose target1/2/3.
+    // This is alias normalization only; invalid geometry still
+    // fails closed below.
+    const providedTarget1 =
+      pattern.target1 ??
+      pattern.takeProfit1 ??
+      pattern.targetPrice ??
+      pattern.takeProfit ??
+      pattern.tp1;
+
+    const providedTarget2 =
+      pattern.target2 ??
+      pattern.takeProfit2 ??
+      pattern.tp2;
+
+    const providedTarget3 =
+      pattern.target3 ??
+      pattern.takeProfit3 ??
+      pattern.tp3;
+
     if (
       direction === "BUY"
     ) {
@@ -791,7 +822,7 @@ class SignalGenerator {
 
       target1 =
         this.getValidBullishTarget(
-          pattern.target1,
+          providedTarget1,
           price,
           price +
             risk *
@@ -800,7 +831,7 @@ class SignalGenerator {
 
       target2 =
         this.getValidBullishTarget(
-          pattern.target2,
+          providedTarget2,
           target1,
           price +
             risk *
@@ -809,7 +840,7 @@ class SignalGenerator {
 
       target3 =
         this.getValidBullishTarget(
-          pattern.target3,
+          providedTarget3,
           target2,
           price +
             risk *
@@ -841,7 +872,7 @@ class SignalGenerator {
 
       target1 =
         this.getValidBearishTarget(
-          pattern.target1,
+          providedTarget1,
           price,
           price -
             risk *
@@ -850,7 +881,7 @@ class SignalGenerator {
 
       target2 =
         this.getValidBearishTarget(
-          pattern.target2,
+          providedTarget2,
           target1,
           price -
             risk *
@@ -859,7 +890,7 @@ class SignalGenerator {
 
       target3 =
         this.getValidBearishTarget(
-          pattern.target3,
+          providedTarget3,
           target2,
           price -
             risk *
@@ -882,6 +913,38 @@ class SignalGenerator {
       (
         !Number.isFinite(risk) ||
         risk <= 0
+      )
+    ) {
+      return null;
+    }
+
+    if (
+      direction === "BUY" &&
+      !(
+        Number.isFinite(stop) &&
+        Number.isFinite(target1) &&
+        Number.isFinite(target2) &&
+        Number.isFinite(target3) &&
+        stop < price &&
+        target1 > price &&
+        target2 >= target1 &&
+        target3 >= target2
+      )
+    ) {
+      return null;
+    }
+
+    if (
+      direction === "SELL" &&
+      !(
+        Number.isFinite(stop) &&
+        Number.isFinite(target1) &&
+        Number.isFinite(target2) &&
+        Number.isFinite(target3) &&
+        stop > price &&
+        target1 < price &&
+        target2 <= target1 &&
+        target3 <= target2
       )
     ) {
       return null;
@@ -1302,16 +1365,116 @@ class SignalGenerator {
   // Pattern Psychology and Structure
   // =====================================================
 
-  getPatternPsychology(
+  getPatternDescription(
     patternName
   ) {
+    if (
+      patternName ===
+      "Risk-Adjusted Trend Momentum"
+    ) {
+      return (
+        "A systematic trend-continuation setup that requires EMA20/EMA50 alignment, " +
+        "risk-adjusted directional momentum, momentum-zone RSI and a confirmed continuation breakout. " +
+        "The setup uses structure-aware volatility risk control and predefined R-multiple objectives."
+      );
+    }
+
     return this.learner
       .getPatternDescription(
         patternName
       );
   }
 
+  getPatternPsychology(
+    patternName
+  ) {
+    return this.getPatternDescription(
+      patternName
+    );
+  }
+
+  getStrategyEvidence(pattern) {
+    if (
+      !pattern ||
+      pattern.name !==
+        "Risk-Adjusted Trend Momentum"
+    ) {
+      return null;
+    }
+
+    const toOptionalNumber =
+      value => {
+        const number =
+          Number(value);
+
+        return Number.isFinite(number)
+          ? number
+          : null;
+      };
+
+    return {
+      model:
+        pattern.strategy ||
+        "RISK_ADJUSTED_TIME_SERIES_MOMENTUM",
+
+      rsiMode:
+        pattern.rsiMode ||
+        "MOMENTUM",
+
+      riskAdjustedMomentum:
+        toOptionalNumber(
+          pattern.riskAdjustedMomentum
+        ),
+
+      emaSeparationATR:
+        toOptionalNumber(
+          pattern.emaSeparationATR
+        ),
+
+      extensionATR:
+        toOptionalNumber(
+          pattern.extensionATR
+        ),
+
+      structureStopUsed:
+        pattern.structureStopUsed ===
+        true,
+
+      targetModel:
+        "2R_3R_4R"
+    };
+  }
+
   getMarketStructure(pattern) {
+    if (
+      pattern?.name ===
+      "Risk-Adjusted Trend Momentum"
+    ) {
+      const bullish =
+        pattern.direction ===
+        "BUY";
+
+      return {
+        interpretation:
+          bullish
+            ? "Bullish trend continuation with volatility-adjusted momentum"
+            : "Bearish trend continuation with volatility-adjusted momentum",
+
+        sentiment:
+          bullish
+            ? "Persistent upside pressure with trend alignment"
+            : "Persistent downside pressure with trend alignment",
+
+        momentum:
+          bullish
+            ? "Risk-adjusted upside momentum confirmed"
+            : "Risk-adjusted downside momentum confirmed",
+
+        recommendedAction:
+          "Use only after the analyzer confirms trend, momentum, RSI, continuation breakout and overextension controls."
+      };
+    }
+
     if (
       pattern.direction === "BUY"
     ) {
@@ -1372,6 +1535,9 @@ class SignalGenerator {
     timeframe
   ) {
     const guidance = {
+      "Risk-Adjusted Trend Momentum":
+        `Entry: Only after EMA20/EMA50 trend alignment, risk-adjusted momentum and a continuation close beyond the prior candle confirm the same direction. Stop: Use the analyzer-provided structure/ATR invalidation. Targets: 2R, 3R and 4R. On ${timeframe}, avoid chasing overextended moves and avoid high-impact news/liquidity shocks.`,
+
       "Double Top":
         `Entry: On close below neckline support. Stop: Above the second peak. Target: Pattern height projected downward. On ${timeframe}, avoid entering before neckline confirmation.`,
 
@@ -1459,6 +1625,43 @@ class SignalGenerator {
     timeframe,
     marketRegime = "UNKNOWN"
   ) {
+    if (
+      patternName ===
+      "Risk-Adjusted Trend Momentum"
+    ) {
+      return {
+        confirmationRequired:
+          true,
+
+        volumeImportant:
+          true,
+
+        recommendedEntry:
+          "Enter only after trend alignment, risk-adjusted momentum and continuation breakout are simultaneously confirmed.",
+
+        riskLevel:
+          this.getRiskLevel(
+            timeframe
+          ),
+
+        liquidityRequired:
+          true,
+
+        marketRegime,
+
+        bestSessions:
+          this.getBestSessions(
+            timeframe
+          ),
+
+        avoidTimes:
+          "Avoid high-impact news windows, poor liquidity and entries after excessive ATR extension.",
+
+        notes:
+          `Risk-Adjusted Trend Momentum on ${timeframe} uses structure-aware risk and staged 2R/3R/4R objectives. Higher-timeframe and downstream institutional controls remain authoritative.`
+      };
+    }
+
     return {
       confirmationRequired:
         true,
@@ -1966,7 +2169,7 @@ class SignalGenerator {
         "PipSight Signal Generator",
 
       version:
-        "4.0.0",
+        "4.1.0",
 
       adaptiveConfidence:
         true,
@@ -1978,6 +2181,15 @@ class SignalGenerator {
         true,
 
       riskRewardFilter:
+        true,
+
+      analyzerTargetPreservation:
+        true,
+
+      failClosedPriceGeometry:
+        true,
+
+      riskAdjustedTrendMomentum:
         true,
 
       learnerIntegration:
