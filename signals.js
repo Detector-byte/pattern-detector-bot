@@ -782,8 +782,6 @@ class SignalGenerator {
     const providedTarget1 =
       pattern.target1 ??
       pattern.takeProfit1 ??
-      pattern.targetPrice ??
-      pattern.takeProfit ??
       pattern.tp1;
 
     const providedTarget2 =
@@ -927,8 +925,8 @@ class SignalGenerator {
         Number.isFinite(target3) &&
         stop < price &&
         target1 > price &&
-        target2 >= target1 &&
-        target3 >= target2
+        target2 > target1 &&
+        target3 > target2
       )
     ) {
       return null;
@@ -943,8 +941,8 @@ class SignalGenerator {
         Number.isFinite(target3) &&
         stop > price &&
         target1 < price &&
-        target2 <= target1 &&
-        target3 <= target2
+        target2 < target1 &&
+        target3 < target2
       )
     ) {
       return null;
@@ -2169,7 +2167,7 @@ class SignalGenerator {
         "PipSight Signal Generator",
 
       version:
-        "4.1.0",
+        "4.1.1",
 
       adaptiveConfidence:
         true,
