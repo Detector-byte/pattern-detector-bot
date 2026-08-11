@@ -60,10 +60,20 @@ class PatternAnalyzer {
     this.minTouchCount = 3;       // min times price must touch flat support/resistance
 
     // Step 9 configuration
+    // Canonical production timeframe keys are preserved alongside
+    // legacy aliases so direct/older integrations keep identical behavior.
+    // 30m previously fell back to weight 1; keep that exact behavior
+    // explicitly until historical evidence supports a different weight.
     this.timeframeWeights = {
+        "5m": 1,
         M5: 1,
+        "15m": 1.25,
         M15: 1.25,
+        "30m": 1,
+        M30: 1,
+        "1H": 1.5,
         H1: 1.5,
+        "4H": 2,
         H4: 2
     };
 
