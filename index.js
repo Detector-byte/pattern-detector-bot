@@ -470,9 +470,23 @@ function getDefaultLearningData() {
 
     regimeStats: {},
 
+    contextEdgeStats: {},
+
+    patternRegimeStats: {},
+
+    patternSessionStats: {},
+
+    strategyStateContextStats: {},
+
+    patternDirectionStateStats: {},
+
+    patternStateStats: {},
+
     patternWeights: {},
 
     calibration: {},
+
+    finalConfidenceCalibration: {},
 
     patternEvolution: {},
 
@@ -2502,6 +2516,7 @@ function enrichCandidatePhase6(
     [];
 
   candidate.marketState =
+    candidate.marketState ||
     detectAdvancedMarketState(
       timeframeCandles,
       candidate.marketRegime
@@ -2559,6 +2574,29 @@ function enrichCandidatePhase6(
 
   candidate.confidenceComponents =
     confidence.components;
+
+  candidate.finalConfidenceReliability =
+    typeof learner
+      .getConfidenceReliabilityAuthority ===
+      "function"
+      ? learner
+          .getConfidenceReliabilityAuthority({
+            stage:
+              "FINAL",
+
+            confidence:
+              candidate.finalAIConfidence,
+
+            minimumRequiredRate:
+              MINIMUM_CONFIDENCE
+          })
+      : {
+          eligible: true,
+          status:
+            "NOT_AVAILABLE",
+          reason:
+            "learner final confidence reliability authority is unavailable"
+        };
 
   const ranking =
     calculateInstitutionalAIScore(
@@ -2626,6 +2664,16 @@ function selectInstitutionalSignal(
             candidate.rejectionReason =
               portfolioRisk.reasons
                 .join("; ");
+          } else if (
+            candidate
+              .finalConfidenceReliability
+              ?.eligible === false
+          ) {
+            candidate.rejectionReason =
+              candidate
+                .finalConfidenceReliability
+                .reason ||
+              "final confidence reliability veto";
           } else if (
             candidate.aiScore <
             MINIMUM_AI_SCORE
@@ -2779,6 +2827,52 @@ function scorePattern(
     return null;
   }
 
+  const adaptiveConfidenceReliability =
+    typeof learner
+      .getConfidenceReliabilityAuthority ===
+      "function"
+      ? learner
+          .getConfidenceReliabilityAuthority({
+            stage:
+              "ADAPTIVE",
+
+            confidence,
+
+            minimumRequiredRate:
+              MINIMUM_CONFIDENCE
+          })
+      : {
+          eligible: true,
+          status:
+            "NOT_AVAILABLE",
+          reason:
+            "learner confidence reliability authority is unavailable"
+        };
+
+  if (
+    adaptiveConfidenceReliability
+      ?.eligible === false
+  ) {
+    logAudit({
+      pair,
+
+      timeframe,
+
+      pattern:
+        pattern.name,
+
+      decision:
+        "REJECTED",
+
+      reason:
+        adaptiveConfidenceReliability
+          .reason ||
+        "adaptive confidence reliability veto"
+    });
+
+    return null;
+  }
+
   const signal =
     signalGenerator
       .generateSignal(
@@ -2859,6 +2953,221 @@ function scorePattern(
   const session =
     getMarketSession();
 
+  // Reuse the candles already loaded for this candidate.
+  // No external request is made by the live strategy-state authority.
+  const marketState =
+    detectAdvancedMarketState(
+      timeframeCandles,
+      marketRegime
+    );
+
+  const economicEdge =
+    typeof learner
+      .getEconomicEdge ===
+      "function"
+      ? learner
+          .getEconomicEdge({
+            pattern:
+              pattern.name,
+
+            pair,
+
+            timeframe,
+
+            marketRegime,
+
+            session
+          })
+      : {
+          eligible: true,
+          status:
+            "NOT_AVAILABLE",
+          reason:
+            "learner economic-edge gate is unavailable"
+        };
+
+  if (
+    economicEdge?.eligible ===
+    false
+  ) {
+    logAudit({
+      pair,
+
+      timeframe,
+
+      pattern:
+        pattern.name,
+
+      decision:
+        "REJECTED",
+
+      reason:
+        economicEdge.reason ||
+        "negative live economic edge"
+    });
+
+    return null;
+  }
+
+  const strategyAuthority =
+    typeof learner
+      .getStrategyMarketAuthority ===
+      "function"
+      ? learner
+          .getStrategyMarketAuthority({
+            pattern:
+              pattern.name,
+
+            direction:
+              signal.direction,
+
+            pair,
+
+            timeframe,
+
+            marketRegime,
+
+            marketState,
+
+            session
+          })
+      : {
+          eligible: true,
+          status:
+            "NOT_AVAILABLE",
+          reason:
+            "learner strategy-state authority is unavailable"
+        };
+
+  if (
+    strategyAuthority?.eligible ===
+    false
+  ) {
+    logAudit({
+      pair,
+
+      timeframe,
+
+      pattern:
+        pattern.name,
+
+      decision:
+        "REJECTED",
+
+      reason:
+        strategyAuthority.reason ||
+        "negative live strategy-state edge"
+    });
+
+    return null;
+  }
+
+  const degradationAuthority =
+    typeof learner
+      .getStrategyDegradationAuthority ===
+      "function"
+      ? learner
+          .getStrategyDegradationAuthority({
+            pattern:
+              pattern.name,
+
+            direction:
+              signal.direction,
+
+            pair,
+
+            timeframe,
+
+            marketRegime,
+
+            marketState,
+
+            session
+          })
+      : {
+          eligible: true,
+          status:
+            "NOT_AVAILABLE",
+          reason:
+            "learner degradation authority is unavailable"
+        };
+
+  if (
+    degradationAuthority?.eligible ===
+    false
+  ) {
+    logAudit({
+      pair,
+
+      timeframe,
+
+      pattern:
+        pattern.name,
+
+      decision:
+        "REJECTED",
+
+      reason:
+        degradationAuthority.reason ||
+        "live strategy degradation kill-switch"
+    });
+
+    return null;
+  }
+
+  const sequentialOOSAuthority =
+    typeof learner
+      .getSequentialOOSStabilityAuthority ===
+      "function"
+      ? learner
+          .getSequentialOOSStabilityAuthority({
+            pattern:
+              pattern.name,
+
+            direction:
+              signal.direction,
+
+            pair,
+
+            timeframe,
+
+            marketRegime,
+
+            marketState,
+
+            session
+          })
+      : {
+          eligible: true,
+          status:
+            "NOT_AVAILABLE",
+          reason:
+            "learner sequential OOS stability authority is unavailable"
+        };
+
+  if (
+    sequentialOOSAuthority
+      ?.eligible === false
+  ) {
+    logAudit({
+      pair,
+
+      timeframe,
+
+      pattern:
+        pattern.name,
+
+      decision:
+        "REJECTED",
+
+      reason:
+        sequentialOOSAuthority.reason ||
+        "live sequential OOS stability veto"
+    });
+
+    return null;
+  }
+
   let qualityScore =
     confidence * 0.35 +
     toNumber(
@@ -2903,9 +3212,21 @@ function scorePattern(
 
     marketRegime,
 
+    marketState,
+
     historicalWinRate,
 
-    riskReward
+    riskReward,
+
+    economicEdge,
+
+    strategyAuthority,
+
+    degradationAuthority,
+
+    sequentialOOSAuthority,
+
+    adaptiveConfidenceReliability
   };
 }
 
@@ -3217,6 +3538,13 @@ function refreshExistingSignal(
     "explanation",
     "marketState",
     "strategyPriority",
+    "session",
+    "economicEdge",
+    "strategyAuthority",
+    "degradationAuthority",
+    "sequentialOOSAuthority",
+    "adaptiveConfidenceReliability",
+    "finalConfidenceReliability",
     "portfolioRisk"
   ];
 
@@ -4052,6 +4380,29 @@ function analyzeMarkets(
       strategyPriority:
         selected.strategyPriority,
 
+      session:
+        selected.session,
+
+      economicEdge:
+        selected.economicEdge,
+
+      strategyAuthority:
+        selected.strategyAuthority,
+
+      degradationAuthority:
+        selected.degradationAuthority,
+
+      sequentialOOSAuthority:
+        selected.sequentialOOSAuthority,
+
+      adaptiveConfidenceReliability:
+        selected
+          .adaptiveConfidenceReliability,
+
+      finalConfidenceReliability:
+        selected
+          .finalConfidenceReliability,
+
       portfolioRisk:
         selected.portfolioRisk,
 
@@ -4113,6 +4464,48 @@ function analyzeMarkets(
 
     createdAt:
       timestamp,
+
+    /*
+     * Immutable forecast provenance. Active-signal refreshes may update
+     * displayed/live confidence, but calibration must evaluate the values
+     * that existed when the trade was first published.
+     */
+    decisionAdaptiveConfidence:
+      toNumber(
+        selected.confidence,
+        null
+      ),
+
+    decisionSignalConfidence:
+      toNumber(
+        selected.signal
+          ?.confidence,
+        null
+      ),
+
+    decisionFinalAIConfidence:
+      toNumber(
+        selected.finalAIConfidence,
+        null
+      ),
+
+    decisionAIScore:
+      toNumber(
+        selected.aiScore,
+        null
+      ),
+
+    confidenceProvenance:
+      "LOCKED_AT_PUBLICATION",
+
+    decisionConfidenceCapturedAt:
+      timestamp,
+
+    initialStopLoss:
+      toNumber(
+        enhancedSignal.stopLoss,
+        null
+      ),
 
     lastUpdated:
       timestamp,
@@ -4294,6 +4687,101 @@ function determineSignalOutcome(
   return null;
 }
 
+function calculateResolvedTradeR(
+  signal,
+  outcome
+) {
+  if (
+    !signal ||
+    (
+      outcome !== "WIN" &&
+      outcome !== "LOSS"
+    )
+  ) {
+    return null;
+  }
+
+  const direction =
+    String(
+      signal.direction ||
+      ""
+    ).toUpperCase();
+
+  const entry =
+    toNumber(
+      signal.entry,
+      NaN
+    );
+
+  const initialStop =
+    toNumber(
+      signal.initialStopLoss ??
+      signal.stopLoss,
+      NaN
+    );
+
+  const exitPrice =
+    outcome === "WIN"
+      ? getPrimaryTakeProfit(
+          signal
+        )
+      : toNumber(
+          signal.stopLoss,
+          NaN
+        );
+
+  const initialRisk =
+    Math.abs(
+      entry -
+      initialStop
+    );
+
+  if (
+    ![
+      entry,
+      initialStop,
+      exitPrice,
+      initialRisk
+    ].every(
+      Number.isFinite
+    ) ||
+    initialRisk <= 0 ||
+    ![
+      "BUY",
+      "SELL"
+    ].includes(
+      direction
+    )
+  ) {
+    return null;
+  }
+
+  const realizedMove =
+    direction === "BUY"
+      ? exitPrice -
+        entry
+      : entry -
+        exitPrice;
+
+  const realizedR =
+    realizedMove /
+    initialRisk;
+
+  return {
+    initialRisk,
+    realizedMove,
+    realizedR:
+      Number(
+        realizedR.toFixed(4)
+      ),
+    exitPrice,
+    exitReason:
+      outcome === "WIN"
+        ? "TAKE_PROFIT_1"
+        : "STOP_LOSS"
+  };
+}
+
 async function resolvePendingSignals(
   learner,
   existingSignals,
@@ -4355,6 +4843,12 @@ async function resolvePendingSignals(
       );
 
     if (outcome) {
+      const economicResult =
+        calculateResolvedTradeR(
+          signal,
+          outcome
+        );
+
       signal.outcome =
         outcome;
 
@@ -4367,6 +4861,33 @@ async function resolvePendingSignals(
       signal.lastUpdated =
         signal.resolvedAt;
 
+      if (economicResult) {
+        signal.exitPrice =
+          economicResult.exitPrice;
+
+        signal.exitReason =
+          economicResult.exitReason;
+
+        signal.realizedR =
+          economicResult.realizedR;
+
+        signal.performance = {
+          ...(
+            signal.performance ||
+            {}
+          ),
+
+          initialRisk:
+            economicResult.initialRisk,
+
+          realizedMove:
+            economicResult.realizedMove,
+
+          realizedR:
+            economicResult.realizedR
+        };
+      }
+
       resolutions.push({
         id:
           signal.id ||
@@ -4376,7 +4897,42 @@ async function resolvePendingSignals(
         outcome,
 
         resolvedAt:
-          signal.resolvedAt
+          signal.resolvedAt,
+
+        realizedR:
+          signal.realizedR,
+
+        exitPrice:
+          signal.exitPrice,
+
+        exitReason:
+          signal.exitReason,
+
+        session:
+          signal.session,
+
+        marketRegime:
+          signal.marketRegime,
+
+        marketState:
+          signal.marketState,
+
+        strategy:
+          signal.strategyPriority
+            ?.primary ||
+          signal.strategy ||
+          null,
+
+        strategyModel:
+          signal.metadata
+            ?.strategy ||
+          signal.strategy ||
+          null,
+
+        strategyEvidence:
+          signal.metadata
+            ?.strategyEvidence ||
+          null
       });
 
       logAudit({
@@ -6011,6 +6567,8 @@ module.exports = {
   resolvePendingSignals,
 
   determineSignalOutcome,
+
+  calculateResolvedTradeR,
 
   saveData,
 
