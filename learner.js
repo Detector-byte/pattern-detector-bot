@@ -40,7 +40,7 @@ class LearningSystem {
     this.minPatternWeight = 0.70;
     this.maxPatternWeight = 1.50;
 
-    // Threshold evolution is limited to ±20%.
+    // Threshold evolution is limited to Â±20%.
     this.maxEvolutionChange = 0.20;
 
     // Initialize existing storage
@@ -511,7 +511,7 @@ class LearningSystem {
       actualRate -
       Number(confidenceBin);
 
-    // Limit calibration correction to ±10 points.
+    // Limit calibration correction to Â±10 points.
     const correction =
       Math.max(
         -10,
@@ -3041,7 +3041,7 @@ class LearningSystem {
         new Date().toISOString(),
 
       version:
-        "4.8.0"
+        "4.8.1"
 
     };
   }
@@ -3253,7 +3253,7 @@ class LearningSystem {
         "Pattern Recognition AI",
 
       version:
-        "4.8.0",
+        "4.8.1",
 
       learning:
         true,
@@ -3286,6 +3286,9 @@ class LearningSystem {
         true,
 
       liveSequentialOOSStabilityAuthority:
+        true,
+
+      terminalLifecycleSynchronization:
         true,
 
       adaptiveConfidence:
@@ -4503,7 +4506,7 @@ class LearningSystem {
    * Build calibration bins from resolved signals.
    *
    * Example:
-   * Predicted confidence 70–74 is grouped into bin 70.
+   * Predicted confidence 70â74 is grouped into bin 70.
    * The actual win rate is then compared with the prediction.
    */
   updateConfidenceCalibration() {
@@ -5462,7 +5465,7 @@ class LearningSystem {
    * The analyzer may apply these values through
    * applyPatternEvolution().
    *
-   * Every recommendation is limited to ±20%
+   * Every recommendation is limited to Â±20%
    * of its baseline value.
    */
   updatePatternEvolution() {
@@ -6045,7 +6048,9 @@ class LearningSystem {
   // =====================================================
 
   /**
-   * Mark signal as WIN or LOSS.
+   * Mark a signal with a terminal learning outcome.
+   * WIN/LOSS remain the only outcomes used in win-rate/economic statistics;
+   * EXPIRED is persisted so terminal signals do not remain falsely pending.
    *
    * Supports either signal.id or signal.timestamp.
    */
@@ -6056,7 +6061,8 @@ class LearningSystem {
 
     if (
       outcome !== "WIN" &&
-      outcome !== "LOSS"
+      outcome !== "LOSS" &&
+      outcome !== "EXPIRED"
     ) {
       return false;
     }
@@ -6080,14 +6086,25 @@ class LearningSystem {
     signal.outcome =
       outcome;
 
+    signal.status =
+      outcome;
+
     signal.resolvedAt =
       new Date().toISOString();
 
+    if (
+      outcome === "EXPIRED"
+    ) {
+      signal.expiredAt =
+        signal.resolvedAt;
+    }
+
     /*
-     * Save the confidence that existed when the
-     * trade was resolved for future calibration.
+     * Save the confidence that existed when a WIN/LOSS trade was resolved
+     * for future calibration. Expiry is not a calibration outcome.
      */
     if (
+      outcome !== "EXPIRED" &&
       !Number.isFinite(
         Number(
           signal.confidence
@@ -6168,7 +6185,8 @@ class LearningSystem {
         !signal ||
         (
           outcome !== "WIN" &&
-          outcome !== "LOSS"
+          outcome !== "LOSS" &&
+          outcome !== "EXPIRED"
         )
       ) {
         failed++;
@@ -6178,14 +6196,27 @@ class LearningSystem {
       signal.outcome =
         outcome;
 
+      signal.status =
+        outcome;
+
       signal.resolvedAt =
         resolution.resolvedAt ||
         new Date().toISOString();
+
+      if (
+        outcome === "EXPIRED"
+      ) {
+        signal.expiredAt =
+          resolution.expiredAt ||
+          signal.resolvedAt;
+      }
 
       const resolutionFields = [
         "realizedR",
         "exitPrice",
         "exitReason",
+        "resolutionCandleTime",
+        "expiredAt",
         "session",
         "marketRegime",
         "marketState",
