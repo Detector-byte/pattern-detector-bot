@@ -182,6 +182,33 @@ const EXPIRY_MAP = {
 };
 
 /**
+ * Exact candle durations used only for lifecycle path reconstruction.
+ * These are deterministic timeframe lengths, not trading thresholds.
+ */
+const TIMEFRAME_DURATION_MS = {
+  "1m":
+    1 * 60 * 1000,
+
+  "5m":
+    5 * 60 * 1000,
+
+  "15m":
+    15 * 60 * 1000,
+
+  "30m":
+    30 * 60 * 1000,
+
+  "1H":
+    60 * 60 * 1000,
+
+  "4H":
+    4 * 60 * 60 * 1000,
+
+  "1D":
+    24 * 60 * 60 * 1000
+};
+
+/**
  * Existing market-session quality multipliers.
  */
 const SESSION_QUALITY_MULTIPLIER = {
@@ -817,7 +844,7 @@ function saveAuditLog() {
   );
 
   console.log(
-    `📝 Audit log: ${auditLog.length} entries recorded`
+    `ð Audit log: ${auditLog.length} entries recorded`
   );
 
   auditLog = [];
@@ -865,7 +892,7 @@ function runHealthCheck(report) {
   );
 
   console.log(
-    `🩺 Health check: ${report.status}`
+    `ð©º Health check: ${report.status}`
   );
 }
 
@@ -877,7 +904,7 @@ async function fetchMarketData(
   analyzer
 ) {
   console.log(
-    "📊 Fetching candle data..."
+    "ð Fetching candle data..."
   );
 
   for (
@@ -901,7 +928,7 @@ async function fetchMarketData(
       }
     } catch (error) {
       console.warn(
-        `⚠️ Fetch attempt ${attempt} failed: ${error.message}`
+        `â ï¸ Fetch attempt ${attempt} failed: ${error.message}`
       );
     }
 
@@ -909,7 +936,7 @@ async function fetchMarketData(
       attempt < 3
     ) {
       console.log(
-        "🔄 Retrying in 3 seconds..."
+        "ð Retrying in 3 seconds..."
       );
 
       await sleep(3000);
@@ -917,7 +944,7 @@ async function fetchMarketData(
   }
 
   console.warn(
-    "⚠️ No candle data available"
+    "â ï¸ No candle data available"
   );
 
   updateStaleness(
@@ -1085,6 +1112,325 @@ function getSignalTimestamp(signal) {
     signal?.lastUpdated ||
     nowIso()
   );
+}
+
+function parseTimestampMs(
+  value
+) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  if (
+    typeof value === "number" ||
+    (
+      typeof value === "string" &&
+      /^\d+(?:\.\d+)?$/.test(
+        value.trim()
+      )
+    )
+  ) {
+    const numeric =
+      Number(value);
+
+    if (
+      Number.isFinite(
+        numeric
+      )
+    ) {
+      return Math.abs(numeric) <
+        1e12
+        ? numeric * 1000
+        : numeric;
+    }
+  }
+
+  const raw =
+    String(value)
+      .trim();
+
+  const normalized =
+    /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)?$/.test(
+      raw
+    )
+      ? `${raw.replace(
+          " ",
+          "T"
+        )}Z`
+      : raw;
+
+  const parsed =
+    Date.parse(
+      normalized
+    );
+
+  return Number.isFinite(
+    parsed
+  )
+    ? parsed
+    : null;
+}
+
+function getCandleOpenTimestamp(
+  candle
+) {
+  if (
+    !candle ||
+    typeof candle !==
+      "object"
+  ) {
+    return null;
+  }
+
+  const candidates = [
+    candle.timestamp,
+    candle.time,
+    candle.datetime,
+    candle.date
+  ];
+
+  for (
+    const candidate of
+    candidates
+  ) {
+    const parsed =
+      parseTimestampMs(
+        candidate
+      );
+
+    if (
+      Number.isFinite(
+        parsed
+      )
+    ) {
+      return parsed;
+    }
+  }
+
+  return null;
+}
+
+function getSignalExpiryTimestamp(
+  signal
+) {
+  const explicitExpiry =
+    parseTimestampMs(
+      signal?.expiresAt
+    );
+
+  if (
+    Number.isFinite(
+      explicitExpiry
+    )
+  ) {
+    return explicitExpiry;
+  }
+
+  const createdTime =
+    parseTimestampMs(
+      signal?.timestamp ||
+      signal?.createdAt ||
+      signal?.lastUpdated
+    );
+
+  const fallbackDuration =
+    EXPIRY_MAP[
+      signal?.timeframe
+    ];
+
+  if (
+    !Number.isFinite(
+      createdTime
+    ) ||
+    !Number.isFinite(
+      fallbackDuration
+    )
+  ) {
+    return null;
+  }
+
+  return (
+    createdTime +
+    fallbackDuration
+  );
+}
+
+function getSignalResolutionCandles(
+  candles,
+  signal,
+  referenceTimeMs =
+    Date.now()
+) {
+  const rows =
+    getPairTimeframeCandles(
+      candles,
+      signal?.pair,
+      signal?.timeframe
+    );
+
+  if (
+    !Array.isArray(
+      rows
+    ) ||
+    rows.length === 0
+  ) {
+    return [];
+  }
+
+  const signalTime =
+    parseTimestampMs(
+      signal?.timestamp ||
+      signal?.createdAt
+    );
+
+  const expiryTime =
+    getSignalExpiryTimestamp(
+      signal
+    );
+
+  const duration =
+    TIMEFRAME_DURATION_MS[
+      signal?.timeframe
+    ];
+
+  if (
+    !Number.isFinite(
+      signalTime
+    ) ||
+    !Number.isFinite(
+      duration
+    ) ||
+    duration <= 0
+  ) {
+    return [
+      rows[
+        rows.length - 1
+      ]
+    ];
+  }
+
+  const cutoffTime =
+    Number.isFinite(
+      expiryTime
+    )
+      ? Math.min(
+          referenceTimeMs,
+          expiryTime
+        )
+      : referenceTimeMs;
+
+  return rows
+    .map(
+      candle => {
+        const openTime =
+          getCandleOpenTimestamp(
+            candle
+          );
+
+        return {
+          candle,
+          openTime,
+          closeTime:
+            Number.isFinite(
+              openTime
+            )
+              ? openTime +
+                duration
+              : null
+        };
+      }
+    )
+    .filter(
+      item =>
+        Number.isFinite(
+          item.openTime
+        ) &&
+        Number.isFinite(
+          item.closeTime
+        ) &&
+        item.closeTime >
+          signalTime &&
+        item.closeTime <=
+          cutoffTime
+    )
+    .sort(
+      (
+        first,
+        second
+      ) =>
+        first.openTime -
+        second.openTime
+    )
+    .map(
+      item =>
+        item.candle
+    );
+}
+
+function syncExpiredSignalToLearner(
+  learner,
+  signal
+) {
+  const history =
+    learner?.data?.history;
+
+  if (
+    !Array.isArray(
+      history
+    ) ||
+    !signal
+  ) {
+    return false;
+  }
+
+  const signalId =
+    signal.id ||
+    signal.signalId ||
+    signal.timestamp;
+
+  const historicalSignal =
+    history.find(
+      historical => {
+        if (!historical) {
+          return false;
+        }
+
+        const historicalId =
+          historical.id ||
+          historical.signalId ||
+          historical.timestamp;
+
+        return (
+          signalId &&
+          historicalId ===
+            signalId
+        );
+      }
+    );
+
+  if (
+    !historicalSignal
+  ) {
+    return false;
+  }
+
+  historicalSignal.outcome =
+    "EXPIRED";
+
+  historicalSignal.status =
+    "EXPIRED";
+
+  historicalSignal.expiredAt =
+    signal.expiredAt;
+
+  historicalSignal.lastUpdated =
+    signal.lastUpdated;
+
+  return true;
 }
 
 function isSignalInCooldown(
@@ -4021,7 +4367,7 @@ function analyzePair(
       );
 
     console.log(
-      `📦 ${pair} ${timeframe}: ${
+      `ð¦ ${pair} ${timeframe}: ${
         Array.isArray(timeframeCandles)
           ? timeframeCandles.length
           : 0
@@ -4184,7 +4530,7 @@ function analyzePair(
     }
 
     console.log(
-      `🔎 ${pair} ${timeframe}: ${
+      `ð ${pair} ${timeframe}: ${
         Array.isArray(patterns)
           ? patterns.length
           : 0
@@ -4282,7 +4628,7 @@ function analyzeMarkets(
   pipelineStatus = null
 ) {
   console.log(
-    "🔍 Analyzing patterns with Phase 6 institutional layer..."
+    "ð Analyzing patterns with Phase 6 institutional layer..."
   );
 
   const candidates = [];
@@ -4436,7 +4782,7 @@ function analyzeMarkets(
         "REFRESHED",
 
       reason:
-        `Phase 6 confidence ${refresh.oldConfidence}% → ${refresh.newConfidence}%`
+        `Phase 6 confidence ${refresh.oldConfidence}% â ${refresh.newConfidence}%`
     });
 
     return [];
@@ -4573,7 +4919,7 @@ function analyzeMarkets(
   });
 
   console.log(
-    `🏛️ Published: ${preparedSignal.pair} ${preparedSignal.timeframe} ${preparedSignal.pattern} | AI ${preparedSignal.aiScore} ${preparedSignal.qualityGrade} | Confidence ${preparedSignal.finalAIConfidence}%`
+    `ðï¸ Published: ${preparedSignal.pair} ${preparedSignal.timeframe} ${preparedSignal.pattern} | AI ${preparedSignal.aiScore} ${preparedSignal.qualityGrade} | Confidence ${preparedSignal.finalAIConfidence}%`
   );
 
   return [
@@ -4815,32 +5161,33 @@ async function resolvePendingSignals(
         nowIso();
     }
 
-    const pairCandles =
-      candles?.[
-        signal.pair
-      ]?.[
-        signal.timeframe
-      ];
+    const referenceTimeMs =
+      Date.now();
 
-    if (
-      !Array.isArray(
-        pairCandles
-      ) ||
-      pairCandles.length === 0
-    ) {
-      continue;
-    }
-
-    const latest =
-      pairCandles[
-        pairCandles.length - 1
-      ];
-
-    const outcome =
-      determineSignalOutcome(
+    const resolutionCandles =
+      getSignalResolutionCandles(
+        candles,
         signal,
-        latest
+        referenceTimeMs
       );
+
+    let outcome =
+      null;
+
+    for (
+      const candle of
+      resolutionCandles
+    ) {
+      outcome =
+        determineSignalOutcome(
+          signal,
+          candle
+        );
+
+      if (outcome) {
+        break;
+      }
+    }
 
     if (outcome) {
       const economicResult =
@@ -4954,26 +5301,17 @@ async function resolvePendingSignals(
       continue;
     }
 
-    const expiry =
-      EXPIRY_MAP[
-        signal.timeframe
-      ];
-
-    const createdTime =
-      new Date(
-        getSignalTimestamp(
-          signal
-        )
-      ).getTime();
+    const expiryTime =
+      getSignalExpiryTimestamp(
+        signal
+      );
 
     if (
-      expiry &&
       Number.isFinite(
-        createdTime
+        expiryTime
       ) &&
-      Date.now() -
-        createdTime >=
-        expiry
+      referenceTimeMs >=
+        expiryTime
     ) {
       signal.status =
         "EXPIRED";
@@ -4982,10 +5320,17 @@ async function resolvePendingSignals(
         "EXPIRED";
 
       signal.expiredAt =
-        nowIso();
+        new Date(
+          expiryTime
+        ).toISOString();
 
       signal.lastUpdated =
-        signal.expiredAt;
+        nowIso();
+
+      syncExpiredSignalToLearner(
+        learner,
+        signal
+      );
 
       logAudit({
         pair:
@@ -5044,7 +5389,7 @@ async function updateLearning(
   candles
 ) {
   console.log(
-    "🧠 Updating learning outcomes..."
+    "ð§  Updating learning outcomes..."
   );
 
   await resolvePendingSignals(
@@ -6151,11 +6496,11 @@ function updateStaleness(
 
 async function runBot() {
   console.log(
-    "🤖 PipSight Pro AI Phase 6 Starting..."
+    "ð¤ PipSight Pro AI Phase 6 Starting..."
   );
 
   console.log(
-    `⏰ Execution time: ${nowIso()}`
+    `â° Execution time: ${nowIso()}`
   );
 
   const totalStart =
@@ -6422,19 +6767,19 @@ async function runBot() {
     saveAuditLog();
 
     console.log(
-      "\n✨ Phase 6 execution complete"
+      "\nâ¨ Phase 6 execution complete"
     );
 
     console.log(
-      `🏛️ Institutional signals published: ${newSignals.length}`
+      `ðï¸ Institutional signals published: ${newSignals.length}`
     );
 
     console.log(
-      `⏱ Total runtime: ${Date.now() - totalStart} ms`
+      `â± Total runtime: ${Date.now() - totalStart} ms`
     );
   } catch (error) {
     console.error(
-      "❌ Bot execution failed:",
+      "â Bot execution failed:",
       error.message
     );
 
@@ -6613,6 +6958,18 @@ module.exports = {
   generateDashboardData,
 
   persistPhase6Outputs,
+
+  parseTimestampMs,
+
+  getCandleOpenTimestamp,
+
+  getSignalExpiryTimestamp,
+
+  getSignalResolutionCandles,
+
+  syncExpiredSignalToLearner,
+
+  TIMEFRAME_DURATION_MS,
 
   OPEN_STATUSES,
 
