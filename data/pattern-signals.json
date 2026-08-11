@@ -35,7 +35,7 @@
         "patternBlacklisted": false,
         "reason": "Confidence passed"
       },
-      "status": "ACTIVE",
+      "status": "LOSS",
       "description": "The second bullish candle engulfs the previous bearish candle body. It indicates buyers overpowering sellers and is strongest near support or after a decline.",
       "psychology": "The second bullish candle engulfs the previous bearish candle body. It indicates buyers overpowering sellers and is strongest near support or after a decline.",
       "timeframeContext": {
@@ -295,8 +295,18 @@
       "confidenceProvenance": "LOCKED_AT_PUBLICATION",
       "decisionConfidenceCapturedAt": "2026-08-11T12:40:33.716Z",
       "initialStopLoss": 4389.48851,
-      "lastUpdated": "2026-08-11T12:40:33.716Z",
-      "refreshCount": 1
+      "lastUpdated": "2026-08-11T16:40:31.645Z",
+      "refreshCount": 1,
+      "outcome": "LOSS",
+      "resolvedAt": "2026-08-11T16:40:31.645Z",
+      "exitPrice": 4389.48851,
+      "exitReason": "STOP_LOSS",
+      "realizedR": -1,
+      "performance": {
+        "initialRisk": 4.555110000000241,
+        "realizedMove": -4.555110000000241,
+        "realizedR": -1
+      }
     },
     {
       "id": "GBPJPY-30m-BullishEngulfing-1786452066991-z4642m",
@@ -333,7 +343,7 @@
         "patternBlacklisted": false,
         "reason": "Confidence passed"
       },
-      "status": "ACTIVE",
+      "status": "EXPIRED",
       "description": "The second bullish candle engulfs the previous bearish candle body. It indicates buyers overpowering sellers and is strongest near support or after a decline.",
       "psychology": "The second bullish candle engulfs the previous bearish candle body. It indicates buyers overpowering sellers and is strongest near support or after a decline.",
       "timeframeContext": {
@@ -593,14 +603,16 @@
       "confidenceProvenance": "LOCKED_AT_PUBLICATION",
       "decisionConfidenceCapturedAt": "2026-08-11T12:41:06.994Z",
       "initialStopLoss": 214.877,
-      "lastUpdated": "2026-08-11T12:41:06.994Z",
-      "refreshCount": 1
+      "lastUpdated": "2026-08-11T16:40:31.646Z",
+      "refreshCount": 1,
+      "outcome": "EXPIRED",
+      "expiredAt": "2026-08-11T14:41:06.992Z"
     }
   ],
-  "updatedAt": "2026-08-11T16:35:38.015Z",
+  "updatedAt": "2026-08-11T16:40:31.648Z",
   "stale": {},
   "totalSignals": 2,
-  "resolvedSignals": 0,
-  "expiredSignals": 0,
-  "pendingSignals": 2
+  "resolvedSignals": 1,
+  "expiredSignals": 1,
+  "pendingSignals": 0
 }
