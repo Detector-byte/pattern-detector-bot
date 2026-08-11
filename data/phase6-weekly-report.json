@@ -1,23 +1,68 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-11T12:35:27.399Z",
+  "generatedAt": "2026-08-11T12:40:33.720Z",
   "period": {
-    "start": "2026-08-04T12:35:27.399Z",
-    "end": "2026-08-11T12:35:27.399Z"
+    "start": "2026-08-04T12:40:33.720Z",
+    "end": "2026-08-11T12:40:33.720Z"
   },
   "metrics": {
-    "totalSignals": 0,
+    "totalSignals": 1,
     "resolvedSignals": 0,
     "overallWinRate": 0,
-    "averageRiskReward": 0,
-    "patternAccuracy": {},
-    "pairAccuracy": {},
-    "timeframeAccuracy": {},
-    "sessionAccuracy": {},
-    "marketRegimeAccuracy": {},
+    "averageRiskReward": 2,
+    "patternAccuracy": {
+      "Bullish Engulfing": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
+      }
+    },
+    "pairAccuracy": {
+      "XAUUSD": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
+      }
+    },
+    "timeframeAccuracy": {
+      "5m": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
+      }
+    },
+    "sessionAccuracy": {
+      "LONDON_NY_OVERLAP": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
+      }
+    },
+    "marketRegimeAccuracy": {
+      "RANGING": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
+      }
+    },
     "learningProgress": "insufficient-data",
-    "bestPattern": null,
-    "worstPattern": null,
+    "bestPattern": "Bullish Engulfing",
+    "worstPattern": "Bullish Engulfing",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []
