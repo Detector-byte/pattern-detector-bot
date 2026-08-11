@@ -40,7 +40,7 @@ class LearningSystem {
     this.minPatternWeight = 0.70;
     this.maxPatternWeight = 1.50;
 
-    // Threshold evolution is limited to Â±20%.
+    // Threshold evolution is limited to ±20%.
     this.maxEvolutionChange = 0.20;
 
     // Initialize existing storage
@@ -121,6 +121,16 @@ class LearningSystem {
 
     if (!this.data.lastLearningUpdate)
       this.data.lastLearningUpdate = null;
+
+    /*
+     * Production lifecycle integrity migration.
+     *
+     * Older learning snapshots can contain a terminal outcome while their
+     * copied status/lastUpdated metadata still reflects the formerly active
+     * signal. Reconcile those already-known terminal facts locally on load.
+     * No market data, API request, new outcome or timestamp is fabricated.
+     */
+    this.reconcileTerminalLifecycleHistory();
 
     // Existing learning files predate the advanced market-state aggregates.
     // Rebuild them immediately from already-stored local history so the
@@ -511,7 +521,7 @@ class LearningSystem {
       actualRate -
       Number(confidenceBin);
 
-    // Limit calibration correction to Â±10 points.
+    // Limit calibration correction to ±10 points.
     const correction =
       Math.max(
         -10,
@@ -3041,7 +3051,7 @@ class LearningSystem {
         new Date().toISOString(),
 
       version:
-        "4.8.1"
+        "4.8.2"
 
     };
   }
@@ -3118,6 +3128,8 @@ class LearningSystem {
         updatedAt:
           new Date().toISOString()
       };
+
+    this.reconcileTerminalLifecycleHistory();
 
     this.cleanupHistory();
 
@@ -3253,7 +3265,7 @@ class LearningSystem {
         "Pattern Recognition AI",
 
       version:
-        "4.8.1",
+        "4.8.2",
 
       learning:
         true,
@@ -3289,6 +3301,9 @@ class LearningSystem {
         true,
 
       terminalLifecycleSynchronization:
+        true,
+
+      terminalLifecycleSelfHealing:
         true,
 
       adaptiveConfidence:
@@ -4506,7 +4521,7 @@ class LearningSystem {
    * Build calibration bins from resolved signals.
    *
    * Example:
-   * Predicted confidence 70â74 is grouped into bin 70.
+   * Predicted confidence 70–74 is grouped into bin 70.
    * The actual win rate is then compared with the prediction.
    */
   updateConfidenceCalibration() {
@@ -5465,7 +5480,7 @@ class LearningSystem {
    * The analyzer may apply these values through
    * applyPatternEvolution().
    *
-   * Every recommendation is limited to Â±20%
+   * Every recommendation is limited to ±20%
    * of its baseline value.
    */
   updatePatternEvolution() {
@@ -6040,6 +6055,160 @@ class LearningSystem {
       lastLearningUpdate:
         this.data.lastLearningUpdate
 
+    };
+  }
+
+  // =====================================================
+  // Terminal Lifecycle Reconciliation
+  // =====================================================
+
+  /**
+   * Reconcile terminal lifecycle metadata already present in learning
+   * history. This is a local self-healing migration only:
+   *
+   * - WIN / LOSS / EXPIRED are the only terminal outcomes normalized here.
+   * - Existing outcome is authoritative when it is terminal.
+   * - Otherwise an existing terminal status can supply the matching outcome.
+   * - lastUpdated is advanced only to an existing terminal timestamp when
+   *   that timestamp is newer; no current-time timestamp is invented.
+   * - WIN/LOSS statistics remain driven by outcome exactly as before.
+   */
+  reconcileTerminalLifecycleHistory() {
+
+    if (
+      !Array.isArray(
+        this.data.history
+      )
+    ) {
+      return {
+        updatedRecords: 0
+      };
+    }
+
+    const terminalOutcomes =
+      new Set([
+        "WIN",
+        "LOSS",
+        "EXPIRED"
+      ]);
+
+    let updatedRecords = 0;
+
+    for (
+      const signal of
+      this.data.history
+    ) {
+
+      if (
+        !signal ||
+        typeof signal !==
+          "object"
+      ) {
+        continue;
+      }
+
+      const existingOutcome =
+        String(
+          signal.outcome ||
+          ""
+        ).toUpperCase();
+
+      const existingStatus =
+        String(
+          signal.status ||
+          ""
+        ).toUpperCase();
+
+      const terminalOutcome =
+        terminalOutcomes.has(
+          existingOutcome
+        )
+          ? existingOutcome
+          : terminalOutcomes.has(
+              existingStatus
+            )
+            ? existingStatus
+            : null;
+
+      if (!terminalOutcome) {
+        continue;
+      }
+
+      let changed = false;
+
+      if (
+        signal.outcome !==
+        terminalOutcome
+      ) {
+        signal.outcome =
+          terminalOutcome;
+
+        changed = true;
+      }
+
+      if (
+        signal.status !==
+        terminalOutcome
+      ) {
+        signal.status =
+          terminalOutcome;
+
+        changed = true;
+      }
+
+      const terminalTimestamp =
+        terminalOutcome ===
+          "EXPIRED"
+          ? (
+              signal.expiredAt ||
+              signal.resolvedAt ||
+              null
+            )
+          : (
+              signal.resolvedAt ||
+              null
+            );
+
+      if (
+        terminalTimestamp
+      ) {
+        const terminalTime =
+          new Date(
+            terminalTimestamp
+          ).getTime();
+
+        const existingUpdateTime =
+          new Date(
+            signal.lastUpdated ||
+            0
+          ).getTime();
+
+        if (
+          Number.isFinite(
+            terminalTime
+          ) &&
+          (
+            !Number.isFinite(
+              existingUpdateTime
+            ) ||
+            terminalTime >
+              existingUpdateTime
+          )
+        ) {
+          signal.lastUpdated =
+            terminalTimestamp;
+
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        updatedRecords++;
+      }
+    }
+
+    return {
+      updatedRecords
     };
   }
 
