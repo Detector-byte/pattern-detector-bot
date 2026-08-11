@@ -1,23 +1,23 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-11T19:35:29.437Z",
+  "generatedAt": "2026-08-11T19:40:32.061Z",
   "period": {
-    "start": "2026-08-04T19:35:29.437Z",
-    "end": "2026-08-11T19:35:29.437Z"
+    "start": "2026-08-04T19:40:32.060Z",
+    "end": "2026-08-11T19:40:32.060Z"
   },
   "metrics": {
-    "totalSignals": 3,
+    "totalSignals": 4,
     "resolvedSignals": 1,
     "overallWinRate": 0,
-    "averageRiskReward": 2,
+    "averageRiskReward": 1.88,
     "patternAccuracy": {
       "Bullish Engulfing": {
-        "total": 2,
+        "total": 3,
         "wins": 0,
         "losses": 1,
         "expired": 1,
         "winRate": 0,
-        "averageRiskReward": 2
+        "averageRiskReward": 1.83
       },
       "Risk-Adjusted Trend Momentum": {
         "total": 1,
@@ -38,12 +38,12 @@
         "averageRiskReward": 2
       },
       "GBPJPY": {
-        "total": 2,
+        "total": 3,
         "wins": 0,
         "losses": 0,
         "expired": 2,
         "winRate": 0,
-        "averageRiskReward": 2
+        "averageRiskReward": 1.83
       }
     },
     "timeframeAccuracy": {
@@ -56,12 +56,12 @@
         "averageRiskReward": 2
       },
       "30m": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 1,
         "winRate": 0,
-        "averageRiskReward": 2
+        "averageRiskReward": 1.75
       },
       "15m": {
         "total": 1,
@@ -82,12 +82,12 @@
         "averageRiskReward": 2
       },
       "NEWYORK": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 1,
         "winRate": 0,
-        "averageRiskReward": 2
+        "averageRiskReward": 1.75
       }
     },
     "marketRegimeAccuracy": {
@@ -98,6 +98,14 @@
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 2
+      },
+      "COMPRESSION": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "learningProgress": "insufficient-data",

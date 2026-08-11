@@ -1,17 +1,39 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-11T19:35:29.438Z",
-  "lastRun": "2026-08-11T19:35:29.438Z",
-  "publishedSignalId": null,
+  "updatedAt": "2026-08-11T19:40:32.062Z",
+  "lastRun": "2026-08-11T19:40:32.062Z",
+  "publishedSignalId": "GBPJPY_30m_BULLISHENGULFING_20260811",
   "portfolio": {
-    "openTrades": 0,
+    "openTrades": 1,
     "limits": {
       "maxOpenTrades": 4,
       "maxPairOpenTrades": 2,
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {},
-  "strategyPriorities": {},
+  "marketStates": {
+    "GBPJPY_30m": {
+      "state": "COMPRESSION",
+      "confidence": 80,
+      "features": {
+        "baseRegime": "RANGING",
+        "directionalMove": 0.00017,
+        "rangeRatio": 0.59,
+        "bodyRatio": 0.42,
+        "volumeRatio": 1,
+        "breakout": false
+      }
+    }
+  },
+  "strategyPriorities": {
+    "GBPJPY_30m": {
+      "primary": "INTRADAY",
+      "scores": {
+        "INTRADAY": 70,
+        "SCALPING": 60,
+        "SWING": 45
+      }
+    }
+  },
   "optimizerRecommendations": []
 }
