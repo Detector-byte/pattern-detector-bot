@@ -9,6 +9,11 @@ class LearningSystem {
     this.data = learningData || {};
     this.confidenceData = confidenceData || {};
 
+    const requiresStrategyStateMigration =
+      !this.data.strategyStateContextStats ||
+      !this.data.patternDirectionStateStats ||
+      !this.data.patternStateStats;
+
     // Confidence limits
     this.minConfidence = 50;
     this.maxConfidence = 95;
@@ -70,11 +75,40 @@ class LearningSystem {
     if (!this.data.regimeStats)
       this.data.regimeStats = {};
 
+    // Contextual economic-edge aggregates are additive and rebuilt
+    // from learning history, preserving backward compatibility.
+    if (!this.data.contextEdgeStats)
+      this.data.contextEdgeStats = {};
+
+    if (!this.data.patternRegimeStats)
+      this.data.patternRegimeStats = {};
+
+    if (!this.data.patternSessionStats)
+      this.data.patternSessionStats = {};
+
+    // Advanced market-state strategy authority is fully additive.
+    // It uses already-computed Pattern Detector market state only;
+    // no external data source or API request is introduced.
+    if (!this.data.strategyStateContextStats)
+      this.data.strategyStateContextStats = {};
+
+    if (!this.data.patternDirectionStateStats)
+      this.data.patternDirectionStateStats = {};
+
+    if (!this.data.patternStateStats)
+      this.data.patternStateStats = {};
+
     if (!this.data.patternWeights)
       this.data.patternWeights = {};
 
     if (!this.data.calibration)
       this.data.calibration = {};
+
+    // Published Phase-6 confidence is a separate forecast stage from
+    // the learner's adaptive confidence. Keep its calibration separate
+    // so one stage can never contaminate the other.
+    if (!this.data.finalConfidenceCalibration)
+      this.data.finalConfidenceCalibration = {};
 
     if (!this.data.patternEvolution)
       this.data.patternEvolution = {};
@@ -87,6 +121,17 @@ class LearningSystem {
 
     if (!this.data.lastLearningUpdate)
       this.data.lastLearningUpdate = null;
+
+    // Existing learning files predate the advanced market-state aggregates.
+    // Rebuild them immediately from already-stored local history so the
+    // direct-live authority is available on the first upgraded run.
+    // This is local computation only and performs no API/network request.
+    if (
+      requiresStrategyStateMigration &&
+      this.data.history.length > 0
+    ) {
+      this.updatePatternStats();
+    }
   }
 
   // =====================================================
@@ -1373,6 +1418,24 @@ class LearningSystem {
       regimeStats:
         this.data.regimeStats,
 
+      contextEdgeStats:
+        this.data.contextEdgeStats,
+
+      patternRegimeStats:
+        this.data.patternRegimeStats,
+
+      patternSessionStats:
+        this.data.patternSessionStats,
+
+      strategyStateContextStats:
+        this.data.strategyStateContextStats,
+
+      patternDirectionStateStats:
+        this.data.patternDirectionStateStats,
+
+      patternStateStats:
+        this.data.patternStateStats,
+
       patternWeights:
         this.data.patternWeights,
 
@@ -1382,12 +1445,1451 @@ class LearningSystem {
       calibration:
         this.data.calibration,
 
+      finalConfidenceCalibration:
+        this.data.finalConfidenceCalibration,
+
       patternEvolution:
         this.data.patternEvolution,
 
       updatedAt:
         new Date().toISOString()
 
+    };
+  }
+
+  /**
+   * Live contextual economic-edge veto.
+   *
+   * Evidence is selected from the most specific statistically mature
+   * bucket available, then falls back hierarchically:
+   *
+   * 1. pattern + pair + timeframe + regime + session
+   * 2. pattern + pair + timeframe
+   * 3. pattern + regime
+   * 4. pattern + session
+   * 5. pattern
+   *
+   * Every bucket must independently satisfy the existing minSamples
+   * requirement before it may control a live decision. This prevents a
+   * tiny contextual sample from overriding mature broader evidence while
+   * still allowing regime/session-specific edge to take authority once it
+   * has enough resolved R outcomes.
+   */
+  getEconomicEdge(signal) {
+
+    const patternName =
+      signal?.pattern ||
+      "Unknown";
+
+    const pair =
+      signal?.pair ||
+      "UNKNOWN";
+
+    const timeframe =
+      signal?.timeframe ||
+      "UNKNOWN";
+
+    const marketRegime =
+      signal?.marketRegime ||
+      signal?.regime ||
+      "UNKNOWN";
+
+    const session =
+      signal?.session ||
+      "UNKNOWN";
+
+    const exactKey =
+      `${patternName}_${pair}_${timeframe}`;
+
+    const contextKey =
+      [
+        patternName,
+        pair,
+        timeframe,
+        marketRegime,
+        session
+      ].join("::");
+
+    const patternRegimeKey =
+      [
+        patternName,
+        marketRegime
+      ].join("::");
+
+    const patternSessionKey =
+      [
+        patternName,
+        session
+      ].join("::");
+
+    const evidenceCandidates = [
+      {
+        source:
+          "EXACT_PATTERN_PAIR_TIMEFRAME_REGIME_SESSION",
+        stats:
+          this.data.contextEdgeStats?.[
+            contextKey
+          ] || null
+      },
+      {
+        source:
+          "EXACT_PATTERN_PAIR_TIMEFRAME",
+        stats:
+          this.data.stats?.[
+            exactKey
+          ] || null
+      },
+      {
+        source:
+          "PATTERN_REGIME",
+        stats:
+          this.data.patternRegimeStats?.[
+            patternRegimeKey
+          ] || null
+      },
+      {
+        source:
+          "PATTERN_SESSION",
+        stats:
+          this.data.patternSessionStats?.[
+            patternSessionKey
+          ] || null
+      },
+      {
+        source:
+          "PATTERN_FALLBACK",
+        stats:
+          this.data.patternStats?.[
+            patternName
+          ] || null
+      }
+    ];
+
+    const hasEvidence = stats =>
+      Number(
+        stats?.edgeSamples ||
+        0
+      ) >= this.minSamples;
+
+    const selectedEvidence =
+      evidenceCandidates.find(
+        candidate =>
+          hasEvidence(
+            candidate.stats
+          )
+      ) || null;
+
+    if (!selectedEvidence) {
+      const availableSamples =
+        Math.max(
+          0,
+          ...evidenceCandidates.map(
+            candidate =>
+              Number(
+                candidate.stats
+                  ?.edgeSamples ||
+                0
+              )
+          )
+        );
+
+      return {
+        eligible: true,
+        status:
+          "LIVE_BOOTSTRAP",
+        reason:
+          `economic edge requires ${this.minSamples} resolved R samples; ${availableSamples} available`,
+        source: null,
+        sampleSize:
+          availableSamples,
+        requiredSamples:
+          this.minSamples,
+        expectancyR: null,
+        decayedExpectancyR: null,
+        profitFactor: null,
+        profitFactorInfinite: false,
+        context: {
+          pattern:
+            patternName,
+          pair,
+          timeframe,
+          marketRegime,
+          session
+        }
+      };
+    }
+
+    const stats =
+      selectedEvidence.stats;
+
+    const source =
+      selectedEvidence.source;
+
+    const expectancyR =
+      Number(
+        stats.expectancyR
+      );
+
+    const decayedExpectancyR =
+      Number(
+        stats.decayedExpectancyR
+      );
+
+    const profitFactorInfinite =
+      Boolean(
+        stats.profitFactorInfinite
+      );
+
+    const profitFactor =
+      profitFactorInfinite
+        ? Number.POSITIVE_INFINITY
+        : Number(
+            stats.profitFactor
+          );
+
+    const negativeEdge =
+      Number.isFinite(
+        expectancyR
+      ) &&
+      expectancyR <= 0 &&
+      Number.isFinite(
+        decayedExpectancyR
+      ) &&
+      decayedExpectancyR <= 0 &&
+      !profitFactorInfinite &&
+      Number.isFinite(
+        profitFactor
+      ) &&
+      profitFactor < 1;
+
+    return {
+      eligible:
+        !negativeEdge,
+      status:
+        negativeEdge
+          ? "LIVE_EDGE_VETO"
+          : "LIVE_EDGE_PASS",
+      reason:
+        negativeEdge
+          ? `negative economic edge (${source}): expectancy ${expectancyR.toFixed(4)}R, decayed ${decayedExpectancyR.toFixed(4)}R, profit factor ${profitFactor.toFixed(4)}`
+          : `economic edge passed from ${source} with ${stats.edgeSamples} R samples`,
+      source,
+      sampleSize:
+        Number(
+          stats.edgeSamples ||
+          0
+        ),
+      requiredSamples:
+        this.minSamples,
+      expectancyR,
+      decayedExpectancyR,
+      profitFactor:
+        profitFactorInfinite
+          ? null
+          : profitFactor,
+      profitFactorInfinite,
+      context: {
+        pattern:
+          patternName,
+        pair,
+        timeframe,
+        marketRegime,
+        session
+      }
+    };
+  }
+
+  /**
+   * Direct-LIVE advanced market-state strategy authority.
+   *
+   * This is deliberately data-driven rather than a hard-coded pattern/regime
+   * opinion table. A pattern/direction is allowed or vetoed only after the
+   * existing minimum sample requirement is met in market-state-specific
+   * realized-R history. Until then the normal live pipeline remains active.
+   *
+   * Evidence hierarchy:
+   * 1. pattern + direction + pair + timeframe + marketState + session
+   * 2. pattern + direction + marketState
+   * 3. pattern + marketState
+   */
+  getStrategyMarketAuthority(signal) {
+
+    const patternName =
+      signal?.pattern ||
+      "Unknown";
+
+    const direction =
+      String(
+        signal?.direction ||
+        "UNKNOWN"
+      ).toUpperCase();
+
+    const pair =
+      signal?.pair ||
+      "UNKNOWN";
+
+    const timeframe =
+      signal?.timeframe ||
+      "UNKNOWN";
+
+    const marketState =
+      signal?.marketState?.state ||
+      signal?.advancedMarketState ||
+      signal?.marketState ||
+      "UNKNOWN";
+
+    const session =
+      signal?.session ||
+      "UNKNOWN";
+
+    const exactContextKey =
+      [
+        patternName,
+        direction,
+        pair,
+        timeframe,
+        marketState,
+        session
+      ].join("::");
+
+    const directionStateKey =
+      [
+        patternName,
+        direction,
+        marketState
+      ].join("::");
+
+    const patternStateKey =
+      [
+        patternName,
+        marketState
+      ].join("::");
+
+    const evidenceCandidates = [
+      {
+        source:
+          "EXACT_PATTERN_DIRECTION_PAIR_TIMEFRAME_STATE_SESSION",
+        stats:
+          this.data.strategyStateContextStats?.[
+            exactContextKey
+          ] || null
+      },
+      {
+        source:
+          "PATTERN_DIRECTION_STATE",
+        stats:
+          this.data.patternDirectionStateStats?.[
+            directionStateKey
+          ] || null
+      },
+      {
+        source:
+          "PATTERN_STATE",
+        stats:
+          this.data.patternStateStats?.[
+            patternStateKey
+          ] || null
+      }
+    ];
+
+    const hasEvidence = stats =>
+      Number(
+        stats?.edgeSamples ||
+        0
+      ) >= this.minSamples;
+
+    const selectedEvidence =
+      evidenceCandidates.find(
+        candidate =>
+          hasEvidence(
+            candidate.stats
+          )
+      ) || null;
+
+    if (!selectedEvidence) {
+      const availableSamples =
+        Math.max(
+          0,
+          ...evidenceCandidates.map(
+            candidate =>
+              Number(
+                candidate.stats
+                  ?.edgeSamples ||
+                0
+              )
+          )
+        );
+
+      return {
+        eligible: true,
+        status:
+          "LIVE_STRATEGY_STATE_BOOTSTRAP",
+        reason:
+          `strategy-state authority requires ${this.minSamples} resolved R samples; ${availableSamples} available`,
+        source: null,
+        sampleSize:
+          availableSamples,
+        requiredSamples:
+          this.minSamples,
+        expectancyR: null,
+        decayedExpectancyR: null,
+        profitFactor: null,
+        profitFactorInfinite: false,
+        context: {
+          pattern:
+            patternName,
+          direction,
+          pair,
+          timeframe,
+          marketState,
+          session
+        }
+      };
+    }
+
+    const stats =
+      selectedEvidence.stats;
+
+    const source =
+      selectedEvidence.source;
+
+    const expectancyR =
+      Number(
+        stats.expectancyR
+      );
+
+    const decayedExpectancyR =
+      Number(
+        stats.decayedExpectancyR
+      );
+
+    const profitFactorInfinite =
+      Boolean(
+        stats.profitFactorInfinite
+      );
+
+    const profitFactor =
+      profitFactorInfinite
+        ? Number.POSITIVE_INFINITY
+        : Number(
+            stats.profitFactor
+          );
+
+    const negativeEdge =
+      Number.isFinite(
+        expectancyR
+      ) &&
+      expectancyR <= 0 &&
+      Number.isFinite(
+        decayedExpectancyR
+      ) &&
+      decayedExpectancyR <= 0 &&
+      !profitFactorInfinite &&
+      Number.isFinite(
+        profitFactor
+      ) &&
+      profitFactor < 1;
+
+    return {
+      eligible:
+        !negativeEdge,
+      status:
+        negativeEdge
+          ? "LIVE_STRATEGY_STATE_VETO"
+          : "LIVE_STRATEGY_STATE_PASS",
+      reason:
+        negativeEdge
+          ? `negative strategy-state edge (${source}): expectancy ${expectancyR.toFixed(4)}R, decayed ${decayedExpectancyR.toFixed(4)}R, profit factor ${profitFactor.toFixed(4)}`
+          : `strategy-state edge passed from ${source} with ${stats.edgeSamples} R samples`,
+      source,
+      sampleSize:
+        Number(
+          stats.edgeSamples ||
+          0
+        ),
+      requiredSamples:
+        this.minSamples,
+      expectancyR,
+      decayedExpectancyR,
+      profitFactor:
+        profitFactorInfinite
+          ? null
+          : profitFactor,
+      profitFactorInfinite,
+      context: {
+        pattern:
+          patternName,
+        direction,
+        pair,
+        timeframe,
+        marketState,
+        session
+      }
+    };
+  }
+
+  /**
+   * Direct-LIVE strategy degradation kill-switch.
+   *
+   * Uses only resolved local learning history. No market-data request,
+   * provider call or external API access is performed here.
+   *
+   * A degradation veto requires BOTH:
+   * - a statistically mature older baseline with positive economic edge; and
+   * - a full recent performance window with negative economic edge.
+   *
+   * Existing configuration supplies all sample requirements:
+   * - baseline minimum = minSamples
+   * - recent window = performanceWindow
+   *
+   * Evidence hierarchy mirrors the live strategy-state authority and then
+   * falls back to the whole pattern only when more-specific groups do not
+   * contain enough resolved R observations.
+   */
+  getStrategyDegradationAuthority(signal) {
+
+    const patternName =
+      signal?.pattern ||
+      "Unknown";
+
+    const direction =
+      String(
+        signal?.direction ||
+        "UNKNOWN"
+      ).toUpperCase();
+
+    const pair =
+      signal?.pair ||
+      "UNKNOWN";
+
+    const timeframe =
+      signal?.timeframe ||
+      "UNKNOWN";
+
+    const marketState =
+      signal?.marketState?.state ||
+      signal?.advancedMarketState ||
+      signal?.marketState ||
+      "UNKNOWN";
+
+    const session =
+      signal?.session ||
+      "UNKNOWN";
+
+    const requiredRecentSamples =
+      this.performanceWindow;
+
+    const requiredBaselineSamples =
+      this.minSamples;
+
+    const requiredTotalSamples =
+      requiredRecentSamples +
+      requiredBaselineSamples;
+
+    const realizedRValue = item => {
+      const value =
+        Number(
+          item?.realizedR ??
+          item?.performance?.realizedR ??
+          item?.learningFeedback?.realizedR
+        );
+
+      return Number.isFinite(value)
+        ? value
+        : null;
+    };
+
+    const normalizedMarketState = item =>
+      item?.marketState?.state ||
+      item?.advancedMarketState ||
+      item?.marketState ||
+      "UNKNOWN";
+
+    const resolvedTime = (item, index) => {
+      const raw =
+        item?.resolvedAt ||
+        item?.closedAt ||
+        item?.updatedAt ||
+        item?.timestamp ||
+        item?.createdAt ||
+        null;
+
+      let parsed = NaN;
+
+      if (
+        typeof raw === "number" &&
+        Number.isFinite(raw)
+      ) {
+        parsed =
+          raw < 10_000_000_000
+            ? raw * 1000
+            : raw;
+      } else if (
+        typeof raw === "string" &&
+        /^\d+$/.test(raw.trim())
+      ) {
+        const numeric =
+          Number(raw);
+
+        parsed =
+          Number.isFinite(numeric)
+            ? (
+                numeric < 10_000_000_000
+                  ? numeric * 1000
+                  : numeric
+              )
+            : NaN;
+      } else if (raw != null) {
+        parsed =
+          new Date(raw).getTime();
+      }
+
+      return Number.isFinite(parsed)
+        ? parsed
+        : index;
+    };
+
+    const history =
+      Array.isArray(this.data.history)
+        ? this.data.history
+        : [];
+
+    // Build and chronologically sort the finite-R history once. Candidate
+    // evidence groups are filtered from this local array, avoiding repeated
+    // sorting while keeping the live gate completely network-free.
+    const resolvedREntries =
+      history
+        .map((item, index) => ({
+          item,
+          index,
+          realizedR:
+            realizedRValue(item)
+        }))
+        .filter(entry =>
+          entry.item &&
+          entry.realizedR !== null
+        )
+        .sort((a, b) =>
+          resolvedTime(a.item, a.index) -
+          resolvedTime(b.item, b.index)
+        );
+
+    const withFiniteR = predicate =>
+      resolvedREntries.filter(
+        entry =>
+          predicate(entry.item)
+      );
+
+    const evidenceCandidates = [
+      {
+        source:
+          "EXACT_PATTERN_DIRECTION_PAIR_TIMEFRAME_STATE_SESSION",
+        entries:
+          withFiniteR(item =>
+            (item.pattern || "Unknown") === patternName &&
+            String(item.direction || "UNKNOWN").toUpperCase() === direction &&
+            (item.pair || "UNKNOWN") === pair &&
+            (item.timeframe || "UNKNOWN") === timeframe &&
+            normalizedMarketState(item) === marketState &&
+            (item.session || "UNKNOWN") === session
+          )
+      },
+      {
+        source:
+          "PATTERN_DIRECTION_STATE",
+        entries:
+          withFiniteR(item =>
+            (item.pattern || "Unknown") === patternName &&
+            String(item.direction || "UNKNOWN").toUpperCase() === direction &&
+            normalizedMarketState(item) === marketState
+          )
+      },
+      {
+        source:
+          "PATTERN_STATE",
+        entries:
+          withFiniteR(item =>
+            (item.pattern || "Unknown") === patternName &&
+            normalizedMarketState(item) === marketState
+          )
+      },
+      {
+        source:
+          "PATTERN_FALLBACK",
+        entries:
+          withFiniteR(item =>
+            (item.pattern || "Unknown") === patternName
+          )
+      }
+    ];
+
+    const selectedEvidence =
+      evidenceCandidates.find(
+        candidate =>
+          candidate.entries.length >=
+          requiredTotalSamples
+      ) || null;
+
+    if (!selectedEvidence) {
+      const availableSamples =
+        Math.max(
+          0,
+          ...evidenceCandidates.map(
+            candidate =>
+              candidate.entries.length
+          )
+        );
+
+      return {
+        eligible: true,
+        status:
+          "LIVE_DEGRADATION_BOOTSTRAP",
+        reason:
+          `degradation authority requires ${requiredBaselineSamples} baseline + ${requiredRecentSamples} recent resolved R samples; ${availableSamples} available`,
+        source: null,
+        sampleSize:
+          availableSamples,
+        requiredBaselineSamples,
+        requiredRecentSamples,
+        requiredTotalSamples,
+        baseline: null,
+        recent: null,
+        context: {
+          pattern:
+            patternName,
+          direction,
+          pair,
+          timeframe,
+          marketState,
+          session
+        }
+      };
+    }
+
+    const entries =
+      selectedEvidence.entries;
+
+    const splitIndex =
+      entries.length -
+      requiredRecentSamples;
+
+    const baselineEntries =
+      entries.slice(0, splitIndex);
+
+    const recentEntries =
+      entries.slice(splitIndex);
+
+    const calculateMetrics = entriesToMeasure => {
+      let totalR = 0;
+      let grossProfitR = 0;
+      let grossLossR = 0;
+      let weightedR = 0;
+      let totalWeight = 0;
+
+      for (const entry of entriesToMeasure) {
+        const realizedR =
+          entry.realizedR;
+
+        totalR += realizedR;
+
+        if (realizedR > 0) {
+          grossProfitR += realizedR;
+        } else if (realizedR < 0) {
+          grossLossR +=
+            Math.abs(realizedR);
+        }
+
+        const weight =
+          this.getTimeDecayWeight(
+            entry.item
+          );
+
+        weightedR +=
+          realizedR * weight;
+
+        totalWeight +=
+          weight;
+      }
+
+      const sampleSize =
+        entriesToMeasure.length;
+
+      const expectancyR =
+        sampleSize > 0
+          ? totalR / sampleSize
+          : 0;
+
+      const decayedExpectancyR =
+        totalWeight > 0
+          ? weightedR / totalWeight
+          : 0;
+
+      const profitFactorInfinite =
+        grossLossR === 0 &&
+        grossProfitR > 0;
+
+      const profitFactor =
+        grossLossR > 0
+          ? grossProfitR / grossLossR
+          : (
+              grossProfitR > 0
+                ? null
+                : 0
+            );
+
+      return {
+        sampleSize,
+        totalR:
+          Number(totalR.toFixed(4)),
+        expectancyR:
+          Number(expectancyR.toFixed(4)),
+        decayedExpectancyR:
+          Number(
+            decayedExpectancyR
+              .toFixed(4)
+          ),
+        grossProfitR:
+          Number(grossProfitR.toFixed(4)),
+        grossLossR:
+          Number(grossLossR.toFixed(4)),
+        profitFactor:
+          profitFactorInfinite
+            ? null
+            : Number(
+                profitFactor.toFixed(4)
+              ),
+        profitFactorInfinite,
+        firstResolvedAt:
+          entriesToMeasure[0]
+            ?.item?.resolvedAt ||
+          entriesToMeasure[0]
+            ?.item?.closedAt ||
+          entriesToMeasure[0]
+            ?.item?.updatedAt ||
+          entriesToMeasure[0]
+            ?.item?.timestamp ||
+          null,
+        lastResolvedAt:
+          entriesToMeasure[
+            entriesToMeasure.length - 1
+          ]?.item?.resolvedAt ||
+          entriesToMeasure[
+            entriesToMeasure.length - 1
+          ]?.item?.closedAt ||
+          entriesToMeasure[
+            entriesToMeasure.length - 1
+          ]?.item?.updatedAt ||
+          entriesToMeasure[
+            entriesToMeasure.length - 1
+          ]?.item?.timestamp ||
+          null
+      };
+    };
+
+    const baseline =
+      calculateMetrics(
+        baselineEntries
+      );
+
+    const recent =
+      calculateMetrics(
+        recentEntries
+      );
+
+    const baselineProfitFactor =
+      baseline.profitFactorInfinite
+        ? Number.POSITIVE_INFINITY
+        : Number(
+            baseline.profitFactor
+          );
+
+    const recentProfitFactor =
+      recent.profitFactorInfinite
+        ? Number.POSITIVE_INFINITY
+        : Number(
+            recent.profitFactor
+          );
+
+    const baselinePositive =
+      Number.isFinite(
+        baseline.expectancyR
+      ) &&
+      baseline.expectancyR > 0 &&
+      (
+        baseline.profitFactorInfinite ||
+        (
+          Number.isFinite(
+            baselineProfitFactor
+          ) &&
+          baselineProfitFactor >= 1
+        )
+      );
+
+    const recentNegative =
+      Number.isFinite(
+        recent.expectancyR
+      ) &&
+      recent.expectancyR <= 0 &&
+      Number.isFinite(
+        recent.decayedExpectancyR
+      ) &&
+      recent.decayedExpectancyR <= 0 &&
+      !recent.profitFactorInfinite &&
+      Number.isFinite(
+        recentProfitFactor
+      ) &&
+      recentProfitFactor < 1;
+
+    const degraded =
+      baselinePositive &&
+      recentNegative;
+
+    return {
+      eligible:
+        !degraded,
+      status:
+        degraded
+          ? "LIVE_DEGRADATION_KILL_SWITCH"
+          : "LIVE_DEGRADATION_PASS",
+      reason:
+        degraded
+          ? `strategy degraded (${selectedEvidence.source}): mature baseline expectancy ${baseline.expectancyR.toFixed(4)}R / PF ${baseline.profitFactorInfinite ? "Infinity" : baselineProfitFactor.toFixed(4)} versus recent ${recent.sampleSize}-trade expectancy ${recent.expectancyR.toFixed(4)}R, decayed ${recent.decayedExpectancyR.toFixed(4)}R / PF ${recentProfitFactor.toFixed(4)}`
+          : `strategy degradation check passed from ${selectedEvidence.source}; baseline ${baseline.sampleSize} and recent ${recent.sampleSize} resolved R samples`,
+      source:
+        selectedEvidence.source,
+      sampleSize:
+        entries.length,
+      requiredBaselineSamples,
+      requiredRecentSamples,
+      requiredTotalSamples,
+      baselinePositive,
+      recentNegative,
+      baseline,
+      recent,
+      context: {
+        pattern:
+          patternName,
+        direction,
+        pair,
+        timeframe,
+        marketState,
+        session
+      }
+    };
+  }
+
+  /**
+   * Direct-LIVE sequential out-of-sample stability authority.
+   *
+   * This is a prequential/live-history stability check, not a synthetic
+   * backtest and not a parameter search. Every observation was a real
+   * historical signal whose outcome became known only after publication.
+   *
+   * The method preserves chronological order and uses only existing local
+   * resolved-R history. It performs no market-data request, provider call,
+   * external API access or parameter optimization.
+   *
+   * Existing configuration supplies every sample requirement:
+   * - initial prior-history requirement = minSamples
+   * - OOS horizon = performanceWindow
+   * - OOS fold size = minSamples
+   *
+   * With the current production configuration this means 10 prior resolved
+   * R observations followed by the latest 20 observations evaluated as two
+   * non-overlapping 10-trade OOS folds. A direct-live veto requires BOTH OOS
+   * folds to have negative economic edge using the same mathematical
+   * break-even conditions as the existing economic-edge authorities:
+   * expectancy <= 0R, decayed expectancy <= 0R and profit factor < 1.
+   *
+   * Evidence hierarchy mirrors the strategy-state/degradation authorities.
+   */
+  getSequentialOOSStabilityAuthority(signal) {
+
+    const patternName =
+      signal?.pattern ||
+      "Unknown";
+
+    const direction =
+      String(
+        signal?.direction ||
+        "UNKNOWN"
+      ).toUpperCase();
+
+    const pair =
+      signal?.pair ||
+      "UNKNOWN";
+
+    const timeframe =
+      signal?.timeframe ||
+      "UNKNOWN";
+
+    const marketState =
+      signal?.marketState?.state ||
+      signal?.advancedMarketState ||
+      signal?.marketState ||
+      "UNKNOWN";
+
+    const session =
+      signal?.session ||
+      "UNKNOWN";
+
+    const priorSamples =
+      this.minSamples;
+
+    const oosWindow =
+      this.performanceWindow;
+
+    const foldSize =
+      this.minSamples;
+
+    const foldCount =
+      Math.floor(
+        oosWindow /
+        foldSize
+      );
+
+    const requiredTotalSamples =
+      priorSamples +
+      oosWindow;
+
+    // A meaningful sequential OOS check requires at least two complete
+    // non-overlapping OOS folds. This is derived from existing production
+    // configuration rather than introducing a new trading threshold.
+    if (
+      !Number.isFinite(foldCount) ||
+      foldCount < 2 ||
+      oosWindow % foldSize !== 0
+    ) {
+      return {
+        eligible: true,
+        status:
+          "LIVE_SEQUENTIAL_OOS_NOT_CONFIGURED",
+        reason:
+          "sequential OOS authority requires performanceWindow to contain at least two complete minSamples folds",
+        source: null,
+        sampleSize: 0,
+        priorSamples,
+        oosWindow,
+        foldSize,
+        foldCount,
+        requiredTotalSamples,
+        folds: [],
+        context: {
+          pattern:
+            patternName,
+          direction,
+          pair,
+          timeframe,
+          marketState,
+          session
+        }
+      };
+    }
+
+    const realizedRValue = item => {
+      const value =
+        Number(
+          item?.realizedR ??
+          item?.performance?.realizedR ??
+          item?.learningFeedback?.realizedR
+        );
+
+      return Number.isFinite(value)
+        ? value
+        : null;
+    };
+
+    const normalizedMarketState = item =>
+      item?.marketState?.state ||
+      item?.advancedMarketState ||
+      item?.marketState ||
+      "UNKNOWN";
+
+    const resolvedTime = (item, index) => {
+      const raw =
+        item?.resolvedAt ||
+        item?.closedAt ||
+        item?.updatedAt ||
+        item?.timestamp ||
+        item?.createdAt ||
+        null;
+
+      let parsed = NaN;
+
+      if (
+        typeof raw === "number" &&
+        Number.isFinite(raw)
+      ) {
+        parsed =
+          raw < 10_000_000_000
+            ? raw * 1000
+            : raw;
+      } else if (
+        typeof raw === "string" &&
+        /^\d+$/.test(raw.trim())
+      ) {
+        const numeric =
+          Number(raw);
+
+        parsed =
+          Number.isFinite(numeric)
+            ? (
+                numeric < 10_000_000_000
+                  ? numeric * 1000
+                  : numeric
+              )
+            : NaN;
+      } else if (raw != null) {
+        parsed =
+          new Date(raw).getTime();
+      }
+
+      return Number.isFinite(parsed)
+        ? parsed
+        : index;
+    };
+
+    const history =
+      Array.isArray(this.data.history)
+        ? this.data.history
+        : [];
+
+    const resolvedREntries =
+      history
+        .map((item, index) => ({
+          item,
+          index,
+          realizedR:
+            realizedRValue(item)
+        }))
+        .filter(entry =>
+          entry.item &&
+          entry.realizedR !== null
+        )
+        .sort((a, b) =>
+          resolvedTime(a.item, a.index) -
+          resolvedTime(b.item, b.index)
+        );
+
+    const withFiniteR = predicate =>
+      resolvedREntries.filter(
+        entry =>
+          predicate(entry.item)
+      );
+
+    const evidenceCandidates = [
+      {
+        source:
+          "EXACT_PATTERN_DIRECTION_PAIR_TIMEFRAME_STATE_SESSION",
+        entries:
+          withFiniteR(item =>
+            (item.pattern || "Unknown") === patternName &&
+            String(item.direction || "UNKNOWN").toUpperCase() === direction &&
+            (item.pair || "UNKNOWN") === pair &&
+            (item.timeframe || "UNKNOWN") === timeframe &&
+            normalizedMarketState(item) === marketState &&
+            (item.session || "UNKNOWN") === session
+          )
+      },
+      {
+        source:
+          "PATTERN_DIRECTION_STATE",
+        entries:
+          withFiniteR(item =>
+            (item.pattern || "Unknown") === patternName &&
+            String(item.direction || "UNKNOWN").toUpperCase() === direction &&
+            normalizedMarketState(item) === marketState
+          )
+      },
+      {
+        source:
+          "PATTERN_STATE",
+        entries:
+          withFiniteR(item =>
+            (item.pattern || "Unknown") === patternName &&
+            normalizedMarketState(item) === marketState
+          )
+      },
+      {
+        source:
+          "PATTERN_FALLBACK",
+        entries:
+          withFiniteR(item =>
+            (item.pattern || "Unknown") === patternName
+          )
+      }
+    ];
+
+    const selectedEvidence =
+      evidenceCandidates.find(
+        candidate =>
+          candidate.entries.length >=
+          requiredTotalSamples
+      ) || null;
+
+    if (!selectedEvidence) {
+      const availableSamples =
+        Math.max(
+          0,
+          ...evidenceCandidates.map(
+            candidate =>
+              candidate.entries.length
+          )
+        );
+
+      return {
+        eligible: true,
+        status:
+          "LIVE_SEQUENTIAL_OOS_BOOTSTRAP",
+        reason:
+          `sequential OOS authority requires ${priorSamples} prior + ${oosWindow} OOS resolved R samples; ${availableSamples} available`,
+        source: null,
+        sampleSize:
+          availableSamples,
+        priorSamples,
+        oosWindow,
+        foldSize,
+        foldCount,
+        requiredTotalSamples,
+        folds: [],
+        context: {
+          pattern:
+            patternName,
+          direction,
+          pair,
+          timeframe,
+          marketState,
+          session
+        }
+      };
+    }
+
+    const entries =
+      selectedEvidence.entries;
+
+    // Only the latest configured OOS horizon is judged. All observations
+    // before it are strictly earlier prior-history evidence and are never
+    // mixed into an OOS fold.
+    const oosStart =
+      entries.length -
+      oosWindow;
+
+    const priorEntries =
+      entries.slice(0, oosStart);
+
+    const oosEntries =
+      entries.slice(oosStart);
+
+    const calculateMetrics = entriesToMeasure => {
+      let totalR = 0;
+      let grossProfitR = 0;
+      let grossLossR = 0;
+      let weightedR = 0;
+      let totalWeight = 0;
+
+      for (const entry of entriesToMeasure) {
+        const realizedR =
+          entry.realizedR;
+
+        totalR += realizedR;
+
+        if (realizedR > 0) {
+          grossProfitR += realizedR;
+        } else if (realizedR < 0) {
+          grossLossR +=
+            Math.abs(realizedR);
+        }
+
+        const weight =
+          this.getTimeDecayWeight(
+            entry.item
+          );
+
+        weightedR +=
+          realizedR * weight;
+
+        totalWeight +=
+          weight;
+      }
+
+      const sampleSize =
+        entriesToMeasure.length;
+
+      const expectancyR =
+        sampleSize > 0
+          ? totalR / sampleSize
+          : 0;
+
+      const decayedExpectancyR =
+        totalWeight > 0
+          ? weightedR / totalWeight
+          : 0;
+
+      const profitFactorInfinite =
+        grossLossR === 0 &&
+        grossProfitR > 0;
+
+      const profitFactor =
+        grossLossR > 0
+          ? grossProfitR / grossLossR
+          : (
+              grossProfitR > 0
+                ? null
+                : 0
+            );
+
+      return {
+        sampleSize,
+        totalR:
+          Number(totalR.toFixed(4)),
+        expectancyR:
+          Number(expectancyR.toFixed(4)),
+        decayedExpectancyR:
+          Number(
+            decayedExpectancyR
+              .toFixed(4)
+          ),
+        grossProfitR:
+          Number(grossProfitR.toFixed(4)),
+        grossLossR:
+          Number(grossLossR.toFixed(4)),
+        profitFactor:
+          profitFactorInfinite
+            ? null
+            : Number(
+                profitFactor.toFixed(4)
+              ),
+        profitFactorInfinite,
+        firstResolvedAt:
+          entriesToMeasure[0]
+            ?.item?.resolvedAt ||
+          entriesToMeasure[0]
+            ?.item?.closedAt ||
+          entriesToMeasure[0]
+            ?.item?.updatedAt ||
+          entriesToMeasure[0]
+            ?.item?.timestamp ||
+          null,
+        lastResolvedAt:
+          entriesToMeasure[
+            entriesToMeasure.length - 1
+          ]?.item?.resolvedAt ||
+          entriesToMeasure[
+            entriesToMeasure.length - 1
+          ]?.item?.closedAt ||
+          entriesToMeasure[
+            entriesToMeasure.length - 1
+          ]?.item?.updatedAt ||
+          entriesToMeasure[
+            entriesToMeasure.length - 1
+          ]?.item?.timestamp ||
+          null
+      };
+    };
+
+    const isNegativeEdge = metrics => {
+      const profitFactor =
+        metrics.profitFactorInfinite
+          ? Number.POSITIVE_INFINITY
+          : Number(
+              metrics.profitFactor
+            );
+
+      return (
+        Number.isFinite(
+          metrics.expectancyR
+        ) &&
+        metrics.expectancyR <= 0 &&
+        Number.isFinite(
+          metrics.decayedExpectancyR
+        ) &&
+        metrics.decayedExpectancyR <= 0 &&
+        !metrics.profitFactorInfinite &&
+        Number.isFinite(
+          profitFactor
+        ) &&
+        profitFactor < 1
+      );
+    };
+
+    const folds = [];
+
+    for (
+      let foldIndex = 0;
+      foldIndex < foldCount;
+      foldIndex++
+    ) {
+      const start =
+        foldIndex * foldSize;
+
+      const end =
+        start + foldSize;
+
+      const metrics =
+        calculateMetrics(
+          oosEntries.slice(
+            start,
+            end
+          )
+        );
+
+      folds.push({
+        fold:
+          foldIndex + 1,
+        ...metrics,
+        negativeEdge:
+          isNegativeEdge(metrics)
+      });
+    }
+
+    const allOOSFoldsNegative =
+      folds.length === foldCount &&
+      folds.every(
+        fold =>
+          fold.negativeEdge === true
+      );
+
+    const prior =
+      calculateMetrics(
+        priorEntries
+      );
+
+    return {
+      eligible:
+        !allOOSFoldsNegative,
+      status:
+        allOOSFoldsNegative
+          ? "LIVE_SEQUENTIAL_OOS_VETO"
+          : "LIVE_SEQUENTIAL_OOS_PASS",
+      reason:
+        allOOSFoldsNegative
+          ? `sequential OOS instability (${selectedEvidence.source}): all ${foldCount} non-overlapping ${foldSize}-trade OOS folds have negative economic edge`
+          : `sequential OOS stability check passed from ${selectedEvidence.source}; ${foldCount} non-overlapping OOS folds evaluated after ${prior.sampleSize} prior observations`,
+      source:
+        selectedEvidence.source,
+      sampleSize:
+        entries.length,
+      priorSamples,
+      oosWindow,
+      foldSize,
+      foldCount,
+      requiredTotalSamples,
+      prior,
+      folds,
+      negativeFoldCount:
+        folds.filter(
+          fold =>
+            fold.negativeEdge
+        ).length,
+      context: {
+        pattern:
+          patternName,
+        direction,
+        pair,
+        timeframe,
+        marketState,
+        session
+      }
     };
   }
 
@@ -1496,11 +2998,32 @@ class LearningSystem {
       regimeStats:
         this.data.regimeStats,
 
+      contextEdgeStats:
+        this.data.contextEdgeStats,
+
+      patternRegimeStats:
+        this.data.patternRegimeStats,
+
+      patternSessionStats:
+        this.data.patternSessionStats,
+
+      strategyStateContextStats:
+        this.data.strategyStateContextStats,
+
+      patternDirectionStateStats:
+        this.data.patternDirectionStateStats,
+
+      patternStateStats:
+        this.data.patternStateStats,
+
       patternWeights:
         this.data.patternWeights,
 
       calibration:
         this.data.calibration,
+
+      finalConfidenceCalibration:
+        this.data.finalConfidenceCalibration,
 
       patternEvolution:
         this.data.patternEvolution,
@@ -1518,7 +3041,7 @@ class LearningSystem {
         new Date().toISOString(),
 
       version:
-        "4.1.0"
+        "4.8.0"
 
     };
   }
@@ -1553,11 +3076,32 @@ class LearningSystem {
     this.data.regimeStats =
       data.regimeStats || {};
 
+    this.data.contextEdgeStats =
+      data.contextEdgeStats || {};
+
+    this.data.patternRegimeStats =
+      data.patternRegimeStats || {};
+
+    this.data.patternSessionStats =
+      data.patternSessionStats || {};
+
+    this.data.strategyStateContextStats =
+      data.strategyStateContextStats || {};
+
+    this.data.patternDirectionStateStats =
+      data.patternDirectionStateStats || {};
+
+    this.data.patternStateStats =
+      data.patternStateStats || {};
+
     this.data.patternWeights =
       data.patternWeights || {};
 
     this.data.calibration =
       data.calibration || {};
+
+    this.data.finalConfidenceCalibration =
+      data.finalConfidenceCalibration || {};
 
     this.data.patternEvolution =
       data.patternEvolution || {};
@@ -1599,9 +3143,23 @@ class LearningSystem {
 
     this.data.regimeStats = {};
 
+    this.data.contextEdgeStats = {};
+
+    this.data.patternRegimeStats = {};
+
+    this.data.patternSessionStats = {};
+
+    this.data.strategyStateContextStats = {};
+
+    this.data.patternDirectionStateStats = {};
+
+    this.data.patternStateStats = {};
+
     this.data.patternWeights = {};
 
     this.data.calibration = {};
+
+    this.data.finalConfidenceCalibration = {};
 
     this.data.patternEvolution = {};
 
@@ -1695,12 +3253,39 @@ class LearningSystem {
         "Pattern Recognition AI",
 
       version:
-        "4.1.0",
+        "4.8.0",
 
       learning:
         true,
 
       riskAdjustedTrendMomentum:
+        true,
+
+      liveEconomicEdge:
+        true,
+
+      contextualEconomicEdge:
+        true,
+
+      liveStrategyStateAuthority:
+        true,
+
+      liveStrategyDegradationKillSwitch:
+        true,
+
+      decisionTimeConfidenceProvenance:
+        true,
+
+      stageCorrectConfidenceCalibration:
+        true,
+
+      liveConfidenceReliabilityAuthority:
+        true,
+
+      lockedSampleStatisticalAuthority:
+        true,
+
+      liveSequentialOOSStabilityAuthority:
         true,
 
       adaptiveConfidence:
@@ -1810,6 +3395,29 @@ class LearningSystem {
     return this.defaultConfidence;
   }
 
+  /**
+   * Convert an optional numeric field without treating null/empty values
+   * as a real zero. This is required for immutable confidence provenance:
+   * Number(null) and Number("") would otherwise create false samples.
+   */
+  toOptionalFiniteNumber(value) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
+      return NaN;
+    }
+
+    const number =
+      Number(value);
+
+    return Number.isFinite(number)
+      ? number
+      : NaN;
+  }
+
   // =====================================================
   // History Management
   // =====================================================
@@ -1864,16 +3472,93 @@ class LearningSystem {
       if (exists)
         continue;
 
+      const signalOutcome =
+        signal.outcome || null;
+
+      const providedDecisionAdaptive =
+        this.toOptionalFiniteNumber(
+          signal.decisionAdaptiveConfidence
+        );
+
+      const providedDecisionFinal =
+        this.toOptionalFiniteNumber(
+          signal.decisionFinalAIConfidence
+        );
+
+      const adaptiveAtIngest =
+        this.toOptionalFiniteNumber(
+          signal.adaptiveConfidence
+        );
+
+      const finalAtIngest =
+        this.toOptionalFiniteNumber(
+          signal.finalAIConfidence ??
+          signal.confidence
+        );
+
+      const mayLockAtIngest =
+        !signalOutcome;
+
+      const decisionAdaptiveConfidence =
+        Number.isFinite(
+          providedDecisionAdaptive
+        )
+          ? providedDecisionAdaptive
+          : (
+              mayLockAtIngest &&
+              Number.isFinite(
+                adaptiveAtIngest
+              )
+                ? adaptiveAtIngest
+                : null
+            );
+
+      const decisionFinalAIConfidence =
+        Number.isFinite(
+          providedDecisionFinal
+        )
+          ? providedDecisionFinal
+          : (
+              mayLockAtIngest &&
+              Number.isFinite(
+                finalAtIngest
+              )
+                ? finalAtIngest
+                : null
+            );
+
+      const confidenceProvenance =
+        signal.confidenceProvenance ||
+        (
+          decisionAdaptiveConfidence !== null ||
+          decisionFinalAIConfidence !== null
+            ? "LOCKED_AT_INGEST"
+            : "LEGACY_RESOLVED_UNAVAILABLE"
+        );
+
       this.data.history.push({
 
         ...signal,
+
+        decisionAdaptiveConfidence,
+
+        decisionFinalAIConfidence,
+
+        confidenceProvenance,
+
+        decisionConfidenceCapturedAt:
+          signal.decisionConfidenceCapturedAt ||
+          signal.createdAt ||
+          signal.timestamp ||
+          signal.addedAt ||
+          new Date().toISOString(),
 
         addedAt:
           signal.addedAt ||
           new Date().toISOString(),
 
         outcome:
-          signal.outcome || null
+          signalOutcome
 
       });
     }
@@ -2003,6 +3688,26 @@ class LearningSystem {
 
       confidenceTotal: 0,
 
+      edgeSamples: 0,
+
+      totalRealizedR: 0,
+
+      grossProfitR: 0,
+
+      grossLossR: 0,
+
+      expectancyR: 0,
+
+      weightedRealizedR: 0,
+
+      edgeWeight: 0,
+
+      decayedExpectancyR: 0,
+
+      profitFactor: 0,
+
+      profitFactorInfinite: false,
+
       lastUpdated: null
 
     };
@@ -2035,6 +3740,70 @@ class LearningSystem {
       stats.averageConfidence =
         stats.confidenceTotal /
         stats.total;
+    }
+
+    const realizedR =
+      Number(
+        signal.realizedR ??
+        signal.performance?.realizedR ??
+        signal.learningFeedback?.realizedR
+      );
+
+    if (
+      Number.isFinite(
+        realizedR
+      )
+    ) {
+      stats.edgeSamples++;
+
+      stats.totalRealizedR +=
+        realizedR;
+
+      if (realizedR > 0) {
+        stats.grossProfitR +=
+          realizedR;
+      } else if (realizedR < 0) {
+        stats.grossLossR +=
+          Math.abs(realizedR);
+      }
+
+      const edgeDecayWeight =
+        this.getTimeDecayWeight(
+          signal
+        );
+
+      stats.weightedRealizedR +=
+        realizedR *
+        edgeDecayWeight;
+
+      stats.edgeWeight +=
+        edgeDecayWeight;
+
+      stats.expectancyR =
+        stats.edgeSamples > 0
+          ? stats.totalRealizedR /
+            stats.edgeSamples
+          : 0;
+
+      stats.decayedExpectancyR =
+        stats.edgeWeight > 0
+          ? stats.weightedRealizedR /
+            stats.edgeWeight
+          : 0;
+
+      stats.profitFactorInfinite =
+        stats.grossLossR === 0 &&
+        stats.grossProfitR > 0;
+
+      stats.profitFactor =
+        stats.grossLossR > 0
+          ? stats.grossProfitR /
+            stats.grossLossR
+          : (
+              stats.grossProfitR > 0
+                ? null
+                : 0
+            );
     }
 
     if (
@@ -2159,12 +3928,24 @@ class LearningSystem {
     const pairStats = {};
     const timeframeStats = {};
     const regimeStats = {};
+    const contextEdgeStats = {};
+    const patternRegimeStats = {};
+    const patternSessionStats = {};
+    const strategyStateContextStats = {};
+    const patternDirectionStateStats = {};
+    const patternStateStats = {};
 
     const exactHistory = {};
     const patternHistory = {};
     const pairHistory = {};
     const timeframeHistory = {};
     const regimeHistory = {};
+    const contextEdgeHistory = {};
+    const patternRegimeHistory = {};
+    const patternSessionHistory = {};
+    const strategyStateContextHistory = {};
+    const patternDirectionStateHistory = {};
+    const patternStateHistory = {};
 
     for (
       const signal of
@@ -2191,8 +3972,68 @@ class LearningSystem {
         signal.regime ||
         "UNKNOWN";
 
+      const session =
+        signal.session ||
+        "UNKNOWN";
+
+      const direction =
+        String(
+          signal.direction ||
+          "UNKNOWN"
+        ).toUpperCase();
+
+      const marketState =
+        signal.marketState?.state ||
+        signal.advancedMarketState ||
+        signal.marketState ||
+        "UNKNOWN";
+
       const exactKey =
         `${pattern}_${pair}_${timeframe}`;
+
+      const contextEdgeKey =
+        [
+          pattern,
+          pair,
+          timeframe,
+          regime,
+          session
+        ].join("::");
+
+      const patternRegimeKey =
+        [
+          pattern,
+          regime
+        ].join("::");
+
+      const patternSessionKey =
+        [
+          pattern,
+          session
+        ].join("::");
+
+      const strategyStateContextKey =
+        [
+          pattern,
+          direction,
+          pair,
+          timeframe,
+          marketState,
+          session
+        ].join("::");
+
+      const patternDirectionStateKey =
+        [
+          pattern,
+          direction,
+          marketState
+        ].join("::");
+
+      const patternStateKey =
+        [
+          pattern,
+          marketState
+        ].join("::");
 
       if (!exactStats[exactKey])
         exactStats[exactKey] =
@@ -2213,6 +4054,60 @@ class LearningSystem {
       if (!regimeStats[regime])
         regimeStats[regime] =
           this.createEmptyStats();
+
+      if (!contextEdgeStats[
+        contextEdgeKey
+      ]) {
+        contextEdgeStats[
+          contextEdgeKey
+        ] =
+          this.createEmptyStats();
+      }
+
+      if (!patternRegimeStats[
+        patternRegimeKey
+      ]) {
+        patternRegimeStats[
+          patternRegimeKey
+        ] =
+          this.createEmptyStats();
+      }
+
+      if (!patternSessionStats[
+        patternSessionKey
+      ]) {
+        patternSessionStats[
+          patternSessionKey
+        ] =
+          this.createEmptyStats();
+      }
+
+      if (!strategyStateContextStats[
+        strategyStateContextKey
+      ]) {
+        strategyStateContextStats[
+          strategyStateContextKey
+        ] =
+          this.createEmptyStats();
+      }
+
+      if (!patternDirectionStateStats[
+        patternDirectionStateKey
+      ]) {
+        patternDirectionStateStats[
+          patternDirectionStateKey
+        ] =
+          this.createEmptyStats();
+      }
+
+      if (!patternStateStats[
+        patternStateKey
+      ]) {
+        patternStateStats[
+          patternStateKey
+        ] =
+          this.createEmptyStats();
+      }
 
       this.addSignalToStats(
         exactStats[exactKey],
@@ -2239,6 +4134,48 @@ class LearningSystem {
         signal
       );
 
+      this.addSignalToStats(
+        contextEdgeStats[
+          contextEdgeKey
+        ],
+        signal
+      );
+
+      this.addSignalToStats(
+        patternRegimeStats[
+          patternRegimeKey
+        ],
+        signal
+      );
+
+      this.addSignalToStats(
+        patternSessionStats[
+          patternSessionKey
+        ],
+        signal
+      );
+
+      this.addSignalToStats(
+        strategyStateContextStats[
+          strategyStateContextKey
+        ],
+        signal
+      );
+
+      this.addSignalToStats(
+        patternDirectionStateStats[
+          patternDirectionStateKey
+        ],
+        signal
+      );
+
+      this.addSignalToStats(
+        patternStateStats[
+          patternStateKey
+        ],
+        signal
+      );
+
       if (!exactHistory[exactKey])
         exactHistory[exactKey] = [];
 
@@ -2253,6 +4190,54 @@ class LearningSystem {
 
       if (!regimeHistory[regime])
         regimeHistory[regime] = [];
+
+      if (!contextEdgeHistory[
+        contextEdgeKey
+      ]) {
+        contextEdgeHistory[
+          contextEdgeKey
+        ] = [];
+      }
+
+      if (!patternRegimeHistory[
+        patternRegimeKey
+      ]) {
+        patternRegimeHistory[
+          patternRegimeKey
+        ] = [];
+      }
+
+      if (!patternSessionHistory[
+        patternSessionKey
+      ]) {
+        patternSessionHistory[
+          patternSessionKey
+        ] = [];
+      }
+
+      if (!strategyStateContextHistory[
+        strategyStateContextKey
+      ]) {
+        strategyStateContextHistory[
+          strategyStateContextKey
+        ] = [];
+      }
+
+      if (!patternDirectionStateHistory[
+        patternDirectionStateKey
+      ]) {
+        patternDirectionStateHistory[
+          patternDirectionStateKey
+        ] = [];
+      }
+
+      if (!patternStateHistory[
+        patternStateKey
+      ]) {
+        patternStateHistory[
+          patternStateKey
+        ] = [];
+      }
 
       exactHistory[exactKey].push(
         signal
@@ -2273,6 +4258,30 @@ class LearningSystem {
       regimeHistory[regime].push(
         signal
       );
+
+      contextEdgeHistory[
+        contextEdgeKey
+      ].push(signal);
+
+      patternRegimeHistory[
+        patternRegimeKey
+      ].push(signal);
+
+      patternSessionHistory[
+        patternSessionKey
+      ].push(signal);
+
+      strategyStateContextHistory[
+        strategyStateContextKey
+      ].push(signal);
+
+      patternDirectionStateHistory[
+        patternDirectionStateKey
+      ].push(signal);
+
+      patternStateHistory[
+        patternStateKey
+      ].push(signal);
     }
 
     const applyTrends =
@@ -2332,6 +4341,52 @@ class LearningSystem {
               stat.averageConfidence.toFixed(2)
             );
 
+          stat.totalRealizedR =
+            Number(
+              stat.totalRealizedR.toFixed(4)
+            );
+
+          stat.grossProfitR =
+            Number(
+              stat.grossProfitR.toFixed(4)
+            );
+
+          stat.grossLossR =
+            Number(
+              stat.grossLossR.toFixed(4)
+            );
+
+          stat.expectancyR =
+            Number(
+              stat.expectancyR.toFixed(4)
+            );
+
+          stat.weightedRealizedR =
+            Number(
+              stat.weightedRealizedR.toFixed(4)
+            );
+
+          stat.edgeWeight =
+            Number(
+              stat.edgeWeight.toFixed(4)
+            );
+
+          stat.decayedExpectancyR =
+            Number(
+              stat.decayedExpectancyR.toFixed(4)
+            );
+
+          if (
+            Number.isFinite(
+              stat.profitFactor
+            )
+          ) {
+            stat.profitFactor =
+              Number(
+                stat.profitFactor.toFixed(4)
+              );
+          }
+
           delete stat.confidenceTotal;
         }
       };
@@ -2361,6 +4416,36 @@ class LearningSystem {
       regimeHistory
     );
 
+    applyTrends(
+      contextEdgeStats,
+      contextEdgeHistory
+    );
+
+    applyTrends(
+      patternRegimeStats,
+      patternRegimeHistory
+    );
+
+    applyTrends(
+      patternSessionStats,
+      patternSessionHistory
+    );
+
+    applyTrends(
+      strategyStateContextStats,
+      strategyStateContextHistory
+    );
+
+    applyTrends(
+      patternDirectionStateStats,
+      patternDirectionStateHistory
+    );
+
+    applyTrends(
+      patternStateStats,
+      patternStateHistory
+    );
+
     this.data.stats =
       exactStats;
 
@@ -2376,7 +4461,27 @@ class LearningSystem {
     this.data.regimeStats =
       regimeStats;
 
+    this.data.contextEdgeStats =
+      contextEdgeStats;
+
+    this.data.patternRegimeStats =
+      patternRegimeStats;
+
+    this.data.patternSessionStats =
+      patternSessionStats;
+
+    this.data.strategyStateContextStats =
+      strategyStateContextStats;
+
+    this.data.patternDirectionStateStats =
+      patternDirectionStateStats;
+
+    this.data.patternStateStats =
+      patternStateStats;
+
     this.updateConfidenceCalibration();
+
+    this.updateFinalConfidenceCalibration();
 
     this.updatePatternWeights();
 
@@ -2420,12 +4525,38 @@ class LearningSystem {
         continue;
       }
 
-      const rawConfidence =
-        Number(
-          signal.confidence ??
-          signal.aiConfidence ??
-          this.defaultConfidence
+      const lockedAdaptiveConfidence =
+        this.toOptionalFiniteNumber(
+          signal.decisionAdaptiveConfidence
         );
+
+      const storedAdaptiveConfidence =
+        this.toOptionalFiniteNumber(
+          signal.adaptiveConfidence
+        );
+
+      /*
+       * Calibration feeds calculateAdaptiveConfidence(), so it must be
+       * built from the adaptive-confidence stage that existed when the
+       * trade decision was made. Published Phase-6 confidence belongs to
+       * a different stage and is calibrated separately below.
+       */
+      const rawConfidence =
+        Number.isFinite(
+          lockedAdaptiveConfidence
+        )
+          ? lockedAdaptiveConfidence
+          : (
+              Number.isFinite(
+                storedAdaptiveConfidence
+              )
+                ? storedAdaptiveConfidence
+                : Number(
+                    signal.confidence ??
+                    signal.aiConfidence ??
+                    this.defaultConfidence
+                  )
+            );
 
       if (
         !Number.isFinite(
@@ -2469,35 +4600,139 @@ class LearningSystem {
 
           calibrationError: 0,
 
+          brierScore: 0,
+
+          lockedSamples: 0,
+
+          lockedWins: 0,
+
+          lockedLosses: 0,
+
+          lockedPredictedConfidence: null,
+
+          lockedActualRate: null,
+
+          lockedCalibrationError: null,
+
+          lockedBrierScore: null,
+
+          legacySamples: 0,
+
+          legacyWins: 0,
+
+          legacyLosses: 0,
+
+          confidenceTotal: 0,
+
+          brierTotal: 0,
+
+          lockedConfidenceTotal: 0,
+
+          lockedBrierTotal: 0,
+
           lastUpdated: null
 
         };
       }
 
-      calibration[bin].total++;
+      const bucket =
+        calibration[bin];
 
-      if (
+      bucket.total++;
+
+      bucket.confidenceTotal +=
+        normalizedConfidence;
+
+      const lockedSample =
+        Number.isFinite(
+          lockedAdaptiveConfidence
+        );
+
+      if (lockedSample) {
+        bucket.lockedSamples++;
+        bucket.lockedConfidenceTotal +=
+          normalizedConfidence;
+      } else {
+        bucket.legacySamples++;
+      }
+
+      const outcomeValue =
         signal.outcome === "WIN"
-      ) {
-        calibration[bin].wins++;
+          ? 1
+          : 0;
+
+      if (outcomeValue === 1) {
+        bucket.wins++;
+        if (lockedSample) {
+          bucket.lockedWins++;
+        } else {
+          bucket.legacyWins++;
+        }
+      } else {
+        bucket.losses++;
+        if (lockedSample) {
+          bucket.lockedLosses++;
+        } else {
+          bucket.legacyLosses++;
+        }
       }
 
-      else {
-        calibration[bin].losses++;
+      const probability =
+        normalizedConfidence / 100;
+
+      const brierComponent =
+        Math.pow(
+          probability - outcomeValue,
+          2
+        );
+
+      bucket.brierTotal +=
+        brierComponent;
+
+      if (lockedSample) {
+        bucket.lockedBrierTotal +=
+          brierComponent;
       }
 
-      calibration[bin].actualRate =
+      bucket.actualRate =
         (
-          calibration[bin].wins /
-          calibration[bin].total
+          bucket.wins /
+          bucket.total
         ) * 100;
 
-      calibration[bin].calibrationError =
-        calibration[bin].actualRate -
-        calibration[bin]
-          .predictedConfidence;
+      bucket.predictedConfidence =
+        bucket.confidenceTotal /
+        bucket.total;
 
-      calibration[bin].lastUpdated =
+      bucket.calibrationError =
+        bucket.actualRate -
+        bucket.predictedConfidence;
+
+      bucket.brierScore =
+        bucket.brierTotal /
+        bucket.total;
+
+      if (bucket.lockedSamples > 0) {
+        bucket.lockedPredictedConfidence =
+          bucket.lockedConfidenceTotal /
+          bucket.lockedSamples;
+
+        bucket.lockedActualRate =
+          (
+            bucket.lockedWins /
+            bucket.lockedSamples
+          ) * 100;
+
+        bucket.lockedCalibrationError =
+          bucket.lockedActualRate -
+          bucket.lockedPredictedConfidence;
+
+        bucket.lockedBrierScore =
+          bucket.lockedBrierTotal /
+          bucket.lockedSamples;
+      }
+
+      bucket.lastUpdated =
         new Date().toISOString();
     }
 
@@ -2505,6 +4740,13 @@ class LearningSystem {
       const bin in
       calibration
     ) {
+
+      calibration[bin].predictedConfidence =
+        Number(
+          calibration[bin]
+            .predictedConfidence
+            .toFixed(2)
+        );
 
       calibration[bin].actualRate =
         Number(
@@ -2520,9 +4762,346 @@ class LearningSystem {
             .calibrationError
             .toFixed(2)
         );
+
+      calibration[bin].brierScore =
+        Number(
+          calibration[bin]
+            .brierScore
+            .toFixed(6)
+        );
+
+      if (
+        Number.isFinite(
+          calibration[bin]
+            .lockedPredictedConfidence
+        )
+      ) {
+        calibration[bin].lockedPredictedConfidence =
+          Number(
+            calibration[bin]
+              .lockedPredictedConfidence
+              .toFixed(2)
+          );
+
+        calibration[bin].lockedActualRate =
+          Number(
+            calibration[bin]
+              .lockedActualRate
+              .toFixed(2)
+          );
+
+        calibration[bin].lockedCalibrationError =
+          Number(
+            calibration[bin]
+              .lockedCalibrationError
+              .toFixed(2)
+          );
+
+        calibration[bin].lockedBrierScore =
+          Number(
+            calibration[bin]
+              .lockedBrierScore
+              .toFixed(6)
+          );
+      }
+
+      delete calibration[bin]
+        .confidenceTotal;
+
+      delete calibration[bin]
+        .brierTotal;
+
+      delete calibration[bin]
+        .lockedConfidenceTotal;
+
+      delete calibration[bin]
+        .lockedBrierTotal;
     }
 
     this.data.calibration =
+      calibration;
+
+    return {
+      ...calibration
+    };
+  }
+
+  /**
+   * Build calibration for the separately published Phase-6 confidence.
+   * This is diagnostics-only here; the adaptive learner never consumes
+   * these bins, preventing forecast-stage leakage.
+   */
+  updateFinalConfidenceCalibration() {
+
+    const calibration = {};
+
+    for (
+      const signal of
+      this.data.history
+    ) {
+
+      if (
+        !signal ||
+        (
+          signal.outcome !== "WIN" &&
+          signal.outcome !== "LOSS"
+        )
+      ) {
+        continue;
+      }
+
+      const lockedFinalConfidence =
+        this.toOptionalFiniteNumber(
+          signal.decisionFinalAIConfidence
+        );
+
+      const storedFinalConfidence =
+        this.toOptionalFiniteNumber(
+          signal.finalAIConfidence
+        );
+
+      const rawConfidence =
+        Number.isFinite(
+          lockedFinalConfidence
+        )
+          ? lockedFinalConfidence
+          : (
+              Number.isFinite(
+                storedFinalConfidence
+              )
+                ? storedFinalConfidence
+                : NaN
+            );
+
+      if (
+        !Number.isFinite(
+          rawConfidence
+        )
+      ) {
+        continue;
+      }
+
+      const normalizedConfidence =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            rawConfidence
+          )
+        );
+
+      const bin =
+        String(
+          Math.round(
+            normalizedConfidence / 5
+          ) * 5
+        );
+
+      if (!calibration[bin]) {
+        calibration[bin] = {
+          total: 0,
+          wins: 0,
+          losses: 0,
+          predictedConfidence: 0,
+          actualRate: 0,
+          calibrationError: 0,
+          brierScore: 0,
+          lockedSamples: 0,
+          lockedWins: 0,
+          lockedLosses: 0,
+          lockedPredictedConfidence: null,
+          lockedActualRate: null,
+          lockedCalibrationError: null,
+          lockedBrierScore: null,
+          legacySamples: 0,
+          legacyWins: 0,
+          legacyLosses: 0,
+          confidenceTotal: 0,
+          brierTotal: 0,
+          lockedConfidenceTotal: 0,
+          lockedBrierTotal: 0,
+          lastUpdated: null
+        };
+      }
+
+      const bucket =
+        calibration[bin];
+
+      bucket.total++;
+      bucket.confidenceTotal +=
+        normalizedConfidence;
+
+      const lockedSample =
+        Number.isFinite(
+          lockedFinalConfidence
+        );
+
+      if (lockedSample) {
+        bucket.lockedSamples++;
+        bucket.lockedConfidenceTotal +=
+          normalizedConfidence;
+      } else {
+        bucket.legacySamples++;
+      }
+
+      const outcomeValue =
+        signal.outcome === "WIN"
+          ? 1
+          : 0;
+
+      if (outcomeValue === 1) {
+        bucket.wins++;
+        if (lockedSample) {
+          bucket.lockedWins++;
+        } else {
+          bucket.legacyWins++;
+        }
+      } else {
+        bucket.losses++;
+        if (lockedSample) {
+          bucket.lockedLosses++;
+        } else {
+          bucket.legacyLosses++;
+        }
+      }
+
+      const probability =
+        normalizedConfidence / 100;
+
+      const brierComponent =
+        Math.pow(
+          probability - outcomeValue,
+          2
+        );
+
+      bucket.brierTotal +=
+        brierComponent;
+
+      if (lockedSample) {
+        bucket.lockedBrierTotal +=
+          brierComponent;
+      }
+
+      bucket.actualRate =
+        (
+          bucket.wins /
+          bucket.total
+        ) * 100;
+
+      bucket.predictedConfidence =
+        bucket.confidenceTotal /
+        bucket.total;
+
+      bucket.calibrationError =
+        bucket.actualRate -
+        bucket.predictedConfidence;
+
+      bucket.brierScore =
+        bucket.brierTotal /
+        bucket.total;
+
+      if (bucket.lockedSamples > 0) {
+        bucket.lockedPredictedConfidence =
+          bucket.lockedConfidenceTotal /
+          bucket.lockedSamples;
+
+        bucket.lockedActualRate =
+          (
+            bucket.lockedWins /
+            bucket.lockedSamples
+          ) * 100;
+
+        bucket.lockedCalibrationError =
+          bucket.lockedActualRate -
+          bucket.lockedPredictedConfidence;
+
+        bucket.lockedBrierScore =
+          bucket.lockedBrierTotal /
+          bucket.lockedSamples;
+      }
+
+      bucket.lastUpdated =
+        new Date().toISOString();
+    }
+
+    for (
+      const bin in
+      calibration
+    ) {
+      calibration[bin].predictedConfidence =
+        Number(
+          calibration[bin]
+            .predictedConfidence
+            .toFixed(2)
+        );
+
+      calibration[bin].actualRate =
+        Number(
+          calibration[bin]
+            .actualRate
+            .toFixed(2)
+        );
+
+      calibration[bin].calibrationError =
+        Number(
+          calibration[bin]
+            .calibrationError
+            .toFixed(2)
+        );
+
+      calibration[bin].brierScore =
+        Number(
+          calibration[bin]
+            .brierScore
+            .toFixed(6)
+        );
+
+      if (
+        Number.isFinite(
+          calibration[bin]
+            .lockedPredictedConfidence
+        )
+      ) {
+        calibration[bin].lockedPredictedConfidence =
+          Number(
+            calibration[bin]
+              .lockedPredictedConfidence
+              .toFixed(2)
+          );
+
+        calibration[bin].lockedActualRate =
+          Number(
+            calibration[bin]
+              .lockedActualRate
+              .toFixed(2)
+          );
+
+        calibration[bin].lockedCalibrationError =
+          Number(
+            calibration[bin]
+              .lockedCalibrationError
+              .toFixed(2)
+          );
+
+        calibration[bin].lockedBrierScore =
+          Number(
+            calibration[bin]
+              .lockedBrierScore
+              .toFixed(6)
+          );
+      }
+
+      delete calibration[bin]
+        .confidenceTotal;
+      delete calibration[bin]
+        .brierTotal;
+      delete calibration[bin]
+        .lockedConfidenceTotal;
+      delete calibration[bin]
+        .lockedBrierTotal;
+    }
+
+    this.data.finalConfidenceCalibration =
       calibration;
 
     return {
@@ -2537,6 +5116,339 @@ class LearningSystem {
 
     return {
       ...this.data.calibration
+    };
+  }
+
+  /**
+   * Return published Phase-6 confidence calibration data.
+   */
+  getFinalConfidenceCalibrationData() {
+
+    return {
+      ...this.data.finalConfidenceCalibration
+    };
+  }
+
+  /**
+   * Wilson score interval for a binomial win rate.
+   *
+   * A two-sided 95% interval is intentionally used as a conservative
+   * live-control test: a confidence stage is vetoed only when even the
+   * upper bound remains below the existing production confidence floor.
+   */
+  calculateWilsonConfidenceInterval(
+    wins,
+    total,
+    z = 1.959963984540054
+  ) {
+
+    const safeWins =
+      Number(wins);
+
+    const safeTotal =
+      Number(total);
+
+    if (
+      !Number.isFinite(
+        safeWins
+      ) ||
+      !Number.isFinite(
+        safeTotal
+      ) ||
+      safeTotal <= 0 ||
+      safeWins < 0 ||
+      safeWins > safeTotal
+    ) {
+      return null;
+    }
+
+    const proportion =
+      safeWins / safeTotal;
+
+    const zSquared =
+      z * z;
+
+    const denominator =
+      1 +
+      zSquared / safeTotal;
+
+    const center =
+      (
+        proportion +
+        zSquared /
+          (2 * safeTotal)
+      ) /
+      denominator;
+
+    const margin =
+      (
+        z *
+        Math.sqrt(
+          (
+            proportion *
+            (1 - proportion) /
+            safeTotal
+          ) +
+          (
+            zSquared /
+            (4 * safeTotal * safeTotal)
+          )
+        )
+      ) /
+      denominator;
+
+    return {
+      lower:
+        Math.max(
+          0,
+          (center - margin) * 100
+        ),
+      upper:
+        Math.min(
+          100,
+          (center + margin) * 100
+        ),
+      confidenceLevel: 95
+    };
+  }
+
+  /**
+   * Direct-LIVE confidence reliability authority.
+   *
+   * Only decision-time locked samples are allowed to veto production.
+   * Legacy/mutable confidence observations remain visible in diagnostics
+   * but can never become direct-live statistical authority.
+   *
+   * No arbitrary calibration-error or Brier threshold is introduced.
+   * The existing production confidence floor is reused. A stage is vetoed
+   * only when the 95% Wilson upper bound for its locked historical win rate
+   * is already below that floor.
+   */
+  getConfidenceReliabilityAuthority({
+    stage = "ADAPTIVE",
+    confidence,
+    minimumRequiredRate =
+      this.actionableThreshold
+  } = {}) {
+
+    const normalizedStage =
+      String(stage || "ADAPTIVE")
+        .trim()
+        .toUpperCase();
+
+    const finalStage =
+      normalizedStage === "FINAL" ||
+      normalizedStage === "PHASE6" ||
+      normalizedStage === "FINAL_AI";
+
+    const numericConfidence =
+      Number(confidence);
+
+    const requiredRate =
+      Number(
+        minimumRequiredRate
+      );
+
+    if (
+      !Number.isFinite(
+        numericConfidence
+      ) ||
+      !Number.isFinite(
+        requiredRate
+      )
+    ) {
+      return {
+        eligible: false,
+        status:
+          "LIVE_CONFIDENCE_RELIABILITY_INVALID",
+        reason:
+          "confidence reliability authority received invalid confidence input",
+        stage:
+          finalStage
+            ? "FINAL"
+            : "ADAPTIVE"
+      };
+    }
+
+    const normalizedConfidence =
+      finalStage
+        ? Math.max(
+            0,
+            Math.min(
+              100,
+              numericConfidence
+            )
+          )
+        : Math.max(
+            this.minConfidence,
+            Math.min(
+              this.maxConfidence,
+              numericConfidence
+            )
+          );
+
+    const bin =
+      String(
+        Math.round(
+          normalizedConfidence / 5
+        ) * 5
+      );
+
+    const calibration =
+      finalStage
+        ? this.data
+            .finalConfidenceCalibration
+        : this.data.calibration;
+
+    const bucket =
+      calibration?.[bin] ||
+      null;
+
+    const lockedSamples =
+      Number(
+        bucket?.lockedSamples
+      );
+
+    if (
+      !bucket ||
+      !Number.isFinite(
+        lockedSamples
+      ) ||
+      lockedSamples <
+        this.minSamples
+    ) {
+      return {
+        eligible: true,
+        status:
+          "LIVE_CONFIDENCE_RELIABILITY_BOOTSTRAP",
+        reason:
+          `${finalStage ? "final" : "adaptive"} confidence bin ${bin} requires ${this.minSamples} locked decision-time outcomes; ${Number.isFinite(lockedSamples) ? lockedSamples : 0} available`,
+        stage:
+          finalStage
+            ? "FINAL"
+            : "ADAPTIVE",
+        bin:
+          Number(bin),
+        sampleSize:
+          Number.isFinite(
+            lockedSamples
+          )
+            ? lockedSamples
+            : 0,
+        requiredSamples:
+          this.minSamples,
+        minimumRequiredRate:
+          requiredRate
+      };
+    }
+
+    const lockedWins =
+      Number(
+        bucket.lockedWins
+      );
+
+    const interval =
+      this.calculateWilsonConfidenceInterval(
+        lockedWins,
+        lockedSamples
+      );
+
+    if (!interval) {
+      return {
+        eligible: false,
+        status:
+          "LIVE_CONFIDENCE_RELIABILITY_INVALID",
+        reason:
+          `${finalStage ? "final" : "adaptive"} confidence bin ${bin} has invalid locked outcome counts`,
+        stage:
+          finalStage
+            ? "FINAL"
+            : "ADAPTIVE",
+        bin:
+          Number(bin)
+      };
+    }
+
+    const statisticallyBelowFloor =
+      interval.upper <
+      requiredRate;
+
+    const actualRate =
+      Number(
+        bucket.lockedActualRate
+      );
+
+    const predictedConfidence =
+      Number(
+        bucket.lockedPredictedConfidence
+      );
+
+    const brierScore =
+      Number(
+        bucket.lockedBrierScore
+      );
+
+    return {
+      eligible:
+        !statisticallyBelowFloor,
+      status:
+        statisticallyBelowFloor
+          ? "LIVE_CONFIDENCE_RELIABILITY_VETO"
+          : "LIVE_CONFIDENCE_RELIABILITY_PASS",
+      reason:
+        statisticallyBelowFloor
+          ? `${finalStage ? "final" : "adaptive"} confidence bin ${bin} statistically failed: ${lockedWins}/${lockedSamples} wins, 95% Wilson upper ${interval.upper.toFixed(2)}% below live ${requiredRate.toFixed(2)}% floor`
+          : `${finalStage ? "final" : "adaptive"} confidence bin ${bin} reliability passed: ${lockedWins}/${lockedSamples} wins, 95% Wilson interval ${interval.lower.toFixed(2)}%-${interval.upper.toFixed(2)}%`,
+      stage:
+        finalStage
+          ? "FINAL"
+          : "ADAPTIVE",
+      bin:
+        Number(bin),
+      sampleSize:
+        lockedSamples,
+      requiredSamples:
+        this.minSamples,
+      wins:
+        lockedWins,
+      losses:
+        Number(
+          bucket.lockedLosses
+        ),
+      observedWinRate:
+        Number.isFinite(actualRate)
+          ? actualRate
+          : (
+              lockedWins /
+              lockedSamples
+            ) * 100,
+      predictedConfidence:
+        Number.isFinite(
+          predictedConfidence
+        )
+          ? predictedConfidence
+          : normalizedConfidence,
+      brierScore:
+        Number.isFinite(
+          brierScore
+        )
+          ? brierScore
+          : null,
+      minimumRequiredRate:
+        requiredRate,
+      wilson95: {
+        lower:
+          Number(
+            interval.lower
+              .toFixed(4)
+          ),
+        upper:
+          Number(
+            interval.upper
+              .toFixed(4)
+          )
+      },
+      statisticallyBelowFloor
     };
   }
 
@@ -3086,11 +5998,32 @@ class LearningSystem {
       regimeStats:
         this.data.regimeStats,
 
+      contextEdgeStats:
+        this.data.contextEdgeStats,
+
+      patternRegimeStats:
+        this.data.patternRegimeStats,
+
+      patternSessionStats:
+        this.data.patternSessionStats,
+
+      strategyStateContextStats:
+        this.data.strategyStateContextStats,
+
+      patternDirectionStateStats:
+        this.data.patternDirectionStateStats,
+
+      patternStateStats:
+        this.data.patternStateStats,
+
       patternWeights:
         this.data.patternWeights,
 
       calibration:
         this.data.calibration,
+
+      finalConfidenceCalibration:
+        this.data.finalConfidenceCalibration,
 
       patternEvolution:
         this.data.patternEvolution,
@@ -3248,6 +6181,33 @@ class LearningSystem {
       signal.resolvedAt =
         resolution.resolvedAt ||
         new Date().toISOString();
+
+      const resolutionFields = [
+        "realizedR",
+        "exitPrice",
+        "exitReason",
+        "session",
+        "marketRegime",
+        "marketState",
+        "strategy",
+        "strategyModel",
+        "strategyEvidence",
+        "tradeDurationMinutes",
+        "highestTargetReached"
+      ];
+
+      for (
+        const field of
+        resolutionFields
+      ) {
+        if (
+          resolution[field] !==
+          undefined
+        ) {
+          signal[field] =
+            resolution[field];
+        }
+      }
 
       updated++;
     }
@@ -3710,6 +6670,9 @@ class LearningSystem {
 
       calibration:
         this.getCalibrationData(),
+
+      finalConfidenceCalibration:
+        this.getFinalConfidenceCalibrationData(),
 
       confidence,
 
