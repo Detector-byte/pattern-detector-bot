@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-11T18:15:33.372Z",
+  "updatedAt": "2026-08-11T18:20:33.797Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -37,19 +37,19 @@
       }
     },
     "pair": {
-      "GBPJPY": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "XAUUSD": {
         "total": 1,
         "wins": 0,
         "losses": 1,
         "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
+      },
+      "GBPJPY": {
+        "total": 2,
+        "wins": 0,
+        "losses": 0,
+        "expired": 2,
         "winRate": 0,
         "averageRiskReward": 2
       }
@@ -65,14 +65,6 @@
       }
     },
     "session": {
-      "NEWYORK": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "LONDON_NY_OVERLAP": {
         "total": 2,
         "wins": 0,
@@ -80,21 +72,29 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 2
-      }
-    },
-    "patternRanking": {
-      "Risk-Adjusted Trend Momentum": {
+      },
+      "NEWYORK": {
         "total": 1,
         "wins": 0,
         "losses": 0,
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 2
-      },
+      }
+    },
+    "patternRanking": {
       "Bullish Engulfing": {
         "total": 2,
         "wins": 0,
         "losses": 1,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 2
+      },
+      "Risk-Adjusted Trend Momentum": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 2
@@ -110,10 +110,10 @@
     "recentWinRate": 0,
     "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 254,
-    "analysisDurationMs": 22,
+    "fetchDurationMs": 263,
+    "analysisDurationMs": 44,
     "learningDurationMs": 4,
-    "saveDurationMs": 1,
-    "totalRuntimeMs": 282
+    "saveDurationMs": 3,
+    "totalRuntimeMs": 317
   }
 }
