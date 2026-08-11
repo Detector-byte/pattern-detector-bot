@@ -6428,7 +6428,8 @@ class PatternAnalyzer {
     // Do not reject a pattern when
     // the candle source has no volume field.
     if (
-      last.volume === undefined
+      last.volume === undefined ||
+      last.volume === null
     ) {
       return true;
     }
