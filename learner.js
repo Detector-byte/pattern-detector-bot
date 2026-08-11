@@ -1518,7 +1518,7 @@ class LearningSystem {
         new Date().toISOString(),
 
       version:
-        "4.0.0"
+        "4.1.0"
 
     };
   }
@@ -1695,9 +1695,12 @@ class LearningSystem {
         "Pattern Recognition AI",
 
       version:
-        "4.0.0",
+        "4.1.0",
 
       learning:
+        true,
+
+      riskAdjustedTrendMomentum:
         true,
 
       adaptiveConfidence:
@@ -3350,7 +3353,10 @@ class LearningSystem {
         "A price zone associated with the final opposing candle before a strong institutional move. Retests may provide entries when aligned with structure and liquidity.",
 
       "Fair Value Gap":
-        "An imbalance created by rapid price displacement. Price may revisit the gap before resuming its directional move."
+        "An imbalance created by rapid price displacement. Price may revisit the gap before resuming its directional move.",
+
+      "Risk-Adjusted Trend Momentum":
+        "A systematic trend-continuation strategy that combines EMA20/EMA50 alignment, risk-adjusted time-series momentum, momentum-zone RSI and a confirmed continuation breakout. It uses structure-aware volatility risk control with predefined R-multiple objectives and should be evaluated together with higher-timeframe, market-regime and portfolio controls."
 
     };
 
@@ -3715,4 +3721,3 @@ class LearningSystem {
 }
 
 module.exports = LearningSystem;
-
