@@ -36,6 +36,7 @@ class PatternAnalyzer {
       'Diamond Bottom',
       'Bullish Engulfing',
       'Bearish Engulfing',
+      'Risk-Adjusted Trend Momentum',
       // --- Phase 4: Smart Money Concepts ---
       'Liquidity Sweep (Buy-Side)',
       'Liquidity Sweep (Sell-Side)',
@@ -71,8 +72,28 @@ class PatternAnalyzer {
     this.minATRPercent = 0.00005;   // reject dead/low-volatility markets
 
     this.rsiPeriod = 14;
-    this.rsiBuyMax = 35;          // BUY patterns need RSI below this
-    this.rsiSellMin = 65;         // SELL patterns need RSI above this
+    this.rsiBuyMax = 35;          // legacy reversal reference level
+    this.rsiSellMin = 65;         // legacy reversal reference level
+
+    // Evidence-backed systematic trend/momentum strategy.
+    // The academic evidence supports time-series momentum and
+    // volatility/risk adjustment as broad principles. The exact
+    // intraday parameters below are conservative implementation
+    // choices for this detector and are not a profit guarantee.
+    this.riskAdjustedMomentumConfig = Object.freeze({
+      lookback: 20,
+      minimumRiskAdjustedMomentum: 0.35,
+      buyRSIMin: 50,
+      buyRSIMax: 72,
+      sellRSIMin: 28,
+      sellRSIMax: 50,
+      maxExtensionATR: 1.75,
+      fallbackStopATR: 1.25,
+      minimumStructureRiskATR: 0.75,
+      maximumStructureRiskATR: 2.25,
+      structureBufferATR: 0.15,
+      rewardRisk: 2
+    });
 
     this.maxPatternAge = 10;      // candles since the pattern's key swing point
 
@@ -655,6 +676,16 @@ class PatternAnalyzer {
 
     collect(
       this.detectBearishEngulfing(candles)
+    );
+
+    // Evidence-backed systematic trend/momentum candidate.
+    // Uses the shared EMA/RSI/ATR/volume context already computed
+    // for this timeframe, so no duplicate indicator work is added.
+    collect(
+      this.detectRiskAdjustedTrendMomentum(
+        candles,
+        context
+      )
     );
 
     // --- Phase 4: Smart Money Concepts as standalone signals ---
@@ -2285,6 +2316,508 @@ class PatternAnalyzer {
     }
 
     return null;
+  }
+
+  // =====================================================
+  // Professional Strategy: Risk-Adjusted Trend Momentum
+  // =====================================================
+
+  /**
+   * Risk-adjusted time-series momentum signal.
+   *
+   * The signal is the mean of recent close-to-close returns
+   * divided by their realized volatility and scaled by the
+   * square-root of the observation count. Positive values
+   * represent persistent upside momentum; negative values
+   * represent persistent downside momentum.
+   */
+  calculateRiskAdjustedMomentum(
+    candles,
+    lookback = 20
+  ) {
+    if (
+      !Array.isArray(candles) ||
+      candles.length <
+        lookback + 1
+    ) {
+      return 0;
+    }
+
+    const recent =
+      candles.slice(
+        -(lookback + 1)
+      );
+
+    const returns = [];
+
+    for (
+      let i = 1;
+      i < recent.length;
+      i++
+    ) {
+      const previousClose =
+        Number(
+          recent[i - 1]?.close
+        );
+
+      const currentClose =
+        Number(
+          recent[i]?.close
+        );
+
+      if (
+        !Number.isFinite(
+          previousClose
+        ) ||
+        !Number.isFinite(
+          currentClose
+        ) ||
+        previousClose <= 0
+      ) {
+        return 0;
+      }
+
+      returns.push(
+        (
+          currentClose -
+          previousClose
+        ) /
+        previousClose
+      );
+    }
+
+    if (returns.length < 2) {
+      return 0;
+    }
+
+    const mean =
+      returns.reduce(
+        (
+          total,
+          value
+        ) =>
+          total + value,
+        0
+      ) /
+      returns.length;
+
+    const variance =
+      returns.reduce(
+        (
+          total,
+          value
+        ) => {
+          const difference =
+            value - mean;
+
+          return (
+            total +
+            difference *
+              difference
+          );
+        },
+        0
+      ) /
+      returns.length;
+
+    const volatility =
+      Math.sqrt(
+        Math.max(
+          0,
+          variance
+        )
+      );
+
+    if (
+      !Number.isFinite(
+        volatility
+      ) ||
+      volatility <= 1e-12
+    ) {
+      return 0;
+    }
+
+    return (
+      mean /
+      volatility *
+      Math.sqrt(
+        returns.length
+      )
+    );
+  }
+
+  /**
+   * Regime-aware trend continuation entry using:
+   * - EMA20 / EMA50 trend alignment
+   * - risk-adjusted time-series momentum
+   * - momentum-zone RSI (not reversal RSI)
+   * - one-bar continuation breakout
+   * - ATR overextension control
+   * - structure-aware ATR stop with fixed 2R objective
+   *
+   * This is additive. Existing chart-pattern and SMC detectors
+   * remain available and the downstream learner, signal generator,
+   * HTF alignment, AI score, portfolio, cooldown and duplicate
+   * controls remain authoritative.
+   */
+  detectRiskAdjustedTrendMomentum(
+    candles,
+    context = {}
+  ) {
+    const config =
+      this.riskAdjustedMomentumConfig;
+
+    if (
+      !Array.isArray(candles) ||
+      candles.length < 55 ||
+      !config
+    ) {
+      return null;
+    }
+
+    const atr =
+      Number(context.atr);
+
+    const ema20 =
+      Number(context.ema20);
+
+    const ema50 =
+      Number(context.ema50);
+
+    const rsi =
+      Number(context.rsi);
+
+    if (
+      !Number.isFinite(atr) ||
+      atr <= 0 ||
+      !Number.isFinite(ema20) ||
+      !Number.isFinite(ema50) ||
+      !Number.isFinite(rsi)
+    ) {
+      return null;
+    }
+
+    const riskAdjustedMomentum =
+      this.calculateRiskAdjustedMomentum(
+        candles,
+        config.lookback
+      );
+
+    const bullish =
+      context.trend === 'UP' &&
+      ema20 > ema50 &&
+      riskAdjustedMomentum >=
+        config.minimumRiskAdjustedMomentum;
+
+    const bearish =
+      context.trend === 'DOWN' &&
+      ema20 < ema50 &&
+      riskAdjustedMomentum <=
+        -config.minimumRiskAdjustedMomentum;
+
+    if (!bullish && !bearish) {
+      return null;
+    }
+
+    const direction =
+      bullish
+        ? 'BUY'
+        : 'SELL';
+
+    const rsiAligned =
+      direction === 'BUY'
+        ? (
+            rsi >=
+              config.buyRSIMin &&
+            rsi <=
+              config.buyRSIMax
+          )
+        : (
+            rsi >=
+              config.sellRSIMin &&
+            rsi <=
+              config.sellRSIMax
+          );
+
+    if (!rsiAligned) {
+      return null;
+    }
+
+    const last =
+      candles[
+        candles.length - 1
+      ];
+
+    const previous =
+      candles[
+        candles.length - 2
+      ];
+
+    const entry =
+      Number(last?.close);
+
+    if (
+      !last ||
+      !previous ||
+      !Number.isFinite(entry)
+    ) {
+      return null;
+    }
+
+    // Require a genuine continuation candle instead of entering
+    // solely because a moving average or momentum statistic flipped.
+    const continuationConfirmed =
+      direction === 'BUY'
+        ? (
+            Number(last.close) >
+              Number(previous.high) &&
+            Number(last.close) >
+              Number(last.open)
+          )
+        : (
+            Number(last.close) <
+              Number(previous.low) &&
+            Number(last.close) <
+              Number(last.open)
+          );
+
+    if (!continuationConfirmed) {
+      return null;
+    }
+
+    const extensionATR =
+      Math.abs(
+        entry - ema20
+      ) /
+      atr;
+
+    if (
+      !Number.isFinite(
+        extensionATR
+      ) ||
+      extensionATR >
+        config.maxExtensionATR
+    ) {
+      return null;
+    }
+
+    if (
+      context.marketRegime ===
+      'LOW_VOLATILITY'
+    ) {
+      return null;
+    }
+
+    const structureWindow =
+      candles.slice(-6);
+
+    const structureLevel =
+      direction === 'BUY'
+        ? Math.min(
+            ...structureWindow.map(
+              candle =>
+                Number(candle.low)
+            )
+          )
+        : Math.max(
+            ...structureWindow.map(
+              candle =>
+                Number(candle.high)
+            )
+          );
+
+    if (
+      !Number.isFinite(
+        structureLevel
+      )
+    ) {
+      return null;
+    }
+
+    const bufferedStructureStop =
+      direction === 'BUY'
+        ? (
+            structureLevel -
+            atr *
+              config.structureBufferATR
+          )
+        : (
+            structureLevel +
+            atr *
+              config.structureBufferATR
+          );
+
+    const structureRiskATR =
+      Math.abs(
+        entry -
+        bufferedStructureStop
+      ) /
+      atr;
+
+    const useStructureStop =
+      Number.isFinite(
+        structureRiskATR
+      ) &&
+      structureRiskATR >=
+        config.minimumStructureRiskATR &&
+      structureRiskATR <=
+        config.maximumStructureRiskATR;
+
+    const stopLoss =
+      useStructureStop
+        ? bufferedStructureStop
+        : direction === 'BUY'
+          ? (
+              entry -
+              atr *
+                config.fallbackStopATR
+            )
+          : (
+              entry +
+              atr *
+                config.fallbackStopATR
+            );
+
+    const risk =
+      Math.abs(
+        entry - stopLoss
+      );
+
+    if (
+      !Number.isFinite(risk) ||
+      risk <= 0
+    ) {
+      return null;
+    }
+
+    const targetPrice =
+      direction === 'BUY'
+        ? (
+            entry +
+            risk *
+              config.rewardRisk
+          )
+        : (
+            entry -
+            risk *
+              config.rewardRisk
+          );
+
+    const target2 =
+      direction === 'BUY'
+        ? entry + risk * 3
+        : entry - risk * 3;
+
+    const target3 =
+      direction === 'BUY'
+        ? entry + risk * 4
+        : entry - risk * 4;
+
+    const emaSeparationATR =
+      Math.abs(
+        ema20 - ema50
+      ) /
+      atr;
+
+    const momentumMagnitude =
+      Math.abs(
+        riskAdjustedMomentum
+      );
+
+    const strength =
+      Math.round(
+        Math.max(
+          82,
+          Math.min(
+            95,
+            80 +
+            Math.min(
+              10,
+              momentumMagnitude * 8
+            ) +
+            Math.min(
+              5,
+              emaSeparationATR * 3
+            )
+          )
+        )
+      );
+
+    const confirmationScore =
+      Math.round(
+        Math.max(
+          86,
+          Math.min(
+            95,
+            84 +
+            Math.min(
+              6,
+              momentumMagnitude * 5
+            ) +
+            (
+              context.volumeOk
+                ? 3
+                : 0
+            ) +
+            (
+              String(
+                context.marketRegime ||
+                ''
+              ).startsWith(
+                'TRENDING_'
+              )
+                ? 2
+                : 0
+            )
+          )
+        )
+      );
+
+    const breakoutLevel =
+      direction === 'BUY'
+        ? Number(previous.high)
+        : Number(previous.low);
+
+    return {
+      name:
+        'Risk-Adjusted Trend Momentum',
+      direction,
+      strategy:
+        'RISK_ADJUSTED_TIME_SERIES_MOMENTUM',
+      strength,
+      confirmationScore,
+      reliability:
+        this.getReliability(
+          confirmationScore
+        ),
+      breakoutLevel,
+      stopLoss:
+        +stopLoss.toFixed(5),
+      targetPrice:
+        +targetPrice.toFixed(5),
+      target1:
+        +targetPrice.toFixed(5),
+      target2:
+        +target2.toFixed(5),
+      target3:
+        +target3.toFixed(5),
+      rsiMode:
+        'MOMENTUM',
+      riskAdjustedMomentum:
+        +riskAdjustedMomentum
+          .toFixed(4),
+      emaSeparationATR:
+        +emaSeparationATR
+          .toFixed(4),
+      extensionATR:
+        +extensionATR
+          .toFixed(4),
+      structureStopUsed:
+        useStructureStop,
+      _ageIndex:
+        candles.length - 1,
+      _maxAge: 2
+    };
   }
 
   // =====================================================
@@ -6288,32 +6821,11 @@ class PatternAnalyzer {
       pattern.patternAge = age;
     }
 
-    // RSI confirmation.
-    if (
-      pattern.direction ===
-        "BUY" &&
-      context.rsi >
-        this.rsiBuyMax
-    ) {
-      recordRejection(
-        "rsiBuy"
-      );
-
-      return null;
-    }
-
-    if (
-      pattern.direction ===
-        "SELL" &&
-      context.rsi <
-        this.rsiSellMin
-    ) {
-      recordRejection(
-        "rsiSell"
-      );
-
-      return null;
-    }
+    // RSI is intentionally not a universal hard veto.
+    // Reversal patterns and continuation/momentum patterns need
+    // different RSI behavior. RSI remains an explicit scoring
+    // input below, while strategies that require a hard RSI band
+    // (such as Risk-Adjusted Trend Momentum) enforce it locally.
 
     // Volume confirmation.
     if (!context.volumeOk) {
@@ -6467,31 +6979,60 @@ class PatternAnalyzer {
         : 0;
 
     const rsiScore =
-      pattern.direction ===
-      'BUY'
-        ? Math.max(
-            0,
-            Math.min(
-              100,
-              100 -
-                context.rsi *
-                  1.5
-            )
+      pattern.rsiMode ===
+        'MOMENTUM'
+        ? (
+            pattern.direction ===
+              'BUY'
+              ? Math.max(
+                  0,
+                  Math.min(
+                    100,
+                    100 -
+                    Math.abs(
+                      context.rsi - 60
+                    ) * 4
+                  )
+                )
+              : pattern.direction ===
+                'SELL'
+                ? Math.max(
+                    0,
+                    Math.min(
+                      100,
+                      100 -
+                      Math.abs(
+                        context.rsi - 40
+                      ) * 4
+                    )
+                  )
+                : 50
           )
         : pattern.direction ===
-          'SELL'
+          'BUY'
           ? Math.max(
               0,
               Math.min(
                 100,
-                (
-                  context.rsi -
-                  50
-                ) *
-                  2
+                100 -
+                  context.rsi *
+                    1.5
               )
             )
-          : 50;
+          : pattern.direction ===
+            'SELL'
+            ? Math.max(
+                0,
+                Math.min(
+                  100,
+                  (
+                    context.rsi -
+                    50
+                  ) *
+                    2
+                )
+              )
+            : 50;
 
     const atrScore =
       Math.min(
@@ -6617,6 +7158,10 @@ class PatternAnalyzer {
 
       rsiValue:
         +context.rsi.toFixed(2),
+
+      rsiMode:
+        pattern.rsiMode ||
+        'LEGACY_REVERSAL_SCORE',
 
       atrValue:
         +context.atr.toFixed(5),
