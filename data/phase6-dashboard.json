@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-12T09:50:34.350Z",
+  "updatedAt": "2026-08-12T09:55:27.804Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "INTRADAY": {
-        "total": 4,
-        "wins": 0,
-        "losses": 0,
-        "expired": 4,
-        "winRate": 0,
-        "averageRiskReward": 1.88
-      },
       "SCALPING": {
         "total": 3,
         "wins": 0,
@@ -34,17 +26,17 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 2
+      },
+      "INTRADAY": {
+        "total": 4,
+        "wins": 0,
+        "losses": 0,
+        "expired": 4,
+        "winRate": 0,
+        "averageRiskReward": 1.88
       }
     },
     "pair": {
-      "GBPJPY": {
-        "total": 5,
-        "wins": 0,
-        "losses": 0,
-        "expired": 5,
-        "winRate": 0,
-        "averageRiskReward": 1.9
-      },
       "XAUUSD": {
         "total": 2,
         "wins": 0,
@@ -52,6 +44,14 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 2
+      },
+      "GBPJPY": {
+        "total": 5,
+        "wins": 0,
+        "losses": 0,
+        "expired": 5,
+        "winRate": 0,
+        "averageRiskReward": 1.9
       }
     },
     "marketState": {
@@ -73,14 +73,6 @@
       }
     },
     "session": {
-      "ASIAN": {
-        "total": 2,
-        "wins": 0,
-        "losses": 1,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "LONDON_NY_OVERLAP": {
         "total": 2,
         "wins": 0,
@@ -104,17 +96,17 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 2
+      },
+      "ASIAN": {
+        "total": 2,
+        "wins": 0,
+        "losses": 1,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 2
       }
     },
     "patternRanking": {
-      "Risk-Adjusted Trend Momentum": {
-        "total": 4,
-        "wins": 0,
-        "losses": 1,
-        "expired": 3,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "Bullish Engulfing": {
         "total": 3,
         "wins": 0,
@@ -122,6 +114,14 @@
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.83
+      },
+      "Risk-Adjusted Trend Momentum": {
+        "total": 4,
+        "wins": 0,
+        "losses": 1,
+        "expired": 3,
+        "winRate": 0,
+        "averageRiskReward": 2
       }
     },
     "learningGrowth": "insufficient-data"
@@ -134,10 +134,10 @@
     "recentWinRate": 0,
     "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 401,
-    "analysisDurationMs": 22,
-    "learningDurationMs": 6,
-    "saveDurationMs": 5,
-    "totalRuntimeMs": 438
+    "fetchDurationMs": 295,
+    "analysisDurationMs": 17,
+    "learningDurationMs": 4,
+    "saveDurationMs": 3,
+    "totalRuntimeMs": 322
   }
 }
