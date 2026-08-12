@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-12T20:50:31.360Z",
+  "updatedAt": "2026-08-12T20:55:26.183Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -37,14 +37,6 @@
       }
     },
     "pair": {
-      "GBPJPY": {
-        "total": 7,
-        "wins": 0,
-        "losses": 1,
-        "expired": 6,
-        "winRate": 0,
-        "averageRiskReward": 1.86
-      },
       "XAUUSD": {
         "total": 2,
         "wins": 0,
@@ -52,6 +44,14 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 2
+      },
+      "GBPJPY": {
+        "total": 7,
+        "wins": 0,
+        "losses": 1,
+        "expired": 6,
+        "winRate": 0,
+        "averageRiskReward": 1.86
       }
     },
     "marketState": {
@@ -73,14 +73,6 @@
       }
     },
     "session": {
-      "NEWYORK": {
-        "total": 4,
-        "wins": 0,
-        "losses": 1,
-        "expired": 3,
-        "winRate": 0,
-        "averageRiskReward": 1.75
-      },
       "LONDON_NY_OVERLAP": {
         "total": 2,
         "wins": 0,
@@ -88,6 +80,14 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 2
+      },
+      "NEWYORK": {
+        "total": 4,
+        "wins": 0,
+        "losses": 1,
+        "expired": 3,
+        "winRate": 0,
+        "averageRiskReward": 1.75
       },
       "OFF_HOURS": {
         "total": 1,
@@ -107,14 +107,6 @@
       }
     },
     "patternRanking": {
-      "Risk-Adjusted Trend Momentum": {
-        "total": 5,
-        "wins": 0,
-        "losses": 2,
-        "expired": 3,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "Bullish Engulfing": {
         "total": 4,
         "wins": 0,
@@ -122,6 +114,14 @@
         "expired": 3,
         "winRate": 0,
         "averageRiskReward": 1.75
+      },
+      "Risk-Adjusted Trend Momentum": {
+        "total": 5,
+        "wins": 0,
+        "losses": 2,
+        "expired": 3,
+        "winRate": 0,
+        "averageRiskReward": 2
       }
     },
     "learningGrowth": "insufficient-data"
@@ -134,10 +134,10 @@
     "recentWinRate": 0,
     "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 196,
-    "analysisDurationMs": 26,
-    "learningDurationMs": 8,
-    "saveDurationMs": 3,
-    "totalRuntimeMs": 238
+    "fetchDurationMs": 131,
+    "analysisDurationMs": 33,
+    "learningDurationMs": 6,
+    "saveDurationMs": 6,
+    "totalRuntimeMs": 181
   }
 }
