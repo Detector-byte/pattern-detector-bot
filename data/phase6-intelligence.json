@@ -1,8 +1,8 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-12T03:50:29.267Z",
-  "lastRun": "2026-08-12T03:50:29.267Z",
-  "publishedSignalId": "GBPJPY_1H_RISKADJUSTEDTRENDMOMENTUM_20260812",
+  "updatedAt": "2026-08-12T03:55:26.771Z",
+  "lastRun": "2026-08-12T03:55:26.771Z",
+  "publishedSignalId": null,
   "portfolio": {
     "openTrades": 1,
     "limits": {
@@ -11,29 +11,7 @@
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {
-    "GBPJPY_1H": {
-      "state": "RANGING",
-      "confidence": 60,
-      "features": {
-        "baseRegime": "RANGING",
-        "directionalMove": 0.00085,
-        "rangeRatio": 0.86,
-        "bodyRatio": 0.4,
-        "volumeRatio": 1,
-        "breakout": true
-      }
-    }
-  },
-  "strategyPriorities": {
-    "GBPJPY_1H": {
-      "primary": "INTRADAY",
-      "scores": {
-        "INTRADAY": 70,
-        "SWING": 65,
-        "SCALPING": 60
-      }
-    }
-  },
+  "marketStates": {},
+  "strategyPriorities": {},
   "optimizerRecommendations": []
 }
