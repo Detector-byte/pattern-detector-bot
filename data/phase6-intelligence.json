@@ -1,17 +1,39 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-12T04:50:31.809Z",
-  "lastRun": "2026-08-12T04:50:31.809Z",
-  "publishedSignalId": null,
+  "updatedAt": "2026-08-12T04:55:29.333Z",
+  "lastRun": "2026-08-12T04:55:29.333Z",
+  "publishedSignalId": "XAUUSD_15m_RISKADJUSTEDTRENDMOMENTUM_20260812",
   "portfolio": {
-    "openTrades": 1,
+    "openTrades": 2,
     "limits": {
       "maxOpenTrades": 4,
       "maxPairOpenTrades": 2,
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {},
-  "strategyPriorities": {},
+  "marketStates": {
+    "XAUUSD_15m": {
+      "state": "COMPRESSION",
+      "confidence": 80,
+      "features": {
+        "baseRegime": "RANGING",
+        "directionalMove": 0.00706,
+        "rangeRatio": 0.52,
+        "bodyRatio": 0.54,
+        "volumeRatio": 1,
+        "breakout": false
+      }
+    }
+  },
+  "strategyPriorities": {
+    "XAUUSD_15m": {
+      "primary": "SCALPING",
+      "scores": {
+        "SCALPING": 80,
+        "INTRADAY": 70,
+        "SWING": 45
+      }
+    }
+  },
   "optimizerRecommendations": []
 }
