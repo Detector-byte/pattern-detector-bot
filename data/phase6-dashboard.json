@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-12T20:15:32.202Z",
+  "updatedAt": "2026-08-12T20:20:33.140Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -37,14 +37,6 @@
       }
     },
     "pair": {
-      "XAUUSD": {
-        "total": 2,
-        "wins": 0,
-        "losses": 2,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "GBPJPY": {
         "total": 7,
         "wins": 0,
@@ -52,6 +44,14 @@
         "expired": 6,
         "winRate": 0,
         "averageRiskReward": 1.86
+      },
+      "XAUUSD": {
+        "total": 2,
+        "wins": 0,
+        "losses": 2,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
       }
     },
     "marketState": {
@@ -73,14 +73,6 @@
       }
     },
     "session": {
-      "LONDON_NY_OVERLAP": {
-        "total": 2,
-        "wins": 0,
-        "losses": 1,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "NEWYORK": {
         "total": 4,
         "wins": 0,
@@ -88,6 +80,14 @@
         "expired": 3,
         "winRate": 0,
         "averageRiskReward": 1.75
+      },
+      "LONDON_NY_OVERLAP": {
+        "total": 2,
+        "wins": 0,
+        "losses": 1,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 2
       },
       "OFF_HOURS": {
         "total": 1,
@@ -107,14 +107,6 @@
       }
     },
     "patternRanking": {
-      "Bullish Engulfing": {
-        "total": 4,
-        "wins": 0,
-        "losses": 1,
-        "expired": 3,
-        "winRate": 0,
-        "averageRiskReward": 1.75
-      },
       "Risk-Adjusted Trend Momentum": {
         "total": 5,
         "wins": 0,
@@ -122,22 +114,30 @@
         "expired": 3,
         "winRate": 0,
         "averageRiskReward": 2
+      },
+      "Bullish Engulfing": {
+        "total": 4,
+        "wins": 0,
+        "losses": 1,
+        "expired": 3,
+        "winRate": 0,
+        "averageRiskReward": 1.75
       }
     },
     "learningGrowth": "insufficient-data"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 1,
-    "averageConfidence": 68.4,
-    "averageAIScore": 71.2,
+    "signalsGenerated": 0,
+    "averageConfidence": 0,
+    "averageAIScore": 0,
     "recentWinRate": 0,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 509,
-    "analysisDurationMs": 30,
+    "fetchDurationMs": 468,
+    "analysisDurationMs": 28,
     "learningDurationMs": 6,
     "saveDurationMs": 4,
-    "totalRuntimeMs": 552
+    "totalRuntimeMs": 509
   }
 }
