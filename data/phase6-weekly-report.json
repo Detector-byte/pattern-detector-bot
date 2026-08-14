@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-14T15:35:31.024Z",
+  "generatedAt": "2026-08-14T15:40:34.093Z",
   "period": {
-    "start": "2026-08-07T15:35:31.023Z",
-    "end": "2026-08-14T15:35:31.023Z"
+    "start": "2026-08-07T15:40:34.092Z",
+    "end": "2026-08-14T15:40:34.092Z"
   },
   "metrics": {
     "totalSignals": 12,
@@ -37,14 +37,6 @@
       }
     },
     "pairAccuracy": {
-      "XAUUSD": {
-        "total": 3,
-        "wins": 0,
-        "losses": 3,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.83
-      },
       "GBPJPY": {
         "total": 9,
         "wins": 0,
@@ -52,17 +44,17 @@
         "expired": 6,
         "winRate": 0,
         "averageRiskReward": 1.83
+      },
+      "XAUUSD": {
+        "total": 3,
+        "wins": 0,
+        "losses": 3,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.83
       }
     },
     "timeframeAccuracy": {
-      "5m": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 2
-      },
       "30m": {
         "total": 4,
         "wins": 0,
@@ -70,6 +62,14 @@
         "expired": 3,
         "winRate": 0,
         "averageRiskReward": 1.63
+      },
+      "5m": {
+        "total": 1,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 2
       },
       "15m": {
         "total": 4,
@@ -131,6 +131,14 @@
       }
     },
     "marketRegimeAccuracy": {
+      "BREAKOUT": {
+        "total": 2,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.75
+      },
       "RANGING": {
         "total": 7,
         "wins": 0,
@@ -146,14 +154,6 @@
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.83
-      },
-      "BREAKOUT": {
-        "total": 2,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.75
       }
     },
     "learningProgress": "insufficient-data",
