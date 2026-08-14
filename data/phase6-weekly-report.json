@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-14T10:45:31.549Z",
+  "generatedAt": "2026-08-14T10:50:30.780Z",
   "period": {
-    "start": "2026-08-07T10:45:31.548Z",
-    "end": "2026-08-14T10:45:31.548Z"
+    "start": "2026-08-07T10:50:30.779Z",
+    "end": "2026-08-14T10:50:30.779Z"
   },
   "metrics": {
     "totalSignals": 11,
@@ -19,14 +19,6 @@
         "winRate": 0,
         "averageRiskReward": 2
       },
-      "Bullish Engulfing": {
-        "total": 4,
-        "wins": 0,
-        "losses": 1,
-        "expired": 3,
-        "winRate": 0,
-        "averageRiskReward": 1.75
-      },
       "Bearish Engulfing": {
         "total": 1,
         "wins": 0,
@@ -34,6 +26,14 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "Bullish Engulfing": {
+        "total": 4,
+        "wins": 0,
+        "losses": 1,
+        "expired": 3,
+        "winRate": 0,
+        "averageRiskReward": 1.75
       }
     },
     "pairAccuracy": {
@@ -63,6 +63,14 @@
         "winRate": 0,
         "averageRiskReward": 2
       },
+      "15m": {
+        "total": 4,
+        "wins": 0,
+        "losses": 2,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.88
+      },
       "5m": {
         "total": 1,
         "wins": 0,
@@ -78,14 +86,6 @@
         "expired": 3,
         "winRate": 0,
         "averageRiskReward": 1.67
-      },
-      "15m": {
-        "total": 4,
-        "wins": 0,
-        "losses": 2,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.88
       }
     },
     "sessionAccuracy": {
@@ -158,7 +158,7 @@
     },
     "learningProgress": "insufficient-data",
     "bestPattern": "Risk-Adjusted Trend Momentum",
-    "worstPattern": "Bearish Engulfing",
+    "worstPattern": "Bullish Engulfing",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []

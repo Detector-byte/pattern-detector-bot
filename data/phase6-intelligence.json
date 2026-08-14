@@ -1,8 +1,8 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-14T10:45:31.550Z",
-  "lastRun": "2026-08-14T10:45:31.550Z",
-  "publishedSignalId": "XAUUSD_15m_BEARISHENGULFING_20260814",
+  "updatedAt": "2026-08-14T10:50:30.781Z",
+  "lastRun": "2026-08-14T10:50:30.781Z",
+  "publishedSignalId": null,
   "portfolio": {
     "openTrades": 2,
     "limits": {
@@ -11,29 +11,7 @@
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {
-    "XAUUSD_15m": {
-      "state": "RANGING",
-      "confidence": 60,
-      "features": {
-        "baseRegime": "RANGING",
-        "directionalMove": 0.00674,
-        "rangeRatio": 0.82,
-        "bodyRatio": 0.48,
-        "volumeRatio": 1,
-        "breakout": false
-      }
-    }
-  },
-  "strategyPriorities": {
-    "XAUUSD_15m": {
-      "primary": "SCALPING",
-      "scores": {
-        "SCALPING": 80,
-        "INTRADAY": 70,
-        "SWING": 45
-      }
-    }
-  },
+  "marketStates": {},
+  "strategyPriorities": {},
   "optimizerRecommendations": []
 }
