@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-14T11:35:28.144Z",
+  "updatedAt": "2026-08-14T11:40:30.881Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -131,14 +131,6 @@
         "winRate": 0,
         "averageRiskReward": 2
       },
-      "Bearish Engulfing": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Bullish Engulfing": {
         "total": 4,
         "wins": 0,
@@ -146,6 +138,14 @@
         "expired": 3,
         "winRate": 0,
         "averageRiskReward": 1.75
+      },
+      "Bearish Engulfing": {
+        "total": 1,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "insufficient-data"
@@ -158,10 +158,10 @@
     "recentWinRate": 0,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 405,
-    "analysisDurationMs": 32,
-    "learningDurationMs": 8,
-    "saveDurationMs": 4,
-    "totalRuntimeMs": 453
+    "fetchDurationMs": 277,
+    "analysisDurationMs": 42,
+    "learningDurationMs": 6,
+    "saveDurationMs": 69,
+    "totalRuntimeMs": 400
   }
 }
