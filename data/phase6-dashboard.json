@@ -1,17 +1,17 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-14T10:40:30.428Z",
+  "updatedAt": "2026-08-14T10:45:31.549Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 10,
+      "70-79": 11,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
-      "60-69": 10,
+      "60-69": 11,
       "70-79": 0,
       "80-89": 0,
       "90-100": 0
@@ -28,12 +28,12 @@
         "averageRiskReward": 1.83
       },
       "SCALPING": {
-        "total": 4,
+        "total": 5,
         "wins": 0,
         "losses": 3,
         "expired": 1,
         "winRate": 0,
-        "averageRiskReward": 2
+        "averageRiskReward": 1.9
       }
     },
     "pair": {
@@ -46,12 +46,12 @@
         "averageRiskReward": 1.88
       },
       "XAUUSD": {
-        "total": 2,
+        "total": 3,
         "wins": 0,
         "losses": 2,
         "expired": 0,
         "winRate": 0,
-        "averageRiskReward": 2
+        "averageRiskReward": 1.83
       }
     },
     "marketState": {
@@ -64,12 +64,12 @@
         "averageRiskReward": 2
       },
       "RANGING": {
-        "total": 6,
+        "total": 7,
         "wins": 0,
         "losses": 2,
         "expired": 4,
         "winRate": 0,
-        "averageRiskReward": 1.92
+        "averageRiskReward": 1.86
       },
       "COMPRESSION": {
         "total": 3,
@@ -82,12 +82,12 @@
     },
     "session": {
       "LONDON": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 0,
         "winRate": 0,
-        "averageRiskReward": 2
+        "averageRiskReward": 1.75
       },
       "LONDON_NY_OVERLAP": {
         "total": 2,
@@ -138,22 +138,30 @@
         "expired": 3,
         "winRate": 0,
         "averageRiskReward": 1.75
+      },
+      "Bearish Engulfing": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "insufficient-data"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 67.1,
+    "averageAIScore": 70.4,
     "recentWinRate": 0,
-    "openSignals": 1,
+    "openSignals": 2,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 167,
-    "analysisDurationMs": 35,
-    "learningDurationMs": 7,
-    "saveDurationMs": 5,
-    "totalRuntimeMs": 219
+    "fetchDurationMs": 282,
+    "analysisDurationMs": 38,
+    "learningDurationMs": 6,
+    "saveDurationMs": 4,
+    "totalRuntimeMs": 335
   }
 }
