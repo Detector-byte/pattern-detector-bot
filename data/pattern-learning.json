@@ -3418,7 +3418,7 @@
         "patternBlacklisted": false,
         "reason": "Confidence passed"
       },
-      "status": "ACTIVE",
+      "status": "WIN",
       "description": "The second bullish candle engulfs the previous bearish candle body. It indicates buyers overpowering sellers and is strongest near support or after a decline.",
       "psychology": "The second bullish candle engulfs the previous bearish candle body. It indicates buyers overpowering sellers and is strongest near support or after a decline.",
       "timeframeContext": {
@@ -3469,7 +3469,7 @@
       },
       "createdAt": "2026-08-14T15:35:31.008Z",
       "expiresAt": "2026-08-14T17:35:31.002Z",
-      "outcome": null,
+      "outcome": "WIN",
       "takeProfit": 215.841,
       "finalAIConfidence": 68.3,
       "aiScore": 71.2,
@@ -3676,7 +3676,14 @@
       "initialStopLoss": 215.427,
       "lastUpdated": "2026-08-14T15:35:31.010Z",
       "refreshCount": 1,
-      "addedAt": "2026-08-14T15:35:31.011Z"
+      "addedAt": "2026-08-14T15:35:31.011Z",
+      "resolvedAt": "2026-08-14T16:35:27.002Z",
+      "realizedR": 1.494,
+      "exitPrice": 215.841,
+      "exitReason": "TAKE_PROFIT_1",
+      "strategy": "INTRADAY",
+      "strategyModel": null,
+      "strategyEvidence": null
     }
   ],
   "stats": {
@@ -3703,32 +3710,32 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.060Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing_GBPJPY_30m": {
       "total": 4,
-      "resolved": 0,
-      "wins": 0,
+      "resolved": 1,
+      "wins": 1,
       "losses": 0,
-      "accuracy": 60,
-      "winRate": 60,
-      "decayedWins": 0,
+      "accuracy": 100,
+      "winRate": 100,
+      "decayedWins": 1,
       "decayedLosses": 0,
-      "decayedTotal": 0,
-      "decayedWinRate": 60,
+      "decayedTotal": 1,
+      "decayedWinRate": 100,
       "trend": "stable",
       "averageConfidence": 75,
-      "edgeSamples": 0,
-      "totalRealizedR": 0,
-      "grossProfitR": 0,
+      "edgeSamples": 1,
+      "totalRealizedR": 1.494,
+      "grossProfitR": 1.494,
       "grossLossR": 0,
-      "expectancyR": 0,
-      "weightedRealizedR": 0,
-      "edgeWeight": 0,
-      "decayedExpectancyR": 0,
-      "profitFactor": 0,
-      "profitFactorInfinite": false,
-      "lastUpdated": null
+      "expectancyR": 1.494,
+      "weightedRealizedR": 1.494,
+      "edgeWeight": 1,
+      "decayedExpectancyR": 1.494,
+      "profitFactor": null,
+      "profitFactorInfinite": true,
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum_GBPJPY_15m": {
       "total": 2,
@@ -3753,7 +3760,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum_GBPJPY_1H": {
       "total": 3,
@@ -3763,8 +3770,8 @@
       "accuracy": 0,
       "winRate": 0,
       "decayedWins": 0,
-      "decayedLosses": 0.999,
-      "decayedTotal": 0.999,
+      "decayedLosses": 0.9989,
+      "decayedTotal": 0.9989,
       "decayedWinRate": 0,
       "trend": "stable",
       "averageConfidence": 73,
@@ -3773,12 +3780,12 @@
       "grossProfitR": 0,
       "grossLossR": 1,
       "expectancyR": -1,
-      "weightedRealizedR": -0.999,
-      "edgeWeight": 0.999,
+      "weightedRealizedR": -0.9989,
+      "edgeWeight": 0.9989,
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum_XAUUSD_15m": {
       "total": 1,
@@ -3803,7 +3810,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bearish Engulfing_XAUUSD_15m": {
       "total": 1,
@@ -3828,34 +3835,34 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "patternStats": {
     "Bullish Engulfing": {
       "total": 5,
-      "resolved": 1,
-      "wins": 0,
+      "resolved": 2,
+      "wins": 1,
       "losses": 1,
-      "accuracy": 0,
-      "winRate": 0,
-      "decayedWins": 0,
+      "accuracy": 50,
+      "winRate": 50,
+      "decayedWins": 1,
       "decayedLosses": 0.9772,
-      "decayedTotal": 0.9772,
-      "decayedWinRate": 0,
+      "decayedTotal": 1.9772,
+      "decayedWinRate": 50.58,
       "trend": "stable",
       "averageConfidence": 74.8,
-      "edgeSamples": 1,
-      "totalRealizedR": -1,
-      "grossProfitR": 0,
+      "edgeSamples": 2,
+      "totalRealizedR": 0.494,
+      "grossProfitR": 1.494,
       "grossLossR": 1,
-      "expectancyR": -1,
-      "weightedRealizedR": -0.9772,
-      "edgeWeight": 0.9772,
-      "decayedExpectancyR": -1,
-      "profitFactor": 0,
+      "expectancyR": 0.247,
+      "weightedRealizedR": 0.5168,
+      "edgeWeight": 1.9772,
+      "decayedExpectancyR": 0.2614,
+      "profitFactor": 1.494,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.060Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum": {
       "total": 6,
@@ -3880,7 +3887,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bearish Engulfing": {
       "total": 1,
@@ -3905,7 +3912,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "pairStats": {
@@ -3932,32 +3939,32 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "GBPJPY": {
       "total": 9,
-      "resolved": 2,
-      "wins": 0,
+      "resolved": 3,
+      "wins": 1,
       "losses": 2,
-      "accuracy": 0,
-      "winRate": 0,
-      "decayedWins": 0,
+      "accuracy": 33.33,
+      "winRate": 33.33,
+      "decayedWins": 1,
       "decayedLosses": 1.985,
-      "decayedTotal": 1.985,
-      "decayedWinRate": 0,
+      "decayedTotal": 2.985,
+      "decayedWinRate": 33.5,
       "trend": "stable",
       "averageConfidence": 73.78,
-      "edgeSamples": 2,
-      "totalRealizedR": -2,
-      "grossProfitR": 0,
+      "edgeSamples": 3,
+      "totalRealizedR": -0.506,
+      "grossProfitR": 1.494,
       "grossLossR": 2,
-      "expectancyR": -1,
-      "weightedRealizedR": -1.985,
-      "edgeWeight": 1.985,
-      "decayedExpectancyR": -1,
-      "profitFactor": 0,
+      "expectancyR": -0.1687,
+      "weightedRealizedR": -0.491,
+      "edgeWeight": 2.985,
+      "decayedExpectancyR": -0.1645,
+      "profitFactor": 0.747,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "timeframeStats": {
@@ -3984,32 +3991,32 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.060Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "30m": {
       "total": 4,
-      "resolved": 0,
-      "wins": 0,
+      "resolved": 1,
+      "wins": 1,
       "losses": 0,
-      "accuracy": 60,
-      "winRate": 60,
-      "decayedWins": 0,
+      "accuracy": 100,
+      "winRate": 100,
+      "decayedWins": 1,
       "decayedLosses": 0,
-      "decayedTotal": 0,
-      "decayedWinRate": 60,
+      "decayedTotal": 1,
+      "decayedWinRate": 100,
       "trend": "stable",
       "averageConfidence": 75,
-      "edgeSamples": 0,
-      "totalRealizedR": 0,
-      "grossProfitR": 0,
+      "edgeSamples": 1,
+      "totalRealizedR": 1.494,
+      "grossProfitR": 1.494,
       "grossLossR": 0,
-      "expectancyR": 0,
-      "weightedRealizedR": 0,
-      "edgeWeight": 0,
-      "decayedExpectancyR": 0,
-      "profitFactor": 0,
-      "profitFactorInfinite": false,
-      "lastUpdated": null
+      "expectancyR": 1.494,
+      "weightedRealizedR": 1.494,
+      "edgeWeight": 1,
+      "decayedExpectancyR": 1.494,
+      "profitFactor": null,
+      "profitFactorInfinite": true,
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "15m": {
       "total": 4,
@@ -4019,8 +4026,8 @@
       "accuracy": 0,
       "winRate": 0,
       "decayedWins": 0,
-      "decayedLosses": 2.9658,
-      "decayedTotal": 2.9658,
+      "decayedLosses": 2.9657,
+      "decayedTotal": 2.9657,
       "decayedWinRate": 0,
       "trend": "stable",
       "averageConfidence": 73.75,
@@ -4029,12 +4036,12 @@
       "grossProfitR": 0,
       "grossLossR": 3,
       "expectancyR": -1,
-      "weightedRealizedR": -2.9658,
-      "edgeWeight": 2.9658,
+      "weightedRealizedR": -2.9657,
+      "edgeWeight": 2.9657,
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "1H": {
       "total": 3,
@@ -4044,8 +4051,8 @@
       "accuracy": 0,
       "winRate": 0,
       "decayedWins": 0,
-      "decayedLosses": 0.999,
-      "decayedTotal": 0.999,
+      "decayedLosses": 0.9989,
+      "decayedTotal": 0.9989,
       "decayedWinRate": 0,
       "trend": "stable",
       "averageConfidence": 73,
@@ -4054,39 +4061,39 @@
       "grossProfitR": 0,
       "grossLossR": 1,
       "expectancyR": -1,
-      "weightedRealizedR": -0.999,
-      "edgeWeight": 0.999,
+      "weightedRealizedR": -0.9989,
+      "edgeWeight": 0.9989,
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "regimeStats": {
     "RANGING": {
       "total": 12,
-      "resolved": 5,
-      "wins": 0,
+      "resolved": 6,
+      "wins": 1,
       "losses": 5,
-      "accuracy": 0,
-      "winRate": 0,
-      "decayedWins": 0,
-      "decayedLosses": 4.942,
-      "decayedTotal": 4.942,
-      "decayedWinRate": 0,
+      "accuracy": 16.67,
+      "winRate": 16.67,
+      "decayedWins": 1,
+      "decayedLosses": 4.9418,
+      "decayedTotal": 5.9418,
+      "decayedWinRate": 16.83,
       "trend": "stable",
       "averageConfidence": 74,
-      "edgeSamples": 5,
-      "totalRealizedR": -5,
-      "grossProfitR": 0,
+      "edgeSamples": 6,
+      "totalRealizedR": -3.506,
+      "grossProfitR": 1.494,
       "grossLossR": 5,
-      "expectancyR": -1,
-      "weightedRealizedR": -4.942,
-      "edgeWeight": 4.942,
-      "decayedExpectancyR": -1,
-      "profitFactor": 0,
+      "expectancyR": -0.5843,
+      "weightedRealizedR": -3.4478,
+      "edgeWeight": 5.9418,
+      "decayedExpectancyR": -0.5803,
+      "profitFactor": 0.2988,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "contextEdgeStats": {
@@ -4113,32 +4120,32 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.060Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::GBPJPY::30m::RANGING::LONDON_NY_OVERLAP": {
       "total": 2,
-      "resolved": 0,
-      "wins": 0,
+      "resolved": 1,
+      "wins": 1,
       "losses": 0,
-      "accuracy": 60,
-      "winRate": 60,
-      "decayedWins": 0,
+      "accuracy": 100,
+      "winRate": 100,
+      "decayedWins": 1,
       "decayedLosses": 0,
-      "decayedTotal": 0,
-      "decayedWinRate": 60,
+      "decayedTotal": 1,
+      "decayedWinRate": 100,
       "trend": "stable",
       "averageConfidence": 75,
-      "edgeSamples": 0,
-      "totalRealizedR": 0,
-      "grossProfitR": 0,
+      "edgeSamples": 1,
+      "totalRealizedR": 1.494,
+      "grossProfitR": 1.494,
       "grossLossR": 0,
-      "expectancyR": 0,
-      "weightedRealizedR": 0,
-      "edgeWeight": 0,
-      "decayedExpectancyR": 0,
-      "profitFactor": 0,
-      "profitFactorInfinite": false,
-      "lastUpdated": null
+      "expectancyR": 1.494,
+      "weightedRealizedR": 1.494,
+      "edgeWeight": 1,
+      "decayedExpectancyR": 1.494,
+      "profitFactor": null,
+      "profitFactorInfinite": true,
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum::GBPJPY::15m::RANGING::NEWYORK": {
       "total": 2,
@@ -4163,7 +4170,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::GBPJPY::30m::RANGING::NEWYORK": {
       "total": 2,
@@ -4263,7 +4270,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum::GBPJPY::1H::RANGING::LONDON": {
       "total": 1,
@@ -4273,8 +4280,8 @@
       "accuracy": 0,
       "winRate": 0,
       "decayedWins": 0,
-      "decayedLosses": 0.999,
-      "decayedTotal": 0.999,
+      "decayedLosses": 0.9989,
+      "decayedTotal": 0.9989,
       "decayedWinRate": 0,
       "trend": "stable",
       "averageConfidence": 73,
@@ -4283,12 +4290,12 @@
       "grossProfitR": 0,
       "grossLossR": 1,
       "expectancyR": -1,
-      "weightedRealizedR": -0.999,
-      "edgeWeight": 0.999,
+      "weightedRealizedR": -0.9989,
+      "edgeWeight": 0.9989,
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bearish Engulfing::XAUUSD::15m::RANGING::LONDON": {
       "total": 1,
@@ -4313,34 +4320,34 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "patternRegimeStats": {
     "Bullish Engulfing::RANGING": {
       "total": 5,
-      "resolved": 1,
-      "wins": 0,
+      "resolved": 2,
+      "wins": 1,
       "losses": 1,
-      "accuracy": 0,
-      "winRate": 0,
-      "decayedWins": 0,
+      "accuracy": 50,
+      "winRate": 50,
+      "decayedWins": 1,
       "decayedLosses": 0.9772,
-      "decayedTotal": 0.9772,
-      "decayedWinRate": 0,
+      "decayedTotal": 1.9772,
+      "decayedWinRate": 50.58,
       "trend": "stable",
       "averageConfidence": 74.8,
-      "edgeSamples": 1,
-      "totalRealizedR": -1,
-      "grossProfitR": 0,
+      "edgeSamples": 2,
+      "totalRealizedR": 0.494,
+      "grossProfitR": 1.494,
       "grossLossR": 1,
-      "expectancyR": -1,
-      "weightedRealizedR": -0.9772,
-      "edgeWeight": 0.9772,
-      "decayedExpectancyR": -1,
-      "profitFactor": 0,
+      "expectancyR": 0.247,
+      "weightedRealizedR": 0.5168,
+      "edgeWeight": 1.9772,
+      "decayedExpectancyR": 0.2614,
+      "profitFactor": 1.494,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.060Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum::RANGING": {
       "total": 6,
@@ -4365,7 +4372,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bearish Engulfing::RANGING": {
       "total": 1,
@@ -4390,34 +4397,34 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "patternSessionStats": {
     "Bullish Engulfing::LONDON_NY_OVERLAP": {
       "total": 3,
-      "resolved": 1,
-      "wins": 0,
+      "resolved": 2,
+      "wins": 1,
       "losses": 1,
-      "accuracy": 0,
-      "winRate": 0,
-      "decayedWins": 0,
+      "accuracy": 50,
+      "winRate": 50,
+      "decayedWins": 1,
       "decayedLosses": 0.9772,
-      "decayedTotal": 0.9772,
-      "decayedWinRate": 0,
+      "decayedTotal": 1.9772,
+      "decayedWinRate": 50.58,
       "trend": "stable",
       "averageConfidence": 74.67,
-      "edgeSamples": 1,
-      "totalRealizedR": -1,
-      "grossProfitR": 0,
+      "edgeSamples": 2,
+      "totalRealizedR": 0.494,
+      "grossProfitR": 1.494,
       "grossLossR": 1,
-      "expectancyR": -1,
-      "weightedRealizedR": -0.9772,
-      "edgeWeight": 0.9772,
-      "decayedExpectancyR": -1,
-      "profitFactor": 0,
+      "expectancyR": 0.247,
+      "weightedRealizedR": 0.5168,
+      "edgeWeight": 1.9772,
+      "decayedExpectancyR": 0.2614,
+      "profitFactor": 1.494,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.060Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum::NEWYORK": {
       "total": 2,
@@ -4442,7 +4449,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::NEWYORK": {
       "total": 2,
@@ -4517,7 +4524,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum::LONDON": {
       "total": 1,
@@ -4527,8 +4534,8 @@
       "accuracy": 0,
       "winRate": 0,
       "decayedWins": 0,
-      "decayedLosses": 0.999,
-      "decayedTotal": 0.999,
+      "decayedLosses": 0.9989,
+      "decayedTotal": 0.9989,
       "decayedWinRate": 0,
       "trend": "stable",
       "averageConfidence": 73,
@@ -4537,12 +4544,12 @@
       "grossProfitR": 0,
       "grossLossR": 1,
       "expectancyR": -1,
-      "weightedRealizedR": -0.999,
-      "edgeWeight": 0.999,
+      "weightedRealizedR": -0.9989,
+      "edgeWeight": 0.9989,
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bearish Engulfing::LONDON": {
       "total": 1,
@@ -4567,7 +4574,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "strategyStateContextStats": {
@@ -4594,7 +4601,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.060Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::BUY::GBPJPY::30m::RANGING::LONDON_NY_OVERLAP": {
       "total": 1,
@@ -4644,7 +4651,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::BUY::GBPJPY::30m::COMPRESSION::NEWYORK": {
       "total": 1,
@@ -4744,7 +4751,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::BUY::GBPJPY::30m::RANGING::NEWYORK": {
       "total": 1,
@@ -4779,8 +4786,8 @@
       "accuracy": 0,
       "winRate": 0,
       "decayedWins": 0,
-      "decayedLosses": 0.999,
-      "decayedTotal": 0.999,
+      "decayedLosses": 0.9989,
+      "decayedTotal": 0.9989,
       "decayedWinRate": 0,
       "trend": "stable",
       "averageConfidence": 73,
@@ -4789,12 +4796,12 @@
       "grossProfitR": 0,
       "grossLossR": 1,
       "expectancyR": -1,
-      "weightedRealizedR": -0.999,
-      "edgeWeight": 0.999,
+      "weightedRealizedR": -0.9989,
+      "edgeWeight": 0.9989,
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bearish Engulfing::SELL::XAUUSD::15m::RANGING::LONDON": {
       "total": 1,
@@ -4819,32 +4826,32 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::BUY::GBPJPY::30m::BREAKOUT::LONDON_NY_OVERLAP": {
       "total": 1,
-      "resolved": 0,
-      "wins": 0,
+      "resolved": 1,
+      "wins": 1,
       "losses": 0,
-      "accuracy": 60,
-      "winRate": 60,
-      "decayedWins": 0,
+      "accuracy": 100,
+      "winRate": 100,
+      "decayedWins": 1,
       "decayedLosses": 0,
-      "decayedTotal": 0,
-      "decayedWinRate": 60,
+      "decayedTotal": 1,
+      "decayedWinRate": 100,
       "trend": "stable",
       "averageConfidence": 75,
-      "edgeSamples": 0,
-      "totalRealizedR": 0,
-      "grossProfitR": 0,
+      "edgeSamples": 1,
+      "totalRealizedR": 1.494,
+      "grossProfitR": 1.494,
       "grossLossR": 0,
-      "expectancyR": 0,
-      "weightedRealizedR": 0,
-      "edgeWeight": 0,
-      "decayedExpectancyR": 0,
-      "profitFactor": 0,
-      "profitFactorInfinite": false,
-      "lastUpdated": null
+      "expectancyR": 1.494,
+      "weightedRealizedR": 1.494,
+      "edgeWeight": 1,
+      "decayedExpectancyR": 1.494,
+      "profitFactor": null,
+      "profitFactorInfinite": true,
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "patternDirectionStateStats": {
@@ -4871,7 +4878,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.060Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum::BUY::RANGING": {
       "total": 3,
@@ -4896,7 +4903,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::BUY::COMPRESSION": {
       "total": 1,
@@ -4946,7 +4953,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum::BUY::BREAKOUT": {
       "total": 1,
@@ -4956,8 +4963,8 @@
       "accuracy": 0,
       "winRate": 0,
       "decayedWins": 0,
-      "decayedLosses": 0.999,
-      "decayedTotal": 0.999,
+      "decayedLosses": 0.9989,
+      "decayedTotal": 0.9989,
       "decayedWinRate": 0,
       "trend": "stable",
       "averageConfidence": 73,
@@ -4966,12 +4973,12 @@
       "grossProfitR": 0,
       "grossLossR": 1,
       "expectancyR": -1,
-      "weightedRealizedR": -0.999,
-      "edgeWeight": 0.999,
+      "weightedRealizedR": -0.9989,
+      "edgeWeight": 0.9989,
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bearish Engulfing::SELL::RANGING": {
       "total": 1,
@@ -4996,32 +5003,32 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::BUY::BREAKOUT": {
       "total": 1,
-      "resolved": 0,
-      "wins": 0,
+      "resolved": 1,
+      "wins": 1,
       "losses": 0,
-      "accuracy": 60,
-      "winRate": 60,
-      "decayedWins": 0,
+      "accuracy": 100,
+      "winRate": 100,
+      "decayedWins": 1,
       "decayedLosses": 0,
-      "decayedTotal": 0,
-      "decayedWinRate": 60,
+      "decayedTotal": 1,
+      "decayedWinRate": 100,
       "trend": "stable",
       "averageConfidence": 75,
-      "edgeSamples": 0,
-      "totalRealizedR": 0,
-      "grossProfitR": 0,
+      "edgeSamples": 1,
+      "totalRealizedR": 1.494,
+      "grossProfitR": 1.494,
       "grossLossR": 0,
-      "expectancyR": 0,
-      "weightedRealizedR": 0,
-      "edgeWeight": 0,
-      "decayedExpectancyR": 0,
-      "profitFactor": 0,
-      "profitFactorInfinite": false,
-      "lastUpdated": null
+      "expectancyR": 1.494,
+      "weightedRealizedR": 1.494,
+      "edgeWeight": 1,
+      "decayedExpectancyR": 1.494,
+      "profitFactor": null,
+      "profitFactorInfinite": true,
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "patternStateStats": {
@@ -5048,7 +5055,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.060Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum::RANGING": {
       "total": 3,
@@ -5073,7 +5080,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::COMPRESSION": {
       "total": 1,
@@ -5123,7 +5130,7 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Risk-Adjusted Trend Momentum::BREAKOUT": {
       "total": 1,
@@ -5133,8 +5140,8 @@
       "accuracy": 0,
       "winRate": 0,
       "decayedWins": 0,
-      "decayedLosses": 0.999,
-      "decayedTotal": 0.999,
+      "decayedLosses": 0.9989,
+      "decayedTotal": 0.9989,
       "decayedWinRate": 0,
       "trend": "stable",
       "averageConfidence": 73,
@@ -5143,12 +5150,12 @@
       "grossProfitR": 0,
       "grossLossR": 1,
       "expectancyR": -1,
-      "weightedRealizedR": -0.999,
-      "edgeWeight": 0.999,
+      "weightedRealizedR": -0.9989,
+      "edgeWeight": 0.9989,
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bearish Engulfing::RANGING": {
       "total": 1,
@@ -5173,32 +5180,32 @@
       "decayedExpectancyR": -1,
       "profitFactor": 0,
       "profitFactorInfinite": false,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     },
     "Bullish Engulfing::BREAKOUT": {
       "total": 1,
-      "resolved": 0,
-      "wins": 0,
+      "resolved": 1,
+      "wins": 1,
       "losses": 0,
-      "accuracy": 60,
-      "winRate": 60,
-      "decayedWins": 0,
+      "accuracy": 100,
+      "winRate": 100,
+      "decayedWins": 1,
       "decayedLosses": 0,
-      "decayedTotal": 0,
-      "decayedWinRate": 60,
+      "decayedTotal": 1,
+      "decayedWinRate": 100,
       "trend": "stable",
       "averageConfidence": 75,
-      "edgeSamples": 0,
-      "totalRealizedR": 0,
-      "grossProfitR": 0,
+      "edgeSamples": 1,
+      "totalRealizedR": 1.494,
+      "grossProfitR": 1.494,
       "grossLossR": 0,
-      "expectancyR": 0,
-      "weightedRealizedR": 0,
-      "edgeWeight": 0,
-      "decayedExpectancyR": 0,
-      "profitFactor": 0,
-      "profitFactorInfinite": false,
-      "lastUpdated": null
+      "expectancyR": 1.494,
+      "weightedRealizedR": 1.494,
+      "edgeWeight": 1,
+      "decayedExpectancyR": 1.494,
+      "profitFactor": null,
+      "profitFactorInfinite": true,
+      "lastUpdated": "2026-08-14T16:35:27.007Z"
     }
   },
   "patternWeights": {
@@ -5225,27 +5232,27 @@
       "legacySamples": 0,
       "legacyWins": 0,
       "legacyLosses": 0,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.008Z"
     },
     "75": {
-      "total": 4,
-      "wins": 0,
+      "total": 5,
+      "wins": 1,
       "losses": 4,
-      "predictedConfidence": 74.25,
-      "actualRate": 0,
-      "calibrationError": -74.25,
-      "brierScore": 0.551375,
-      "lockedSamples": 4,
-      "lockedWins": 0,
+      "predictedConfidence": 74.4,
+      "actualRate": 20,
+      "calibrationError": -54.4,
+      "brierScore": 0.4536,
+      "lockedSamples": 5,
+      "lockedWins": 1,
       "lockedLosses": 4,
-      "lockedPredictedConfidence": 74.25,
-      "lockedActualRate": 0,
-      "lockedCalibrationError": -74.25,
-      "lockedBrierScore": 0.551375,
+      "lockedPredictedConfidence": 74.4,
+      "lockedActualRate": 20,
+      "lockedCalibrationError": -54.4,
+      "lockedBrierScore": 0.4536,
       "legacySamples": 0,
       "legacyWins": 0,
       "legacyLosses": 0,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.008Z"
     }
   },
   "finalConfidenceCalibration": {
@@ -5267,50 +5274,50 @@
       "legacySamples": 0,
       "legacyWins": 0,
       "legacyLosses": 0,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.008Z"
     },
     "70": {
-      "total": 4,
-      "wins": 0,
+      "total": 5,
+      "wins": 1,
       "losses": 4,
-      "predictedConfidence": 69.05,
-      "actualRate": 0,
-      "calibrationError": -69.05,
-      "brierScore": 0.476821,
-      "lockedSamples": 4,
-      "lockedWins": 0,
+      "predictedConfidence": 68.9,
+      "actualRate": 20,
+      "calibrationError": -48.9,
+      "brierScore": 0.401554,
+      "lockedSamples": 5,
+      "lockedWins": 1,
       "lockedLosses": 4,
-      "lockedPredictedConfidence": 69.05,
-      "lockedActualRate": 0,
-      "lockedCalibrationError": -69.05,
-      "lockedBrierScore": 0.476821,
+      "lockedPredictedConfidence": 68.9,
+      "lockedActualRate": 20,
+      "lockedCalibrationError": -48.9,
+      "lockedBrierScore": 0.401554,
       "legacySamples": 0,
       "legacyWins": 0,
       "legacyLosses": 0,
-      "lastUpdated": "2026-08-14T16:30:36.061Z"
+      "lastUpdated": "2026-08-14T16:35:27.008Z"
     }
   },
   "patternEvolution": {
     "recommendations": {},
-    "updatedAt": "2026-08-14T16:30:36.061Z"
+    "updatedAt": "2026-08-14T16:35:27.008Z"
   },
   "blacklistedPatterns": {},
   "optimization": {
     "bestPattern": null,
     "weakestPattern": null,
-    "bestPair": "XAUUSD",
+    "bestPair": "GBPJPY",
     "weakestPair": "XAUUSD",
     "bestTimeframe": "15m",
     "weakestTimeframe": "15m",
     "bestRegime": "RANGING",
     "weakestRegime": "RANGING",
     "suggestions": [
-      "XAUUSD currently performs best",
+      "GBPJPY currently performs best",
       "Highest accuracy timeframe: 15m",
       "Best market regime: RANGING"
     ],
-    "generatedAt": "2026-08-14T16:30:36.062Z"
+    "generatedAt": "2026-08-14T16:35:27.008Z"
   },
-  "lastLearningUpdate": "2026-08-14T16:30:36.062Z",
-  "updatedAt": "2026-08-14T16:30:36.063Z"
+  "lastLearningUpdate": "2026-08-14T16:35:27.008Z",
+  "updatedAt": "2026-08-14T16:35:27.009Z"
 }

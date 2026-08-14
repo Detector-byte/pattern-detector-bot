@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-14T16:30:36.068Z",
+  "updatedAt": "2026-08-14T16:35:27.015Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -21,10 +21,10 @@
     "strategy": {
       "INTRADAY": {
         "total": 7,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 5,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.79
       },
       "SCALPING": {
@@ -39,10 +39,10 @@
     "pair": {
       "GBPJPY": {
         "total": 9,
-        "wins": 0,
+        "wins": 1,
         "losses": 2,
         "expired": 6,
-        "winRate": 0,
+        "winRate": 33.3,
         "averageRiskReward": 1.83
       },
       "XAUUSD": {
@@ -57,10 +57,10 @@
     "marketState": {
       "BREAKOUT": {
         "total": 2,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 0,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.75
       },
       "RANGING": {
@@ -83,10 +83,10 @@
     "session": {
       "LONDON_NY_OVERLAP": {
         "total": 3,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.83
       },
       "NEWYORK": {
@@ -125,10 +125,10 @@
     "patternRanking": {
       "Bullish Engulfing": {
         "total": 5,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 3,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.7
       },
       "Risk-Adjusted Trend Momentum": {
@@ -155,13 +155,13 @@
     "signalsGenerated": 0,
     "averageConfidence": 0,
     "averageAIScore": 0,
-    "recentWinRate": 0,
-    "openSignals": 1,
+    "recentWinRate": 16.7,
+    "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 309,
-    "analysisDurationMs": 20,
+    "fetchDurationMs": 215,
+    "analysisDurationMs": 26,
     "learningDurationMs": 7,
-    "saveDurationMs": 4,
-    "totalRuntimeMs": 343
+    "saveDurationMs": 5,
+    "totalRuntimeMs": 258
   }
 }
