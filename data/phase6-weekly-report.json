@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-14T16:35:27.015Z",
+  "generatedAt": "2026-08-14T16:40:34.313Z",
   "period": {
-    "start": "2026-08-07T16:35:27.015Z",
-    "end": "2026-08-14T16:35:27.015Z"
+    "start": "2026-08-07T16:40:34.313Z",
+    "end": "2026-08-14T16:40:34.313Z"
   },
   "metrics": {
     "totalSignals": 12,
@@ -37,14 +37,6 @@
       }
     },
     "pairAccuracy": {
-      "GBPJPY": {
-        "total": 9,
-        "wins": 1,
-        "losses": 2,
-        "expired": 6,
-        "winRate": 33.3,
-        "averageRiskReward": 1.83
-      },
       "XAUUSD": {
         "total": 3,
         "wins": 0,
@@ -52,17 +44,17 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.83
+      },
+      "GBPJPY": {
+        "total": 9,
+        "wins": 1,
+        "losses": 2,
+        "expired": 6,
+        "winRate": 33.3,
+        "averageRiskReward": 1.83
       }
     },
     "timeframeAccuracy": {
-      "30m": {
-        "total": 4,
-        "wins": 1,
-        "losses": 0,
-        "expired": 3,
-        "winRate": 100,
-        "averageRiskReward": 1.63
-      },
       "5m": {
         "total": 1,
         "wins": 0,
@@ -70,6 +62,14 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 2
+      },
+      "30m": {
+        "total": 4,
+        "wins": 1,
+        "losses": 0,
+        "expired": 3,
+        "winRate": 100,
+        "averageRiskReward": 1.63
       },
       "15m": {
         "total": 4,
@@ -131,14 +131,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "BREAKOUT": {
-        "total": 2,
-        "wins": 1,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 50,
-        "averageRiskReward": 1.75
-      },
       "RANGING": {
         "total": 7,
         "wins": 0,
@@ -154,6 +146,14 @@
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.83
+      },
+      "BREAKOUT": {
+        "total": 2,
+        "wins": 1,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 50,
+        "averageRiskReward": 1.75
       }
     },
     "learningProgress": "insufficient-data",
