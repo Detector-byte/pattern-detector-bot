@@ -1,18 +1,18 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-15T00:35:26.401Z",
+  "updatedAt": "2026-08-15T00:40:30.084Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 12,
+      "70-79": 13,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
       "60-69": 12,
-      "70-79": 0,
+      "70-79": 1,
       "80-89": 0,
       "90-100": 0
     }
@@ -28,12 +28,12 @@
         "averageRiskReward": 1.9
       },
       "INTRADAY": {
-        "total": 7,
+        "total": 8,
         "wins": 1,
         "losses": 1,
         "expired": 5,
         "winRate": 50,
-        "averageRiskReward": 1.79
+        "averageRiskReward": 1.75
       }
     },
     "pair": {
@@ -46,22 +46,22 @@
         "averageRiskReward": 1.83
       },
       "GBPJPY": {
-        "total": 9,
+        "total": 10,
         "wins": 1,
         "losses": 2,
         "expired": 6,
         "winRate": 33.3,
-        "averageRiskReward": 1.83
+        "averageRiskReward": 1.8
       }
     },
     "marketState": {
       "RANGING": {
-        "total": 7,
+        "total": 8,
         "wins": 0,
         "losses": 3,
         "expired": 4,
         "winRate": 0,
-        "averageRiskReward": 1.86
+        "averageRiskReward": 1.81
       },
       "COMPRESSION": {
         "total": 3,
@@ -106,12 +106,12 @@
         "averageRiskReward": 2
       },
       "ASIAN": {
-        "total": 2,
+        "total": 3,
         "wins": 0,
         "losses": 1,
         "expired": 1,
         "winRate": 0,
-        "averageRiskReward": 2
+        "averageRiskReward": 1.83
       },
       "LONDON": {
         "total": 2,
@@ -124,12 +124,12 @@
     },
     "patternRanking": {
       "Bullish Engulfing": {
-        "total": 5,
+        "total": 6,
         "wins": 1,
         "losses": 1,
         "expired": 3,
         "winRate": 50,
-        "averageRiskReward": 1.7
+        "averageRiskReward": 1.67
       },
       "Risk-Adjusted Trend Momentum": {
         "total": 6,
@@ -152,16 +152,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 75.7,
+    "averageAIScore": 76.3,
     "recentWinRate": 16.7,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 192,
-    "analysisDurationMs": 27,
-    "learningDurationMs": 6,
-    "saveDurationMs": 5,
-    "totalRuntimeMs": 235
+    "fetchDurationMs": 195,
+    "analysisDurationMs": 34,
+    "learningDurationMs": 7,
+    "saveDurationMs": 4,
+    "totalRuntimeMs": 246
   }
 }

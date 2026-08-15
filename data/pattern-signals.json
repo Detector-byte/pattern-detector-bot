@@ -1,6 +1,304 @@
 {
   "signals": [
     {
+      "id": "GBPJPY-30m-BullishEngulfing-1786754430066-pejc77",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Bullish Engulfing",
+      "direction": "BUY",
+      "signal": "BUY",
+      "confidence": 75.7,
+      "adaptiveConfidence": 91,
+      "entry": 215.614,
+      "stopLoss": 215.523,
+      "takeProfit1": 215.75,
+      "takeProfit2": 215.796,
+      "takeProfit3": 215.887,
+      "riskReward": 1.5,
+      "riskRewardDetails": {
+        "pattern": "Bullish Engulfing",
+        "risk": "0.0910",
+        "reward": "0.1365",
+        "ratio": "1.50",
+        "acceptable": false,
+        "quality": "Poor"
+      },
+      "qualityScore": 76,
+      "grade": "B",
+      "qualityRecommendation": "Good",
+      "patternWeight": 1,
+      "blacklisted": false,
+      "tradeDecision": {
+        "confidence": 91,
+        "execute": true,
+        "threshold": 70,
+        "patternBlacklisted": false,
+        "reason": "Confidence passed"
+      },
+      "status": "ACTIVE",
+      "description": "The second bullish candle engulfs the previous bearish candle body. It indicates buyers overpowering sellers and is strongest near support or after a decline.",
+      "psychology": "The second bullish candle engulfs the previous bearish candle body. It indicates buyers overpowering sellers and is strongest near support or after a decline.",
+      "timeframeContext": {
+        "duration": "30 minute",
+        "holdTime": "2 - 8 hours",
+        "tradingSession": "Intraday swing",
+        "riskLevel": "Medium",
+        "volatility": "Medium",
+        "advice": "Usually produces cleaner signals than lower timeframes."
+      },
+      "marketRegime": "RANGING",
+      "marketStructure": {
+        "interpretation": "Bullish reversal or continuation",
+        "sentiment": "Buyers gaining control",
+        "momentum": "Upside momentum building",
+        "recommendedAction": "Look for long entries after confirmed bullish structure."
+      },
+      "riskManagement": {
+        "risk": 0.091,
+        "stopDistance": 0.091,
+        "profitTarget1": 0.136,
+        "profitTarget2": 0.182,
+        "profitTarget3": 0.273,
+        "recommendation": "GOOD"
+      },
+      "tradingGuidance": "Entry: Above the engulfing candle high. Stop: Below the engulfing candle low. Target: At least 1.5-2 times risk. On 30m, strongest near meaningful support.",
+      "strength": 95,
+      "confirmationScore": 93,
+      "executionNotes": {
+        "confirmationRequired": true,
+        "volumeImportant": true,
+        "recommendedEntry": "Enter after confirmed breakout, breakdown or rejection.",
+        "riskLevel": "MEDIUM",
+        "liquidityRequired": true,
+        "marketRegime": "RANGING",
+        "bestSessions": "London and New York sessions",
+        "avoidTimes": "Avoid high-impact news windows and unusually poor liquidity.",
+        "notes": "Bullish Engulfing is being evaluated on 30m. Combine it with higher-timeframe structure, liquidity and market-regime confirmation."
+      },
+      "metadata": {
+        "source": "PipSight Pro AI",
+        "phase": 4,
+        "patternVersion": null,
+        "strategy": null,
+        "strategyEvidence": null,
+        "evolvedThresholds": {},
+        "generatedBy": "SignalGenerator"
+      },
+      "createdAt": "2026-08-15T00:40:30.070Z",
+      "expiresAt": "2026-08-15T02:40:30.067Z",
+      "takeProfit": 215.75,
+      "finalAIConfidence": 75.7,
+      "aiScore": 76.3,
+      "qualityGrade": "B",
+      "aiScoreComponents": {
+        "patternStrength": 95,
+        "confirmationScore": 93,
+        "adaptiveConfidence": 91,
+        "historicalAccuracy": 100,
+        "riskReward": 49.81684981684376,
+        "marketRegime": 60,
+        "sessionQuality": 67.5,
+        "patternWeight": 50,
+        "trendAlignment": 65,
+        "learningScore": 76,
+        "patternEvolution": 50
+      },
+      "confidenceComponents": {
+        "adaptiveConfidence": 91,
+        "learningConfidence": 76,
+        "historicalAccuracy": 100,
+        "marketRegime": 60,
+        "sessionQuality": 67.5,
+        "riskReward": 49.81684981684376,
+        "patternWeight": 50,
+        "trendStrength": 65,
+        "freshness": 100,
+        "volatility": 75
+      },
+      "marketState": {
+        "state": "RANGING",
+        "confidence": 60,
+        "features": {
+          "baseRegime": "RANGING",
+          "directionalMove": 0.00171,
+          "rangeRatio": 1.23,
+          "bodyRatio": 0.6,
+          "volumeRatio": 1,
+          "breakout": false
+        }
+      },
+      "strategyPriority": {
+        "primary": "INTRADAY",
+        "scores": {
+          "INTRADAY": 70,
+          "SCALPING": 60,
+          "SWING": 45
+        }
+      },
+      "session": "ASIAN",
+      "economicEdge": {
+        "eligible": true,
+        "status": "LIVE_BOOTSTRAP",
+        "reason": "economic edge requires 10 resolved R samples; 2 available",
+        "source": null,
+        "sampleSize": 2,
+        "requiredSamples": 10,
+        "expectancyR": null,
+        "decayedExpectancyR": null,
+        "profitFactor": null,
+        "profitFactorInfinite": false,
+        "context": {
+          "pattern": "Bullish Engulfing",
+          "pair": "GBPJPY",
+          "timeframe": "30m",
+          "marketRegime": "RANGING",
+          "session": "ASIAN"
+        }
+      },
+      "strategyAuthority": {
+        "eligible": true,
+        "status": "LIVE_STRATEGY_STATE_BOOTSTRAP",
+        "reason": "strategy-state authority requires 10 resolved R samples; 1 available",
+        "source": null,
+        "sampleSize": 1,
+        "requiredSamples": 10,
+        "expectancyR": null,
+        "decayedExpectancyR": null,
+        "profitFactor": null,
+        "profitFactorInfinite": false,
+        "context": {
+          "pattern": "Bullish Engulfing",
+          "direction": "BUY",
+          "pair": "GBPJPY",
+          "timeframe": "30m",
+          "marketState": "RANGING",
+          "session": "ASIAN"
+        }
+      },
+      "degradationAuthority": {
+        "eligible": true,
+        "status": "LIVE_DEGRADATION_BOOTSTRAP",
+        "reason": "degradation authority requires 10 baseline + 20 recent resolved R samples; 2 available",
+        "source": null,
+        "sampleSize": 2,
+        "requiredBaselineSamples": 10,
+        "requiredRecentSamples": 20,
+        "requiredTotalSamples": 30,
+        "baseline": null,
+        "recent": null,
+        "context": {
+          "pattern": "Bullish Engulfing",
+          "direction": "BUY",
+          "pair": "GBPJPY",
+          "timeframe": "30m",
+          "marketState": "RANGING",
+          "session": "ASIAN"
+        }
+      },
+      "sequentialOOSAuthority": {
+        "eligible": true,
+        "status": "LIVE_SEQUENTIAL_OOS_BOOTSTRAP",
+        "reason": "sequential OOS authority requires 10 prior + 20 OOS resolved R samples; 2 available",
+        "source": null,
+        "sampleSize": 2,
+        "priorSamples": 10,
+        "oosWindow": 20,
+        "foldSize": 10,
+        "foldCount": 2,
+        "requiredTotalSamples": 30,
+        "folds": [],
+        "context": {
+          "pattern": "Bullish Engulfing",
+          "direction": "BUY",
+          "pair": "GBPJPY",
+          "timeframe": "30m",
+          "marketState": "RANGING",
+          "session": "ASIAN"
+        }
+      },
+      "adaptiveConfidenceReliability": {
+        "eligible": true,
+        "status": "LIVE_CONFIDENCE_RELIABILITY_BOOTSTRAP",
+        "reason": "adaptive confidence bin 90 requires 10 locked decision-time outcomes; 0 available",
+        "stage": "ADAPTIVE",
+        "bin": 90,
+        "sampleSize": 0,
+        "requiredSamples": 10,
+        "minimumRequiredRate": 70
+      },
+      "finalConfidenceReliability": {
+        "eligible": true,
+        "status": "LIVE_CONFIDENCE_RELIABILITY_BOOTSTRAP",
+        "reason": "final confidence bin 75 requires 10 locked decision-time outcomes; 0 available",
+        "stage": "FINAL",
+        "bin": 75,
+        "sampleSize": 0,
+        "requiredSamples": 10,
+        "minimumRequiredRate": 70
+      },
+      "portfolioRisk": {
+        "approved": true,
+        "hardReject": false,
+        "reasons": [],
+        "correlationPenalty": 0,
+        "exposure": {
+          "totalOpen": 0,
+          "samePair": 0,
+          "samePairDirection": 0,
+          "jpy": 0
+        }
+      },
+      "explanation": {
+        "summary": "BUY selected because Bullish Engulfing produced the strongest institutional score for GBPJPY 30m.",
+        "whyDirection": "buyers gained control with bullish pattern and confirmation alignment",
+        "whyConfidence": "Final AI Confidence 75.7% combines existing adaptive confidence with learning, historical accuracy, regime quality, session quality, risk/reward, pattern weight, trend alignment, freshness and volatility.",
+        "whyStopLoss": "Stop loss 215.523 comes from the existing signal engine's market-structure and invalidation logic.",
+        "whyTakeProfit": "Primary take profit 215.75 preserves the existing risk/reward calculation. Phase 6 validates its institutional quality without replacing it.",
+        "whyPatternSelected": "Bullish Engulfing achieved AI Score 76.3/100 with Quality Grade B after portfolio and correlation review.",
+        "whyRiskRewardAccepted": "Risk/reward 1.49 passed the existing signal engine and the institutional ranking threshold.",
+        "marketState": {
+          "state": "RANGING",
+          "confidence": 60,
+          "features": {
+            "baseRegime": "RANGING",
+            "directionalMove": 0.00171,
+            "rangeRatio": 1.23,
+            "bodyRatio": 0.6,
+            "volumeRatio": 1,
+            "breakout": false
+          }
+        },
+        "strategy": {
+          "primary": "INTRADAY",
+          "scores": {
+            "INTRADAY": 70,
+            "SCALPING": 60,
+            "SWING": 45
+          }
+        },
+        "rejectedPatterns": [
+          {
+            "pattern": "Bullish Order Block",
+            "reason": "AI score 65.8 below 70"
+          }
+        ]
+      },
+      "phase": 6,
+      "institutionalRank": 1,
+      "signalId": "GBPJPY_30m_BULLISHENGULFING_20260815",
+      "timestamp": "2026-08-15T00:40:30.070Z",
+      "version": 1,
+      "decisionAdaptiveConfidence": 91,
+      "decisionSignalConfidence": 91,
+      "decisionFinalAIConfidence": 75.7,
+      "decisionAIScore": 76.3,
+      "confidenceProvenance": "LOCKED_AT_PUBLICATION",
+      "decisionConfidenceCapturedAt": "2026-08-15T00:40:30.070Z",
+      "initialStopLoss": 215.523,
+      "lastUpdated": "2026-08-15T00:40:30.070Z",
+      "refreshCount": 1
+    },
+    {
       "id": "XAUUSD-5m-BullishEngulfing-1786452033703-7mjvvf",
       "pair": "XAUUSD",
       "timeframe": "5m",
@@ -3662,10 +3960,10 @@
       }
     }
   ],
-  "updatedAt": "2026-08-15T00:35:26.395Z",
+  "updatedAt": "2026-08-15T00:40:30.077Z",
   "stale": {},
-  "totalSignals": 12,
+  "totalSignals": 13,
   "resolvedSignals": 6,
   "expiredSignals": 6,
-  "pendingSignals": 0
+  "pendingSignals": 1
 }
