@@ -88,8 +88,8 @@
       "expiresAt": "2026-08-15T12:40:33.780Z",
       "takeProfit": 215.691,
       "finalAIConfidence": 75.9,
-      "aiScore": 76.5,
-      "qualityGrade": "B",
+      "aiScore": 70.5,
+      "qualityGrade": "C",
       "aiScoreComponents": {
         "patternStrength": 95,
         "confirmationScore": 93,
@@ -239,13 +239,15 @@
       "portfolioRisk": {
         "approved": true,
         "hardReject": false,
-        "reasons": [],
-        "correlationPenalty": 0,
+        "reasons": [
+          "JPY same-direction exposure -6"
+        ],
+        "correlationPenalty": 6,
         "exposure": {
-          "totalOpen": 0,
-          "samePair": 0,
-          "samePairDirection": 0,
-          "jpy": 0
+          "totalOpen": 1,
+          "samePair": 1,
+          "samePairDirection": 1,
+          "jpy": 1
         }
       },
       "explanation": {
@@ -254,7 +256,7 @@
         "whyConfidence": "Final AI Confidence 75.9% combines existing adaptive confidence with learning, historical accuracy, regime quality, session quality, risk/reward, pattern weight, trend alignment, freshness and volatility.",
         "whyStopLoss": "Stop loss 215.566 comes from the existing signal engine's market-structure and invalidation logic.",
         "whyTakeProfit": "Primary take profit 215.691 preserves the existing risk/reward calculation. Phase 6 validates its institutional quality without replacing it.",
-        "whyPatternSelected": "Bullish Engulfing achieved AI Score 76.5/100 with Quality Grade B after portfolio and correlation review.",
+        "whyPatternSelected": "Bullish Engulfing achieved AI Score 70.5/100 with Quality Grade C after portfolio and correlation review.",
         "whyRiskRewardAccepted": "Risk/reward 1.5 passed the existing signal engine and the institutional ranking threshold.",
         "marketState": {
           "state": "RANGING",
@@ -279,7 +281,7 @@
         "rejectedPatterns": [
           {
             "pattern": "Bullish Engulfing",
-            "reason": "AI score 67.4 below 70"
+            "reason": "AI score 61.4 below 70"
           }
         ]
       },
@@ -287,7 +289,7 @@
       "institutionalRank": 1,
       "signalId": "GBPJPY_30m_BULLISHENGULFING_20260815",
       "timestamp": "2026-08-15T10:40:33.784Z",
-      "version": 1,
+      "version": 2,
       "decisionAdaptiveConfidence": 88,
       "decisionSignalConfidence": 88,
       "decisionFinalAIConfidence": 75.9,
@@ -295,8 +297,8 @@
       "confidenceProvenance": "LOCKED_AT_PUBLICATION",
       "decisionConfidenceCapturedAt": "2026-08-15T10:40:33.784Z",
       "initialStopLoss": 215.566,
-      "lastUpdated": "2026-08-15T10:40:33.785Z",
-      "refreshCount": 1
+      "lastUpdated": "2026-08-15T10:45:33.056Z",
+      "refreshCount": 2
     },
     {
       "id": "XAUUSD-5m-BullishEngulfing-1786452033703-7mjvvf",
@@ -4262,7 +4264,7 @@
       "expiredAt": "2026-08-15T02:40:30.067Z"
     }
   ],
-  "updatedAt": "2026-08-15T10:40:33.793Z",
+  "updatedAt": "2026-08-15T10:45:33.064Z",
   "stale": {},
   "totalSignals": 14,
   "resolvedSignals": 6,
