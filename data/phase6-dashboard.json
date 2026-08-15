@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-15T11:20:32.274Z",
+  "updatedAt": "2026-08-15T11:25:28.201Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "INTRADAY": {
-        "total": 9,
-        "wins": 1,
-        "losses": 2,
-        "expired": 6,
-        "winRate": 33.3,
-        "averageRiskReward": 1.72
-      },
       "SCALPING": {
         "total": 5,
         "wins": 0,
@@ -34,17 +26,17 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.9
+      },
+      "INTRADAY": {
+        "total": 9,
+        "wins": 1,
+        "losses": 2,
+        "expired": 6,
+        "winRate": 33.3,
+        "averageRiskReward": 1.72
       }
     },
     "pair": {
-      "GBPJPY": {
-        "total": 11,
-        "wins": 1,
-        "losses": 3,
-        "expired": 7,
-        "winRate": 25,
-        "averageRiskReward": 1.77
-      },
       "XAUUSD": {
         "total": 3,
         "wins": 0,
@@ -52,6 +44,14 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.83
+      },
+      "GBPJPY": {
+        "total": 11,
+        "wins": 1,
+        "losses": 3,
+        "expired": 7,
+        "winRate": 25,
+        "averageRiskReward": 1.77
       }
     },
     "marketState": {
@@ -81,14 +81,6 @@
       }
     },
     "session": {
-      "LONDON": {
-        "total": 3,
-        "wins": 0,
-        "losses": 3,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.67
-      },
       "LONDON_NY_OVERLAP": {
         "total": 3,
         "wins": 1,
@@ -120,6 +112,14 @@
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.83
+      },
+      "LONDON": {
+        "total": 3,
+        "wins": 0,
+        "losses": 3,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.67
       }
     },
     "patternRanking": {
@@ -158,10 +158,10 @@
     "recentWinRate": 14.3,
     "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 365,
-    "analysisDurationMs": 25,
-    "learningDurationMs": 10,
+    "fetchDurationMs": 294,
+    "analysisDurationMs": 24,
+    "learningDurationMs": 6,
     "saveDurationMs": 5,
-    "totalRuntimeMs": 410
+    "totalRuntimeMs": 333
   }
 }
