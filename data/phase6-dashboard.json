@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-20T16:10:36.697Z",
+  "updatedAt": "2026-08-20T16:15:34.309Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -21,10 +21,10 @@
     "strategy": {
       "INTRADAY": {
         "total": 10,
-        "wins": 1,
+        "wins": 2,
         "losses": 2,
         "expired": 6,
-        "winRate": 33.3,
+        "winRate": 50,
         "averageRiskReward": 1.7
       },
       "SCALPING": {
@@ -47,10 +47,10 @@
     "pair": {
       "XAUUSD": {
         "total": 5,
-        "wins": 0,
+        "wins": 1,
         "losses": 3,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 25,
         "averageRiskReward": 1.7
       },
       "GBPJPY": {
@@ -65,10 +65,10 @@
     "marketState": {
       "TRENDING": {
         "total": 2,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "RANGING": {
@@ -99,10 +99,10 @@
     "session": {
       "LONDON_NY_OVERLAP": {
         "total": 4,
-        "wins": 1,
+        "wins": 2,
         "losses": 1,
         "expired": 1,
-        "winRate": 50,
+        "winRate": 66.7,
         "averageRiskReward": 1.75
       },
       "NEWYORK": {
@@ -141,10 +141,10 @@
     "patternRanking": {
       "Liquidity Sweep (Sell-Side)": {
         "total": 1,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 0,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "Bullish Engulfing": {
@@ -187,13 +187,13 @@
     "signalsGenerated": 0,
     "averageConfidence": 0,
     "averageAIScore": 0,
-    "recentWinRate": 14.3,
-    "openSignals": 1,
+    "recentWinRate": 25,
+    "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 471,
-    "analysisDurationMs": 32,
-    "learningDurationMs": 7,
-    "saveDurationMs": 6,
-    "totalRuntimeMs": 523
+    "fetchDurationMs": 323,
+    "analysisDurationMs": 26,
+    "learningDurationMs": 9,
+    "saveDurationMs": 5,
+    "totalRuntimeMs": 370
   }
 }

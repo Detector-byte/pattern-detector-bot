@@ -1,22 +1,22 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-20T16:10:36.697Z",
+  "generatedAt": "2026-08-20T16:15:34.309Z",
   "period": {
-    "start": "2026-08-13T16:10:36.696Z",
-    "end": "2026-08-20T16:10:36.696Z"
+    "start": "2026-08-13T16:15:34.308Z",
+    "end": "2026-08-20T16:15:34.308Z"
   },
   "metrics": {
     "totalSignals": 7,
-    "resolvedSignals": 4,
-    "overallWinRate": 25,
+    "resolvedSignals": 5,
+    "overallWinRate": 40,
     "averageRiskReward": 1.57,
     "patternAccuracy": {
       "Liquidity Sweep (Sell-Side)": {
         "total": 1,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 0,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "Bearish Engulfing": {
@@ -55,10 +55,10 @@
     "pairAccuracy": {
       "XAUUSD": {
         "total": 3,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.5
       },
       "GBPJPY": {
@@ -73,10 +73,10 @@
     "timeframeAccuracy": {
       "1H": {
         "total": 3,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.67
       },
       "15m": {
@@ -99,7 +99,7 @@
     "sessionAccuracy": {
       "LONDON_NY_OVERLAP": {
         "total": 2,
-        "wins": 1,
+        "wins": 2,
         "losses": 0,
         "expired": 0,
         "winRate": 100,
@@ -125,10 +125,10 @@
     "marketRegimeAccuracy": {
       "TRENDING": {
         "total": 2,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "RANGING": {
@@ -149,7 +149,7 @@
       }
     },
     "learningProgress": "insufficient-data",
-    "bestPattern": "Bullish Engulfing",
+    "bestPattern": "Liquidity Sweep (Sell-Side)",
     "worstPattern": "Bullish Order Block",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
