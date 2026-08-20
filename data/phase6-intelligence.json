@@ -1,17 +1,39 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-20T15:00:47.063Z",
-  "lastRun": "2026-08-20T15:00:47.063Z",
-  "publishedSignalId": null,
+  "updatedAt": "2026-08-20T15:05:29.091Z",
+  "lastRun": "2026-08-20T15:05:29.091Z",
+  "publishedSignalId": "XAUUSD_1H_LIQUIDITYSWEEPSELLSIDE_20260820",
   "portfolio": {
-    "openTrades": 0,
+    "openTrades": 1,
     "limits": {
       "maxOpenTrades": 4,
       "maxPairOpenTrades": 2,
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {},
-  "strategyPriorities": {},
+  "marketStates": {
+    "XAUUSD_1H": {
+      "state": "TRENDING",
+      "confidence": 80,
+      "features": {
+        "baseRegime": "RANGING",
+        "directionalMove": 0.03528,
+        "rangeRatio": 1.58,
+        "bodyRatio": 0.61,
+        "volumeRatio": 1,
+        "breakout": false
+      }
+    }
+  },
+  "strategyPriorities": {
+    "XAUUSD_1H": {
+      "primary": "INTRADAY",
+      "scores": {
+        "INTRADAY": 80,
+        "SWING": 75,
+        "SCALPING": 50
+      }
+    }
+  },
   "optimizerRecommendations": []
 }

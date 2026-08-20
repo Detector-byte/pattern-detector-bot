@@ -1,17 +1,17 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-20T15:00:47.063Z",
+  "updatedAt": "2026-08-20T15:05:29.090Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 15,
+      "70-79": 16,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
-      "60-69": 13,
+      "60-69": 14,
       "70-79": 2,
       "80-89": 0,
       "90-100": 0
@@ -28,12 +28,12 @@
         "averageRiskReward": 1.9
       },
       "INTRADAY": {
-        "total": 9,
+        "total": 10,
         "wins": 1,
         "losses": 2,
         "expired": 6,
         "winRate": 33.3,
-        "averageRiskReward": 1.72
+        "averageRiskReward": 1.7
       },
       "SWING": {
         "total": 1,
@@ -46,12 +46,12 @@
     },
     "pair": {
       "XAUUSD": {
-        "total": 4,
+        "total": 5,
         "wins": 0,
         "losses": 3,
         "expired": 1,
         "winRate": 0,
-        "averageRiskReward": 1.75
+        "averageRiskReward": 1.7
       },
       "GBPJPY": {
         "total": 11,
@@ -88,7 +88,7 @@
         "averageRiskReward": 1.75
       },
       "TRENDING": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 1,
@@ -98,12 +98,12 @@
     },
     "session": {
       "LONDON_NY_OVERLAP": {
-        "total": 3,
+        "total": 4,
         "wins": 1,
         "losses": 1,
         "expired": 1,
         "winRate": 50,
-        "averageRiskReward": 1.83
+        "averageRiskReward": 1.75
       },
       "NEWYORK": {
         "total": 4,
@@ -170,22 +170,30 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "Liquidity Sweep (Sell-Side)": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "insufficient-data"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 68.7,
+    "averageAIScore": 70.2,
     "recentWinRate": 14.3,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 464,
-    "analysisDurationMs": 20,
-    "learningDurationMs": 6,
-    "saveDurationMs": 3,
-    "totalRuntimeMs": 496
+    "fetchDurationMs": 227,
+    "analysisDurationMs": 30,
+    "learningDurationMs": 7,
+    "saveDurationMs": 6,
+    "totalRuntimeMs": 275
   }
 }

@@ -1,15 +1,15 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-20T15:00:47.062Z",
+  "generatedAt": "2026-08-20T15:05:29.090Z",
   "period": {
-    "start": "2026-08-13T15:00:47.062Z",
-    "end": "2026-08-20T15:00:47.062Z"
+    "start": "2026-08-13T15:05:29.089Z",
+    "end": "2026-08-20T15:05:29.089Z"
   },
   "metrics": {
-    "totalSignals": 6,
+    "totalSignals": 7,
     "resolvedSignals": 4,
     "overallWinRate": 25,
-    "averageRiskReward": 1.58,
+    "averageRiskReward": 1.57,
     "patternAccuracy": {
       "Bearish Engulfing": {
         "total": 1,
@@ -42,11 +42,19 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "Liquidity Sweep (Sell-Side)": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 2,
+        "total": 3,
         "wins": 0,
         "losses": 1,
         "expired": 1,
@@ -72,12 +80,12 @@
         "averageRiskReward": 1.5
       },
       "1H": {
-        "total": 2,
+        "total": 3,
         "wins": 0,
         "losses": 1,
         "expired": 1,
         "winRate": 0,
-        "averageRiskReward": 1.75
+        "averageRiskReward": 1.67
       },
       "30m": {
         "total": 3,
@@ -98,7 +106,7 @@
         "averageRiskReward": 1.67
       },
       "LONDON_NY_OVERLAP": {
-        "total": 1,
+        "total": 2,
         "wins": 1,
         "losses": 0,
         "expired": 0,
@@ -132,7 +140,7 @@
         "averageRiskReward": 1.75
       },
       "TRENDING": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 1,
@@ -142,7 +150,7 @@
     },
     "learningProgress": "insufficient-data",
     "bestPattern": "Bullish Engulfing",
-    "worstPattern": "Bullish Order Block",
+    "worstPattern": "Liquidity Sweep (Sell-Side)",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []
