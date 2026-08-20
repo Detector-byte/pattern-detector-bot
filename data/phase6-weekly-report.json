@@ -1,15 +1,15 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-20T05:01:45.762Z",
+  "generatedAt": "2026-08-20T05:05:30.229Z",
   "period": {
-    "start": "2026-08-13T05:01:45.761Z",
-    "end": "2026-08-20T05:01:45.761Z"
+    "start": "2026-08-13T05:05:30.228Z",
+    "end": "2026-08-20T05:05:30.228Z"
   },
   "metrics": {
-    "totalSignals": 5,
+    "totalSignals": 6,
     "resolvedSignals": 4,
     "overallWinRate": 25,
-    "averageRiskReward": 1.6,
+    "averageRiskReward": 1.58,
     "patternAccuracy": {
       "Bearish Engulfing": {
         "total": 1,
@@ -34,11 +34,19 @@
         "expired": 1,
         "winRate": 50,
         "averageRiskReward": 1.5
+      },
+      "Bullish Order Block": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 1,
         "expired": 0,
@@ -64,12 +72,12 @@
         "averageRiskReward": 1.5
       },
       "1H": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 1,
         "expired": 0,
         "winRate": 0,
-        "averageRiskReward": 2
+        "averageRiskReward": 1.75
       },
       "30m": {
         "total": 3,
@@ -98,7 +106,7 @@
         "averageRiskReward": 1.5
       },
       "ASIAN": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 1,
@@ -122,11 +130,19 @@
         "expired": 0,
         "winRate": 50,
         "averageRiskReward": 1.75
+      },
+      "TRENDING": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "learningProgress": "insufficient-data",
     "bestPattern": "Bullish Engulfing",
-    "worstPattern": "Risk-Adjusted Trend Momentum",
+    "worstPattern": "Bullish Order Block",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []
