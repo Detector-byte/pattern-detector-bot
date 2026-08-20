@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-20T15:05:29.090Z",
+  "updatedAt": "2026-08-20T15:10:32.771Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "SCALPING": {
-        "total": 5,
-        "wins": 0,
-        "losses": 4,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.9
-      },
       "INTRADAY": {
         "total": 10,
         "wins": 1,
@@ -34,6 +26,14 @@
         "expired": 6,
         "winRate": 33.3,
         "averageRiskReward": 1.7
+      },
+      "SCALPING": {
+        "total": 5,
+        "wins": 0,
+        "losses": 4,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.9
       },
       "SWING": {
         "total": 1,
@@ -63,6 +63,14 @@
       }
     },
     "marketState": {
+      "TRENDING": {
+        "total": 2,
+        "wins": 0,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "RANGING": {
         "total": 9,
         "wins": 0,
@@ -86,14 +94,6 @@
         "expired": 0,
         "winRate": 50,
         "averageRiskReward": 1.75
-      },
-      "TRENDING": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
       }
     },
     "session": {
@@ -139,6 +139,14 @@
       }
     },
     "patternRanking": {
+      "Liquidity Sweep (Sell-Side)": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -170,30 +178,22 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
-      },
-      "Liquidity Sweep (Sell-Side)": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "insufficient-data"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 1,
-    "averageConfidence": 68.7,
-    "averageAIScore": 70.2,
+    "signalsGenerated": 0,
+    "averageConfidence": 0,
+    "averageAIScore": 0,
     "recentWinRate": 14.3,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 227,
-    "analysisDurationMs": 30,
-    "learningDurationMs": 7,
-    "saveDurationMs": 6,
-    "totalRuntimeMs": 275
+    "fetchDurationMs": 239,
+    "analysisDurationMs": 36,
+    "learningDurationMs": 11,
+    "saveDurationMs": 9,
+    "totalRuntimeMs": 301
   }
 }
