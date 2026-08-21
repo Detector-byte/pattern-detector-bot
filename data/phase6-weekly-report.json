@@ -1,24 +1,16 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-21T11:30:41.746Z",
+  "generatedAt": "2026-08-21T11:35:30.737Z",
   "period": {
-    "start": "2026-08-14T11:30:41.746Z",
-    "end": "2026-08-21T11:30:41.746Z"
+    "start": "2026-08-14T11:35:30.736Z",
+    "end": "2026-08-21T11:35:30.736Z"
   },
   "metrics": {
-    "totalSignals": 8,
-    "resolvedSignals": 6,
-    "overallWinRate": 33.3,
-    "averageRiskReward": 1.56,
+    "totalSignals": 7,
+    "resolvedSignals": 5,
+    "overallWinRate": 40,
+    "averageRiskReward": 1.57,
     "patternAccuracy": {
-      "Bearish Engulfing": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Risk-Adjusted Trend Momentum": {
         "total": 1,
         "wins": 0,
@@ -53,14 +45,6 @@
       }
     },
     "pairAccuracy": {
-      "XAUUSD": {
-        "total": 4,
-        "wins": 1,
-        "losses": 2,
-        "expired": 1,
-        "winRate": 33.3,
-        "averageRiskReward": 1.5
-      },
       "GBPJPY": {
         "total": 4,
         "wins": 1,
@@ -68,17 +52,17 @@
         "expired": 1,
         "winRate": 33.3,
         "averageRiskReward": 1.63
+      },
+      "XAUUSD": {
+        "total": 3,
+        "wins": 1,
+        "losses": 1,
+        "expired": 1,
+        "winRate": 50,
+        "averageRiskReward": 1.5
       }
     },
     "timeframeAccuracy": {
-      "15m": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "1H": {
         "total": 3,
         "wins": 1,
@@ -98,12 +82,12 @@
     },
     "sessionAccuracy": {
       "LONDON": {
-        "total": 3,
+        "total": 2,
         "wins": 0,
-        "losses": 3,
+        "losses": 2,
         "expired": 0,
         "winRate": 0,
-        "averageRiskReward": 1.67
+        "averageRiskReward": 1.75
       },
       "LONDON_NY_OVERLAP": {
         "total": 2,
@@ -123,14 +107,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "RANGING": {
-        "total": 3,
-        "wins": 0,
-        "losses": 2,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "BREAKOUT": {
         "total": 2,
         "wins": 1,
@@ -138,6 +114,14 @@
         "expired": 0,
         "winRate": 50,
         "averageRiskReward": 1.75
+      },
+      "RANGING": {
+        "total": 2,
+        "wins": 0,
+        "losses": 1,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       },
       "TRENDING": {
         "total": 2,
