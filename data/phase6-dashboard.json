@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-21T02:45:32.962Z",
+  "updatedAt": "2026-08-21T02:50:31.849Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "INTRADAY": {
-        "total": 11,
-        "wins": 2,
-        "losses": 3,
-        "expired": 6,
-        "winRate": 40,
-        "averageRiskReward": 1.68
-      },
       "SCALPING": {
         "total": 5,
         "wins": 0,
@@ -34,6 +26,14 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.9
+      },
+      "INTRADAY": {
+        "total": 11,
+        "wins": 2,
+        "losses": 3,
+        "expired": 6,
+        "winRate": 40,
+        "averageRiskReward": 1.68
       },
       "SWING": {
         "total": 1,
@@ -63,14 +63,6 @@
       }
     },
     "marketState": {
-      "EXPANSION": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "RANGING": {
         "total": 9,
         "wins": 0,
@@ -102,17 +94,17 @@
         "expired": 1,
         "winRate": 100,
         "averageRiskReward": 1.5
+      },
+      "EXPANSION": {
+        "total": 1,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "session": {
-      "ASIAN": {
-        "total": 5,
-        "wins": 0,
-        "losses": 2,
-        "expired": 3,
-        "winRate": 0,
-        "averageRiskReward": 1.7
-      },
       "LONDON_NY_OVERLAP": {
         "total": 4,
         "wins": 2,
@@ -137,6 +129,14 @@
         "winRate": 0,
         "averageRiskReward": 2
       },
+      "ASIAN": {
+        "total": 5,
+        "wins": 0,
+        "losses": 2,
+        "expired": 3,
+        "winRate": 0,
+        "averageRiskReward": 1.7
+      },
       "LONDON": {
         "total": 3,
         "wins": 0,
@@ -147,14 +147,6 @@
       }
     },
     "patternRanking": {
-      "Liquidity Sweep (Sell-Side)": {
-        "total": 2,
-        "wins": 1,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -186,6 +178,14 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "Liquidity Sweep (Sell-Side)": {
+        "total": 2,
+        "wins": 1,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 50,
+        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "insufficient-data"
@@ -198,10 +198,10 @@
     "recentWinRate": 22.2,
     "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 203,
-    "analysisDurationMs": 24,
-    "learningDurationMs": 10,
-    "saveDurationMs": 6,
-    "totalRuntimeMs": 249
+    "fetchDurationMs": 117,
+    "analysisDurationMs": 41,
+    "learningDurationMs": 9,
+    "saveDurationMs": 9,
+    "totalRuntimeMs": 182
   }
 }
