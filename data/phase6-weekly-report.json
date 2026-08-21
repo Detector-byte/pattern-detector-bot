@@ -1,22 +1,22 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-21T16:30:40.700Z",
+  "generatedAt": "2026-08-21T16:35:31.661Z",
   "period": {
-    "start": "2026-08-14T16:30:40.699Z",
-    "end": "2026-08-21T16:30:40.699Z"
+    "start": "2026-08-14T16:35:31.661Z",
+    "end": "2026-08-21T16:35:31.661Z"
   },
   "metrics": {
-    "totalSignals": 6,
-    "resolvedSignals": 4,
-    "overallWinRate": 50,
+    "totalSignals": 5,
+    "resolvedSignals": 3,
+    "overallWinRate": 33.3,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
       "Bullish Engulfing": {
-        "total": 3,
-        "wins": 1,
+        "total": 2,
+        "wins": 0,
         "losses": 1,
         "expired": 1,
-        "winRate": 50,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "Bullish Order Block": {
@@ -38,11 +38,11 @@
     },
     "pairAccuracy": {
       "GBPJPY": {
-        "total": 3,
-        "wins": 1,
+        "total": 2,
+        "wins": 0,
         "losses": 1,
         "expired": 1,
-        "winRate": 50,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "XAUUSD": {
@@ -56,11 +56,11 @@
     },
     "timeframeAccuracy": {
       "30m": {
-        "total": 4,
-        "wins": 1,
+        "total": 3,
+        "wins": 0,
         "losses": 2,
         "expired": 1,
-        "winRate": 33.3,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "1H": {
@@ -73,14 +73,6 @@
       }
     },
     "sessionAccuracy": {
-      "LONDON_NY_OVERLAP": {
-        "total": 2,
-        "wins": 2,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "ASIAN": {
         "total": 3,
         "wins": 0,
@@ -96,17 +88,17 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
-      }
-    },
-    "marketRegimeAccuracy": {
-      "BREAKOUT": {
+      },
+      "LONDON_NY_OVERLAP": {
         "total": 1,
         "wins": 1,
         "losses": 0,
         "expired": 0,
         "winRate": 100,
         "averageRiskReward": 1.5
-      },
+      }
+    },
+    "marketRegimeAccuracy": {
       "RANGING": {
         "total": 2,
         "wins": 0,
@@ -133,7 +125,7 @@
       }
     },
     "learningProgress": "insufficient-data",
-    "bestPattern": "Bullish Engulfing",
+    "bestPattern": "Liquidity Sweep (Sell-Side)",
     "worstPattern": "Bullish Order Block",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
