@@ -1,17 +1,39 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-22T11:55:29.827Z",
-  "lastRun": "2026-08-22T11:55:29.827Z",
-  "publishedSignalId": null,
+  "updatedAt": "2026-08-22T12:00:47.746Z",
+  "lastRun": "2026-08-22T12:00:47.746Z",
+  "publishedSignalId": "XAUUSD_1H_BULLISHORDERBLOCK_20260822",
   "portfolio": {
-    "openTrades": 0,
+    "openTrades": 1,
     "limits": {
       "maxOpenTrades": 4,
       "maxPairOpenTrades": 2,
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {},
-  "strategyPriorities": {},
+  "marketStates": {
+    "XAUUSD_1H": {
+      "state": "COMPRESSION",
+      "confidence": 80,
+      "features": {
+        "baseRegime": "RANGING",
+        "directionalMove": 0.0117,
+        "rangeRatio": 0.13,
+        "bodyRatio": 0.5,
+        "volumeRatio": 1,
+        "breakout": false
+      }
+    }
+  },
+  "strategyPriorities": {
+    "XAUUSD_1H": {
+      "primary": "INTRADAY",
+      "scores": {
+        "INTRADAY": 70,
+        "SWING": 65,
+        "SCALPING": 60
+      }
+    }
+  },
   "optimizerRecommendations": []
 }

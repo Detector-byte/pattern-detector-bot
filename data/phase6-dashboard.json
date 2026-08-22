@@ -1,17 +1,17 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-22T11:55:29.826Z",
+  "updatedAt": "2026-08-22T12:00:47.745Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 17,
+      "70-79": 18,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
-      "60-69": 14,
+      "60-69": 15,
       "70-79": 3,
       "80-89": 0,
       "90-100": 0
@@ -28,12 +28,12 @@
         "averageRiskReward": 1.9
       },
       "INTRADAY": {
-        "total": 11,
+        "total": 12,
         "wins": 2,
         "losses": 3,
         "expired": 6,
         "winRate": 40,
-        "averageRiskReward": 1.68
+        "averageRiskReward": 1.67
       },
       "SWING": {
         "total": 1,
@@ -46,12 +46,12 @@
     },
     "pair": {
       "XAUUSD": {
-        "total": 6,
+        "total": 7,
         "wins": 1,
         "losses": 4,
         "expired": 1,
         "winRate": 20,
-        "averageRiskReward": 1.67
+        "averageRiskReward": 1.64
       },
       "GBPJPY": {
         "total": 11,
@@ -72,12 +72,12 @@
         "averageRiskReward": 1.78
       },
       "COMPRESSION": {
-        "total": 3,
+        "total": 4,
         "wins": 0,
         "losses": 1,
         "expired": 2,
         "winRate": 0,
-        "averageRiskReward": 1.83
+        "averageRiskReward": 1.75
       },
       "BREAKOUT": {
         "total": 2,
@@ -106,12 +106,12 @@
     },
     "session": {
       "LONDON_NY_OVERLAP": {
-        "total": 4,
+        "total": 5,
         "wins": 2,
         "losses": 1,
         "expired": 1,
         "winRate": 66.7,
-        "averageRiskReward": 1.75
+        "averageRiskReward": 1.7
       },
       "NEWYORK": {
         "total": 4,
@@ -172,7 +172,7 @@
         "averageRiskReward": 1.5
       },
       "Bullish Order Block": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 1,
@@ -192,16 +192,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 68.9,
+    "averageAIScore": 70.1,
     "recentWinRate": 22.2,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 423,
-    "analysisDurationMs": 27,
-    "learningDurationMs": 7,
-    "saveDurationMs": 6,
-    "totalRuntimeMs": 469
+    "fetchDurationMs": 244,
+    "analysisDurationMs": 28,
+    "learningDurationMs": 9,
+    "saveDurationMs": 5,
+    "totalRuntimeMs": 294
   }
 }
