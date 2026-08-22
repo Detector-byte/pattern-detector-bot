@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-22T18:05:30.068Z",
+  "updatedAt": "2026-08-22T18:10:36.543Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "INTRADAY": {
-        "total": 12,
-        "wins": 2,
-        "losses": 3,
-        "expired": 7,
-        "winRate": 40,
-        "averageRiskReward": 1.67
-      },
       "SCALPING": {
         "total": 5,
         "wins": 0,
@@ -34,6 +26,14 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.9
+      },
+      "INTRADAY": {
+        "total": 12,
+        "wins": 2,
+        "losses": 3,
+        "expired": 7,
+        "winRate": 40,
+        "averageRiskReward": 1.67
       },
       "SWING": {
         "total": 1,
@@ -63,14 +63,6 @@
       }
     },
     "marketState": {
-      "COMPRESSION": {
-        "total": 4,
-        "wins": 0,
-        "losses": 1,
-        "expired": 3,
-        "winRate": 0,
-        "averageRiskReward": 1.75
-      },
       "RANGING": {
         "total": 9,
         "wins": 0,
@@ -78,6 +70,14 @@
         "expired": 5,
         "winRate": 0,
         "averageRiskReward": 1.78
+      },
+      "COMPRESSION": {
+        "total": 4,
+        "wins": 0,
+        "losses": 1,
+        "expired": 3,
+        "winRate": 0,
+        "averageRiskReward": 1.75
       },
       "BREAKOUT": {
         "total": 2,
@@ -147,14 +147,6 @@
       }
     },
     "patternRanking": {
-      "Bullish Order Block": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -179,6 +171,14 @@
         "winRate": 0,
         "averageRiskReward": 1.5
       },
+      "Bullish Order Block": {
+        "total": 2,
+        "wins": 0,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "Liquidity Sweep (Sell-Side)": {
         "total": 2,
         "wins": 1,
@@ -198,10 +198,10 @@
     "recentWinRate": 22.2,
     "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 224,
-    "analysisDurationMs": 30,
-    "learningDurationMs": 11,
-    "saveDurationMs": 8,
-    "totalRuntimeMs": 279
+    "fetchDurationMs": 523,
+    "analysisDurationMs": 23,
+    "learningDurationMs": 8,
+    "saveDurationMs": 6,
+    "totalRuntimeMs": 565
   }
 }
