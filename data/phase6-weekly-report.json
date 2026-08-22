@@ -1,24 +1,16 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-22T11:15:35.403Z",
+  "generatedAt": "2026-08-22T11:20:39.221Z",
   "period": {
-    "start": "2026-08-15T11:15:35.402Z",
-    "end": "2026-08-22T11:15:35.402Z"
+    "start": "2026-08-15T11:20:39.221Z",
+    "end": "2026-08-22T11:20:39.221Z"
   },
   "metrics": {
-    "totalSignals": 4,
-    "resolvedSignals": 3,
-    "overallWinRate": 33.3,
+    "totalSignals": 3,
+    "resolvedSignals": 2,
+    "overallWinRate": 50,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Bullish Engulfing": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Bullish Order Block": {
         "total": 1,
         "wins": 0,
@@ -37,14 +29,6 @@
       }
     },
     "pairAccuracy": {
-      "GBPJPY": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "XAUUSD": {
         "total": 3,
         "wins": 1,
@@ -55,14 +39,6 @@
       }
     },
     "timeframeAccuracy": {
-      "30m": {
-        "total": 2,
-        "wins": 0,
-        "losses": 2,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "1H": {
         "total": 2,
         "wins": 1,
@@ -70,17 +46,17 @@
         "expired": 1,
         "winRate": 100,
         "averageRiskReward": 1.5
-      }
-    },
-    "sessionAccuracy": {
-      "LONDON": {
+      },
+      "30m": {
         "total": 1,
         "wins": 0,
         "losses": 1,
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
-      },
+      }
+    },
+    "sessionAccuracy": {
       "ASIAN": {
         "total": 2,
         "wins": 0,
@@ -99,14 +75,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "RANGING": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "TRENDING": {
         "total": 2,
         "wins": 1,
