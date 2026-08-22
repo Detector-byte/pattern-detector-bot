@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-22T12:00:47.745Z",
+  "updatedAt": "2026-08-22T12:05:26.571Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "SCALPING": {
-        "total": 5,
-        "wins": 0,
-        "losses": 4,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.9
-      },
       "INTRADAY": {
         "total": 12,
         "wins": 2,
@@ -34,6 +26,14 @@
         "expired": 6,
         "winRate": 40,
         "averageRiskReward": 1.67
+      },
+      "SCALPING": {
+        "total": 5,
+        "wins": 0,
+        "losses": 4,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.9
       },
       "SWING": {
         "total": 1,
@@ -63,14 +63,6 @@
       }
     },
     "marketState": {
-      "RANGING": {
-        "total": 9,
-        "wins": 0,
-        "losses": 4,
-        "expired": 5,
-        "winRate": 0,
-        "averageRiskReward": 1.78
-      },
       "COMPRESSION": {
         "total": 4,
         "wins": 0,
@@ -78,6 +70,14 @@
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.75
+      },
+      "RANGING": {
+        "total": 9,
+        "wins": 0,
+        "losses": 4,
+        "expired": 5,
+        "winRate": 0,
+        "averageRiskReward": 1.78
       },
       "BREAKOUT": {
         "total": 2,
@@ -147,6 +147,14 @@
       }
     },
     "patternRanking": {
+      "Bullish Order Block": {
+        "total": 2,
+        "wins": 0,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -171,14 +179,6 @@
         "winRate": 0,
         "averageRiskReward": 1.5
       },
-      "Bullish Order Block": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Liquidity Sweep (Sell-Side)": {
         "total": 2,
         "wins": 1,
@@ -192,16 +192,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 1,
-    "averageConfidence": 68.9,
-    "averageAIScore": 70.1,
+    "signalsGenerated": 0,
+    "averageConfidence": 0,
+    "averageAIScore": 0,
     "recentWinRate": 22.2,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 244,
-    "analysisDurationMs": 28,
-    "learningDurationMs": 9,
-    "saveDurationMs": 5,
-    "totalRuntimeMs": 294
+    "fetchDurationMs": 839,
+    "analysisDurationMs": 18,
+    "learningDurationMs": 4,
+    "saveDurationMs": 4,
+    "totalRuntimeMs": 869
   }
 }
