@@ -1,18 +1,18 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-08-22T08:10:35.487Z",
+  "updatedAt": "2026-08-22T08:15:37.269Z",
   "pairs": {
     "XAUUSD": {
       "5m": {
         "pair": "XAUUSD",
         "timeframe": "5m",
-        "updatedAt": "2026-08-22T08:10:35.460Z",
+        "updatedAt": "2026-08-22T08:15:37.239Z",
         "candleCount": 1500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": null,
-        "atr": 0.27138,
-        "atrPercent": 0.00005889,
+        "atr": 0.27050429,
+        "atrPercent": 0.0000587,
         "minimumATRPercent": 0.00005,
         "rawCandidates": 2,
         "acceptedPatterns": 2,
@@ -34,19 +34,21 @@
       "15m": {
         "pair": "XAUUSD",
         "timeframe": "15m",
-        "updatedAt": "2026-08-22T08:10:35.463Z",
-        "candleCount": 499,
+        "updatedAt": "2026-08-22T08:15:37.242Z",
+        "candleCount": 500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": null,
-        "atr": 0.304365,
-        "atrPercent": 0.00006605,
+        "atr": 0.30356786,
+        "atrPercent": 0.00006587,
         "minimumATRPercent": 0.00005,
-        "rawCandidates": 2,
-        "acceptedPatterns": 2,
-        "returnedPatterns": 2,
+        "rawCandidates": 4,
+        "acceptedPatterns": 4,
+        "returnedPatterns": 4,
         "returnedPatternNames": [
+          "Diamond Bottom",
           "Rectangle Bottom",
+          "Diamond Top",
           "Rectangle Top"
         ],
         "institutionalSequence": {
@@ -62,7 +64,7 @@
       "30m": {
         "pair": "XAUUSD",
         "timeframe": "30m",
-        "updatedAt": "2026-08-22T08:10:35.464Z",
+        "updatedAt": "2026-08-22T08:15:37.243Z",
         "candleCount": 249,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -90,7 +92,7 @@
       "1H": {
         "pair": "XAUUSD",
         "timeframe": "1H",
-        "updatedAt": "2026-08-22T08:10:35.466Z",
+        "updatedAt": "2026-08-22T08:15:37.245Z",
         "candleCount": 124,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -120,7 +122,7 @@
       "4H": {
         "pair": "XAUUSD",
         "timeframe": "4H",
-        "updatedAt": "2026-08-22T08:10:35.468Z",
+        "updatedAt": "2026-08-22T08:15:37.247Z",
         "candleCount": 31,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -153,19 +155,19 @@
       "5m": {
         "pair": "GBPJPY",
         "timeframe": "5m",
-        "updatedAt": "2026-08-22T08:10:35.470Z",
+        "updatedAt": "2026-08-22T08:15:37.249Z",
         "candleCount": 1500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
-        "reason": "breakoutSell: 1",
-        "atr": 0.03012929,
-        "atrPercent": 0.00013889,
+        "reason": "breakoutBuy: 1",
+        "atr": 0.02752286,
+        "atrPercent": 0.00012688,
         "minimumATRPercent": 0.00005,
         "rawCandidates": 2,
         "acceptedPatterns": 1,
         "returnedPatterns": 1,
         "returnedPatternNames": [
-          "Rectangle Bottom"
+          "Rectangle Top"
         ],
         "institutionalSequence": {
           "stage": "SEARCHING_LIQUIDITY",
@@ -180,19 +182,21 @@
       "15m": {
         "pair": "GBPJPY",
         "timeframe": "15m",
-        "updatedAt": "2026-08-22T08:10:35.471Z",
-        "candleCount": 499,
+        "updatedAt": "2026-08-22T08:15:37.249Z",
+        "candleCount": 500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": null,
-        "atr": 0.04103143,
-        "atrPercent": 0.00018915,
+        "atr": 0.04096929,
+        "atrPercent": 0.00018887,
         "minimumATRPercent": 0.00005,
-        "rawCandidates": 2,
-        "acceptedPatterns": 2,
-        "returnedPatterns": 2,
+        "rawCandidates": 4,
+        "acceptedPatterns": 4,
+        "returnedPatterns": 4,
         "returnedPatternNames": [
+          "Diamond Bottom",
           "Rectangle Bottom",
+          "Diamond Top",
           "Rectangle Top"
         ],
         "institutionalSequence": {
@@ -208,7 +212,7 @@
       "30m": {
         "pair": "GBPJPY",
         "timeframe": "30m",
-        "updatedAt": "2026-08-22T08:10:35.471Z",
+        "updatedAt": "2026-08-22T08:15:37.250Z",
         "candleCount": 249,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -236,7 +240,7 @@
       "1H": {
         "pair": "GBPJPY",
         "timeframe": "1H",
-        "updatedAt": "2026-08-22T08:10:35.472Z",
+        "updatedAt": "2026-08-22T08:15:37.251Z",
         "candleCount": 124,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -264,7 +268,7 @@
       "4H": {
         "pair": "GBPJPY",
         "timeframe": "4H",
-        "updatedAt": "2026-08-22T08:10:35.473Z",
+        "updatedAt": "2026-08-22T08:15:37.252Z",
         "candleCount": 31,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
