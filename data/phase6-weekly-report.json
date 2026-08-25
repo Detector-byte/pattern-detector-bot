@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-25T14:02:35.330Z",
+  "generatedAt": "2026-08-25T14:05:36.847Z",
   "period": {
-    "start": "2026-08-18T14:02:35.330Z",
-    "end": "2026-08-25T14:02:35.330Z"
+    "start": "2026-08-18T14:05:36.846Z",
+    "end": "2026-08-25T14:05:36.846Z"
   },
   "metrics": {
     "totalSignals": 6,
@@ -11,20 +11,20 @@
     "overallWinRate": 33.3,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Liquidity Sweep (Sell-Side)": {
-        "total": 4,
-        "wins": 1,
-        "losses": 2,
-        "expired": 1,
-        "winRate": 33.3,
-        "averageRiskReward": 1.5
-      },
       "Bullish Order Block": {
         "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 2,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "Liquidity Sweep (Sell-Side)": {
+        "total": 4,
+        "wins": 1,
+        "losses": 2,
+        "expired": 1,
+        "winRate": 33.3,
         "averageRiskReward": 1.5
       }
     },
@@ -57,14 +57,6 @@
       }
     },
     "sessionAccuracy": {
-      "LONDON": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "ASIAN": {
         "total": 3,
         "wins": 0,
@@ -80,17 +72,17 @@
         "expired": 1,
         "winRate": 100,
         "averageRiskReward": 1.5
+      },
+      "LONDON": {
+        "total": 1,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "marketRegimeAccuracy": {
-      "RANGING": {
-        "total": 2,
-        "wins": 0,
-        "losses": 1,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "TRENDING": {
         "total": 2,
         "wins": 1,
@@ -111,6 +103,14 @@
         "total": 1,
         "wins": 0,
         "losses": 0,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "RANGING": {
+        "total": 2,
+        "wins": 0,
+        "losses": 1,
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
