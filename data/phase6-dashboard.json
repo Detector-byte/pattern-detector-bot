@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-25T04:10:39.317Z",
+  "updatedAt": "2026-08-25T04:15:36.239Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "SCALPING": {
-        "total": 5,
-        "wins": 0,
-        "losses": 4,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.9
-      },
       "INTRADAY": {
         "total": 13,
         "wins": 2,
@@ -34,6 +26,14 @@
         "expired": 7,
         "winRate": 40,
         "averageRiskReward": 1.65
+      },
+      "SCALPING": {
+        "total": 5,
+        "wins": 0,
+        "losses": 4,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.9
       },
       "SWING": {
         "total": 1,
@@ -105,6 +105,14 @@
       }
     },
     "session": {
+      "ASIAN": {
+        "total": 6,
+        "wins": 0,
+        "losses": 2,
+        "expired": 3,
+        "winRate": 0,
+        "averageRiskReward": 1.67
+      },
       "LONDON_NY_OVERLAP": {
         "total": 5,
         "wins": 2,
@@ -129,14 +137,6 @@
         "winRate": 0,
         "averageRiskReward": 2
       },
-      "ASIAN": {
-        "total": 6,
-        "wins": 0,
-        "losses": 2,
-        "expired": 3,
-        "winRate": 0,
-        "averageRiskReward": 1.67
-      },
       "LONDON": {
         "total": 3,
         "wins": 0,
@@ -147,6 +147,14 @@
       }
     },
     "patternRanking": {
+      "Liquidity Sweep (Sell-Side)": {
+        "total": 3,
+        "wins": 1,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 50,
+        "averageRiskReward": 1.5
+      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -178,30 +186,22 @@
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.5
-      },
-      "Liquidity Sweep (Sell-Side)": {
-        "total": 3,
-        "wins": 1,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 50,
-        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "insufficient-data"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 1,
-    "averageConfidence": 74,
-    "averageAIScore": 72.6,
+    "signalsGenerated": 0,
+    "averageConfidence": 0,
+    "averageAIScore": 0,
     "recentWinRate": 22.2,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 297,
-    "analysisDurationMs": 34,
-    "learningDurationMs": 7,
+    "fetchDurationMs": 288,
+    "analysisDurationMs": 31,
+    "learningDurationMs": 9,
     "saveDurationMs": 6,
-    "totalRuntimeMs": 349
+    "totalRuntimeMs": 341
   }
 }

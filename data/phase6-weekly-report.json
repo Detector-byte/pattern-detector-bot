@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-25T04:10:39.317Z",
+  "generatedAt": "2026-08-25T04:15:36.239Z",
   "period": {
-    "start": "2026-08-18T04:10:39.316Z",
-    "end": "2026-08-25T04:10:39.316Z"
+    "start": "2026-08-18T04:15:36.238Z",
+    "end": "2026-08-25T04:15:36.238Z"
   },
   "metrics": {
     "totalSignals": 5,
@@ -11,20 +11,20 @@
     "overallWinRate": 50,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Bullish Order Block": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Liquidity Sweep (Sell-Side)": {
         "total": 3,
         "wins": 1,
         "losses": 1,
         "expired": 0,
         "winRate": 50,
+        "averageRiskReward": 1.5
+      },
+      "Bullish Order Block": {
+        "total": 2,
+        "wins": 0,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 0,
         "averageRiskReward": 1.5
       }
     },
@@ -75,6 +75,14 @@
       }
     },
     "marketRegimeAccuracy": {
+      "RANGING": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "TRENDING": {
         "total": 2,
         "wins": 1,
@@ -96,14 +104,6 @@
         "wins": 0,
         "losses": 0,
         "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
-      "RANGING": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
       }
