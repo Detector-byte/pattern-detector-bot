@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-28T17:50:39.560Z",
+  "generatedAt": "2026-08-28T17:55:34.760Z",
   "period": {
-    "start": "2026-08-21T17:50:39.560Z",
-    "end": "2026-08-28T17:50:39.560Z"
+    "start": "2026-08-21T17:55:34.760Z",
+    "end": "2026-08-28T17:55:34.760Z"
   },
   "metrics": {
     "totalSignals": 5,
@@ -11,6 +11,14 @@
     "overallWinRate": 50,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
+      "Break of Structure": {
+        "total": 2,
+        "wins": 1,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
+        "averageRiskReward": 1.5
+      },
       "Bullish Order Block": {
         "total": 1,
         "wins": 0,
@@ -26,14 +34,6 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
-      },
-      "Break of Structure": {
-        "total": 2,
-        "wins": 1,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
       }
     },
     "pairAccuracy": {
@@ -47,14 +47,6 @@
       }
     },
     "timeframeAccuracy": {
-      "1H": {
-        "total": 4,
-        "wins": 1,
-        "losses": 1,
-        "expired": 2,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "5m": {
         "total": 1,
         "wins": 0,
@@ -62,9 +54,25 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "1H": {
+        "total": 4,
+        "wins": 1,
+        "losses": 1,
+        "expired": 2,
+        "winRate": 50,
+        "averageRiskReward": 1.5
       }
     },
     "sessionAccuracy": {
+      "NEWYORK": {
+        "total": 2,
+        "wins": 1,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
+        "averageRiskReward": 1.5
+      },
       "LONDON_NY_OVERLAP": {
         "total": 1,
         "wins": 0,
@@ -88,17 +96,17 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
-      },
-      "NEWYORK": {
-        "total": 2,
-        "wins": 1,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
       }
     },
     "marketRegimeAccuracy": {
+      "TRENDING": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "COMPRESSION": {
         "total": 1,
         "wins": 0,
@@ -121,14 +129,6 @@
         "losses": 0,
         "expired": 0,
         "winRate": 100,
-        "averageRiskReward": 1.5
-      },
-      "TRENDING": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 0,
         "averageRiskReward": 1.5
       }
     },
