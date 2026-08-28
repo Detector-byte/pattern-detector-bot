@@ -1,24 +1,16 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-28T02:40:38.700Z",
+  "generatedAt": "2026-08-28T02:45:37.320Z",
   "period": {
-    "start": "2026-08-21T02:40:38.699Z",
-    "end": "2026-08-28T02:40:38.699Z"
+    "start": "2026-08-21T02:45:37.320Z",
+    "end": "2026-08-28T02:45:37.320Z"
   },
   "metrics": {
-    "totalSignals": 4,
-    "resolvedSignals": 2,
+    "totalSignals": 3,
+    "resolvedSignals": 1,
     "overallWinRate": 0,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Liquidity Sweep (Sell-Side)": {
-        "total": 3,
-        "wins": 0,
-        "losses": 2,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Bullish Order Block": {
         "total": 1,
         "wins": 0,
@@ -26,27 +18,27 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "Liquidity Sweep (Sell-Side)": {
+        "total": 2,
+        "wins": 0,
+        "losses": 1,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 4,
+        "total": 3,
         "wins": 0,
-        "losses": 2,
+        "losses": 1,
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.5
       }
     },
     "timeframeAccuracy": {
-      "30m": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "1H": {
         "total": 3,
         "wins": 0,
@@ -57,15 +49,15 @@
       }
     },
     "sessionAccuracy": {
-      "ASIAN": {
-        "total": 2,
+      "LONDON_NY_OVERLAP": {
+        "total": 1,
         "wins": 0,
-        "losses": 1,
+        "losses": 0,
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
       },
-      "LONDON_NY_OVERLAP": {
+      "ASIAN": {
         "total": 1,
         "wins": 0,
         "losses": 0,
@@ -83,14 +75,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "EXPANSION": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "COMPRESSION": {
         "total": 1,
         "wins": 0,
@@ -109,8 +93,8 @@
       }
     },
     "learningProgress": "insufficient-data",
-    "bestPattern": "Liquidity Sweep (Sell-Side)",
-    "worstPattern": "Bullish Order Block",
+    "bestPattern": "Bullish Order Block",
+    "worstPattern": "Liquidity Sweep (Sell-Side)",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []
