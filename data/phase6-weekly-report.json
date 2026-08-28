@@ -1,22 +1,22 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-28T17:15:36.501Z",
+  "generatedAt": "2026-08-28T17:20:43.293Z",
   "period": {
-    "start": "2026-08-21T17:15:36.500Z",
-    "end": "2026-08-28T17:15:36.500Z"
+    "start": "2026-08-21T17:20:43.292Z",
+    "end": "2026-08-28T17:20:43.292Z"
   },
   "metrics": {
     "totalSignals": 4,
-    "resolvedSignals": 1,
-    "overallWinRate": 0,
+    "resolvedSignals": 2,
+    "overallWinRate": 50,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
       "Break of Structure": {
         "total": 1,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 0,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "Bullish Order Block": {
@@ -39,30 +39,30 @@
     "pairAccuracy": {
       "XAUUSD": {
         "total": 4,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 2,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.5
       }
     },
     "timeframeAccuracy": {
       "1H": {
         "total": 4,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 2,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.5
       }
     },
     "sessionAccuracy": {
       "NEWYORK": {
         "total": 1,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 0,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "LONDON_NY_OVERLAP": {
@@ -93,10 +93,10 @@
     "marketRegimeAccuracy": {
       "BREAKOUT": {
         "total": 1,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 0,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "COMPRESSION": {
@@ -116,7 +116,7 @@
         "averageRiskReward": 1.5
       }
     },
-    "learningProgress": "insufficient-data",
+    "learningProgress": "improving",
     "bestPattern": "Break of Structure",
     "worstPattern": "Liquidity Sweep (Sell-Side)",
     "mostImprovedPattern": null,

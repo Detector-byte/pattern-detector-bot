@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-28T17:15:36.501Z",
+  "updatedAt": "2026-08-28T17:20:43.293Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -21,10 +21,10 @@
     "strategy": {
       "INTRADAY": {
         "total": 15,
-        "wins": 2,
+        "wins": 3,
         "losses": 4,
         "expired": 8,
-        "winRate": 33.3,
+        "winRate": 42.9,
         "averageRiskReward": 1.63
       },
       "SCALPING": {
@@ -47,10 +47,10 @@
     "pair": {
       "XAUUSD": {
         "total": 10,
-        "wins": 1,
+        "wins": 2,
         "losses": 5,
         "expired": 3,
-        "winRate": 16.7,
+        "winRate": 28.6,
         "averageRiskReward": 1.6
       },
       "GBPJPY": {
@@ -65,10 +65,10 @@
     "marketState": {
       "BREAKOUT": {
         "total": 3,
-        "wins": 1,
+        "wins": 2,
         "losses": 1,
         "expired": 0,
-        "winRate": 50,
+        "winRate": 66.7,
         "averageRiskReward": 1.67
       },
       "RANGING": {
@@ -107,10 +107,10 @@
     "session": {
       "NEWYORK": {
         "total": 5,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 3,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.7
       },
       "LONDON_NY_OVERLAP": {
@@ -149,10 +149,10 @@
     "patternRanking": {
       "Break of Structure": {
         "total": 1,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 0,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "Bullish Engulfing": {
@@ -196,20 +196,20 @@
         "averageRiskReward": 1.5
       }
     },
-    "learningGrowth": "insufficient-data"
+    "learningGrowth": "improving"
   },
   "health": {
     "status": "ONLINE",
     "signalsGenerated": 0,
     "averageConfidence": 0,
     "averageAIScore": 0,
-    "recentWinRate": 20,
-    "openSignals": 1,
+    "recentWinRate": 27.3,
+    "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 148,
-    "analysisDurationMs": 33,
-    "learningDurationMs": 7,
-    "saveDurationMs": 7,
-    "totalRuntimeMs": 201
+    "fetchDurationMs": 331,
+    "analysisDurationMs": 24,
+    "learningDurationMs": 12,
+    "saveDurationMs": 228,
+    "totalRuntimeMs": 605
   }
 }
