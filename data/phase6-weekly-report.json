@@ -1,12 +1,12 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-28T16:05:34.353Z",
+  "generatedAt": "2026-08-28T16:10:41.715Z",
   "period": {
-    "start": "2026-08-21T16:05:34.353Z",
-    "end": "2026-08-28T16:05:34.353Z"
+    "start": "2026-08-21T16:10:41.714Z",
+    "end": "2026-08-28T16:10:41.714Z"
   },
   "metrics": {
-    "totalSignals": 3,
+    "totalSignals": 4,
     "resolvedSignals": 1,
     "overallWinRate": 0,
     "averageRiskReward": 1.5,
@@ -26,11 +26,19 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "Break of Structure": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 3,
+        "total": 4,
         "wins": 0,
         "losses": 1,
         "expired": 2,
@@ -40,7 +48,7 @@
     },
     "timeframeAccuracy": {
       "1H": {
-        "total": 3,
+        "total": 4,
         "wins": 0,
         "losses": 1,
         "expired": 2,
@@ -72,6 +80,14 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "NEWYORK": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "marketRegimeAccuracy": {
@@ -90,11 +106,19 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "BREAKOUT": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "learningProgress": "insufficient-data",
     "bestPattern": "Bullish Order Block",
-    "worstPattern": "Liquidity Sweep (Sell-Side)",
+    "worstPattern": "Break of Structure",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []

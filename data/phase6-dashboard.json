@@ -1,17 +1,17 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-28T16:05:34.353Z",
+  "updatedAt": "2026-08-28T16:10:41.715Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 20,
+      "70-79": 21,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
-      "60-69": 15,
+      "60-69": 16,
       "70-79": 5,
       "80-89": 0,
       "90-100": 0
@@ -28,12 +28,12 @@
         "averageRiskReward": 1.9
       },
       "INTRADAY": {
-        "total": 14,
+        "total": 15,
         "wins": 2,
         "losses": 4,
         "expired": 8,
         "winRate": 33.3,
-        "averageRiskReward": 1.64
+        "averageRiskReward": 1.63
       },
       "SWING": {
         "total": 1,
@@ -46,12 +46,12 @@
     },
     "pair": {
       "XAUUSD": {
-        "total": 9,
+        "total": 10,
         "wins": 1,
         "losses": 5,
         "expired": 3,
         "winRate": 16.7,
-        "averageRiskReward": 1.61
+        "averageRiskReward": 1.6
       },
       "GBPJPY": {
         "total": 11,
@@ -80,12 +80,12 @@
         "averageRiskReward": 1.75
       },
       "BREAKOUT": {
-        "total": 2,
+        "total": 3,
         "wins": 1,
         "losses": 1,
         "expired": 0,
         "winRate": 50,
-        "averageRiskReward": 1.75
+        "averageRiskReward": 1.67
       },
       "TRENDING": {
         "total": 2,
@@ -114,12 +114,12 @@
         "averageRiskReward": 1.7
       },
       "NEWYORK": {
-        "total": 4,
+        "total": 5,
         "wins": 0,
         "losses": 1,
         "expired": 3,
         "winRate": 0,
-        "averageRiskReward": 1.75
+        "averageRiskReward": 1.7
       },
       "OFF_HOURS": {
         "total": 1,
@@ -186,22 +186,30 @@
         "expired": 1,
         "winRate": 33.3,
         "averageRiskReward": 1.5
+      },
+      "Break of Structure": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "insufficient-data"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 69.1,
+    "averageAIScore": 71.3,
     "recentWinRate": 20,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 141,
-    "analysisDurationMs": 21,
-    "learningDurationMs": 5,
-    "saveDurationMs": 5,
-    "totalRuntimeMs": 176
+    "fetchDurationMs": 324,
+    "analysisDurationMs": 33,
+    "learningDurationMs": 8,
+    "saveDurationMs": 136,
+    "totalRuntimeMs": 508
   }
 }
