@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-28T19:25:34.474Z",
+  "updatedAt": "2026-08-28T19:30:45.029Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -63,14 +63,6 @@
       }
     },
     "marketState": {
-      "COMPRESSION": {
-        "total": 5,
-        "wins": 0,
-        "losses": 1,
-        "expired": 4,
-        "winRate": 0,
-        "averageRiskReward": 1.7
-      },
       "RANGING": {
         "total": 11,
         "wins": 0,
@@ -78,6 +70,14 @@
         "expired": 6,
         "winRate": 0,
         "averageRiskReward": 1.73
+      },
+      "COMPRESSION": {
+        "total": 5,
+        "wins": 0,
+        "losses": 1,
+        "expired": 4,
+        "winRate": 0,
+        "averageRiskReward": 1.7
       },
       "BREAKOUT": {
         "total": 3,
@@ -105,14 +105,6 @@
       }
     },
     "session": {
-      "NEWYORK": {
-        "total": 7,
-        "wins": 1,
-        "losses": 1,
-        "expired": 5,
-        "winRate": 50,
-        "averageRiskReward": 1.64
-      },
       "LONDON_NY_OVERLAP": {
         "total": 5,
         "wins": 2,
@@ -120,6 +112,14 @@
         "expired": 2,
         "winRate": 66.7,
         "averageRiskReward": 1.7
+      },
+      "NEWYORK": {
+        "total": 7,
+        "wins": 1,
+        "losses": 1,
+        "expired": 5,
+        "winRate": 50,
+        "averageRiskReward": 1.64
       },
       "OFF_HOURS": {
         "total": 1,
@@ -147,14 +147,6 @@
       }
     },
     "patternRanking": {
-      "Break of Structure": {
-        "total": 3,
-        "wins": 1,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -194,6 +186,14 @@
         "expired": 1,
         "winRate": 33.3,
         "averageRiskReward": 1.5
+      },
+      "Break of Structure": {
+        "total": 3,
+        "wins": 1,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 100,
+        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "improving"
@@ -206,10 +206,10 @@
     "recentWinRate": 27.3,
     "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 221,
-    "analysisDurationMs": 38,
-    "learningDurationMs": 13,
-    "saveDurationMs": 11,
-    "totalRuntimeMs": 291
+    "fetchDurationMs": 216,
+    "analysisDurationMs": 29,
+    "learningDurationMs": 8,
+    "saveDurationMs": 54,
+    "totalRuntimeMs": 313
   }
 }

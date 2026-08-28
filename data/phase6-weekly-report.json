@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-28T19:25:34.474Z",
+  "generatedAt": "2026-08-28T19:30:45.029Z",
   "period": {
-    "start": "2026-08-21T19:25:34.473Z",
-    "end": "2026-08-28T19:25:34.473Z"
+    "start": "2026-08-21T19:30:45.028Z",
+    "end": "2026-08-28T19:30:45.028Z"
   },
   "metrics": {
     "totalSignals": 6,
@@ -11,14 +11,6 @@
     "overallWinRate": 50,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Break of Structure": {
-        "total": 3,
-        "wins": 1,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "Bullish Order Block": {
         "total": 1,
         "wins": 0,
@@ -34,6 +26,14 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "Break of Structure": {
+        "total": 3,
+        "wins": 1,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 100,
+        "averageRiskReward": 1.5
       }
     },
     "pairAccuracy": {
@@ -47,14 +47,6 @@
       }
     },
     "timeframeAccuracy": {
-      "15m": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "1H": {
         "total": 4,
         "wins": 1,
@@ -70,17 +62,17 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "15m": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "sessionAccuracy": {
-      "NEWYORK": {
-        "total": 3,
-        "wins": 1,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "LONDON_NY_OVERLAP": {
         "total": 1,
         "wins": 0,
@@ -103,6 +95,14 @@
         "losses": 1,
         "expired": 0,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "NEWYORK": {
+        "total": 3,
+        "wins": 1,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 100,
         "averageRiskReward": 1.5
       }
     },
