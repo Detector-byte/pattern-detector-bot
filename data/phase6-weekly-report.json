@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-28T17:20:43.293Z",
+  "generatedAt": "2026-08-28T17:25:33.107Z",
   "period": {
-    "start": "2026-08-21T17:20:43.292Z",
-    "end": "2026-08-28T17:20:43.292Z"
+    "start": "2026-08-21T17:25:33.107Z",
+    "end": "2026-08-28T17:25:33.107Z"
   },
   "metrics": {
     "totalSignals": 4,
@@ -11,14 +11,6 @@
     "overallWinRate": 50,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Break of Structure": {
-        "total": 1,
-        "wins": 1,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "Bullish Order Block": {
         "total": 1,
         "wins": 0,
@@ -33,6 +25,14 @@
         "losses": 1,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "Break of Structure": {
+        "total": 1,
+        "wins": 1,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       }
     },
@@ -57,14 +57,6 @@
       }
     },
     "sessionAccuracy": {
-      "NEWYORK": {
-        "total": 1,
-        "wins": 1,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "LONDON_NY_OVERLAP": {
         "total": 1,
         "wins": 0,
@@ -88,17 +80,17 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
-      }
-    },
-    "marketRegimeAccuracy": {
-      "BREAKOUT": {
+      },
+      "NEWYORK": {
         "total": 1,
         "wins": 1,
         "losses": 0,
         "expired": 0,
         "winRate": 100,
         "averageRiskReward": 1.5
-      },
+      }
+    },
+    "marketRegimeAccuracy": {
       "COMPRESSION": {
         "total": 1,
         "wins": 0,
@@ -113,6 +105,14 @@
         "losses": 1,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "BREAKOUT": {
+        "total": 1,
+        "wins": 1,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       }
     },
