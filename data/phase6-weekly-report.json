@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-28T16:10:41.715Z",
+  "generatedAt": "2026-08-28T16:15:40.553Z",
   "period": {
-    "start": "2026-08-21T16:10:41.714Z",
-    "end": "2026-08-28T16:10:41.714Z"
+    "start": "2026-08-21T16:15:40.552Z",
+    "end": "2026-08-28T16:15:40.552Z"
   },
   "metrics": {
     "totalSignals": 4,
@@ -11,6 +11,14 @@
     "overallWinRate": 0,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
+      "Break of Structure": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "Bullish Order Block": {
         "total": 1,
         "wins": 0,
@@ -24,14 +32,6 @@
         "wins": 0,
         "losses": 1,
         "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
-      "Break of Structure": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
       }
@@ -57,6 +57,14 @@
       }
     },
     "sessionAccuracy": {
+      "NEWYORK": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "LONDON_NY_OVERLAP": {
         "total": 1,
         "wins": 0,
@@ -80,17 +88,17 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
-      },
-      "NEWYORK": {
+      }
+    },
+    "marketRegimeAccuracy": {
+      "BREAKOUT": {
         "total": 1,
         "wins": 0,
         "losses": 0,
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
-      }
-    },
-    "marketRegimeAccuracy": {
+      },
       "COMPRESSION": {
         "total": 1,
         "wins": 0,
@@ -106,19 +114,11 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
-      },
-      "BREAKOUT": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
       }
     },
     "learningProgress": "insufficient-data",
-    "bestPattern": "Bullish Order Block",
-    "worstPattern": "Break of Structure",
+    "bestPattern": "Break of Structure",
+    "worstPattern": "Liquidity Sweep (Sell-Side)",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []
