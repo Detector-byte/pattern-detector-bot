@@ -1,18 +1,18 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-28T17:45:40.121Z",
+  "updatedAt": "2026-08-28T17:50:39.560Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 21,
+      "70-79": 22,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
       "60-69": 16,
-      "70-79": 5,
+      "70-79": 6,
       "80-89": 0,
       "90-100": 0
     }
@@ -20,12 +20,12 @@
   "performance": {
     "strategy": {
       "SCALPING": {
-        "total": 5,
+        "total": 6,
         "wins": 0,
         "losses": 4,
         "expired": 1,
         "winRate": 0,
-        "averageRiskReward": 1.9
+        "averageRiskReward": 1.83
       },
       "INTRADAY": {
         "total": 15,
@@ -46,12 +46,12 @@
     },
     "pair": {
       "XAUUSD": {
-        "total": 10,
+        "total": 11,
         "wins": 2,
         "losses": 5,
         "expired": 3,
         "winRate": 28.6,
-        "averageRiskReward": 1.6
+        "averageRiskReward": 1.59
       },
       "GBPJPY": {
         "total": 11,
@@ -88,7 +88,7 @@
         "averageRiskReward": 1.67
       },
       "TRENDING": {
-        "total": 2,
+        "total": 3,
         "wins": 1,
         "losses": 0,
         "expired": 1,
@@ -114,12 +114,12 @@
         "averageRiskReward": 1.7
       },
       "NEWYORK": {
-        "total": 5,
+        "total": 6,
         "wins": 1,
         "losses": 1,
         "expired": 3,
         "winRate": 50,
-        "averageRiskReward": 1.7
+        "averageRiskReward": 1.67
       },
       "OFF_HOURS": {
         "total": 1,
@@ -188,7 +188,7 @@
         "averageRiskReward": 1.5
       },
       "Break of Structure": {
-        "total": 1,
+        "total": 2,
         "wins": 1,
         "losses": 0,
         "expired": 0,
@@ -200,16 +200,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 71.3,
+    "averageAIScore": 70.8,
     "recentWinRate": 27.3,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 262,
-    "analysisDurationMs": 23,
-    "learningDurationMs": 6,
-    "saveDurationMs": 6,
-    "totalRuntimeMs": 303
+    "fetchDurationMs": 296,
+    "analysisDurationMs": 38,
+    "learningDurationMs": 15,
+    "saveDurationMs": 8,
+    "totalRuntimeMs": 364
   }
 }
