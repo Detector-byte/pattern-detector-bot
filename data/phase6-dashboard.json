@@ -1,18 +1,18 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-28T18:20:43.636Z",
+  "updatedAt": "2026-08-28T18:25:32.774Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 22,
+      "70-79": 23,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
       "60-69": 16,
-      "70-79": 6,
+      "70-79": 7,
       "80-89": 0,
       "90-100": 0
     }
@@ -20,12 +20,12 @@
   "performance": {
     "strategy": {
       "SCALPING": {
-        "total": 6,
+        "total": 7,
         "wins": 0,
         "losses": 4,
         "expired": 2,
         "winRate": 0,
-        "averageRiskReward": 1.83
+        "averageRiskReward": 1.79
       },
       "INTRADAY": {
         "total": 15,
@@ -46,12 +46,12 @@
     },
     "pair": {
       "XAUUSD": {
-        "total": 11,
+        "total": 12,
         "wins": 2,
         "losses": 5,
         "expired": 4,
         "winRate": 28.6,
-        "averageRiskReward": 1.59
+        "averageRiskReward": 1.58
       },
       "GBPJPY": {
         "total": 11,
@@ -63,14 +63,6 @@
       }
     },
     "marketState": {
-      "TRENDING": {
-        "total": 3,
-        "wins": 1,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "RANGING": {
         "total": 11,
         "wins": 0,
@@ -80,12 +72,12 @@
         "averageRiskReward": 1.73
       },
       "COMPRESSION": {
-        "total": 4,
+        "total": 5,
         "wins": 0,
         "losses": 1,
         "expired": 3,
         "winRate": 0,
-        "averageRiskReward": 1.75
+        "averageRiskReward": 1.7
       },
       "BREAKOUT": {
         "total": 3,
@@ -94,6 +86,14 @@
         "expired": 0,
         "winRate": 66.7,
         "averageRiskReward": 1.67
+      },
+      "TRENDING": {
+        "total": 3,
+        "wins": 1,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 100,
+        "averageRiskReward": 1.5
       },
       "EXPANSION": {
         "total": 1,
@@ -105,14 +105,6 @@
       }
     },
     "session": {
-      "NEWYORK": {
-        "total": 6,
-        "wins": 1,
-        "losses": 1,
-        "expired": 4,
-        "winRate": 50,
-        "averageRiskReward": 1.67
-      },
       "LONDON_NY_OVERLAP": {
         "total": 5,
         "wins": 2,
@@ -120,6 +112,14 @@
         "expired": 2,
         "winRate": 66.7,
         "averageRiskReward": 1.7
+      },
+      "NEWYORK": {
+        "total": 7,
+        "wins": 1,
+        "losses": 1,
+        "expired": 4,
+        "winRate": 50,
+        "averageRiskReward": 1.64
       },
       "OFF_HOURS": {
         "total": 1,
@@ -147,14 +147,6 @@
       }
     },
     "patternRanking": {
-      "Break of Structure": {
-        "total": 2,
-        "wins": 1,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -194,22 +186,30 @@
         "expired": 1,
         "winRate": 33.3,
         "averageRiskReward": 1.5
+      },
+      "Break of Structure": {
+        "total": 3,
+        "wins": 1,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 100,
+        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "improving"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 71.3,
+    "averageAIScore": 70.8,
     "recentWinRate": 27.3,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 385,
-    "analysisDurationMs": 43,
-    "learningDurationMs": 15,
-    "saveDurationMs": 11,
-    "totalRuntimeMs": 460
+    "fetchDurationMs": 356,
+    "analysisDurationMs": 22,
+    "learningDurationMs": 6,
+    "saveDurationMs": 5,
+    "totalRuntimeMs": 394
   }
 }
