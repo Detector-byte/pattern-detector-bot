@@ -1,205 +1,6 @@
 {
   "entries": [
     {
-      "timestamp": "2026-08-29T14:45:39.858Z",
-      "pair": "GBPJPY",
-      "timeframe": "15m",
-      "pattern": "Rectangle Top",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:45:39.859Z",
-      "pair": "GBPJPY",
-      "timeframe": "30m",
-      "pattern": "Rectangle Top",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:45:39.859Z",
-      "pair": "GBPJPY",
-      "timeframe": "30m",
-      "pattern": "Rectangle Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:45:39.860Z",
-      "pair": "GBPJPY",
-      "timeframe": "1H",
-      "pattern": "Rectangle Top",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:45:39.860Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "decision": "NO_PATTERN",
-      "reason": "analyzer returned zero patterns after detector and post-processing filters"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.032Z",
-      "pair": "XAUUSD",
-      "timeframe": "5m",
-      "pattern": "Rectangle Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.033Z",
-      "pair": "XAUUSD",
-      "timeframe": "5m",
-      "pattern": "Rectangle Top",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.035Z",
-      "pair": "XAUUSD",
-      "timeframe": "15m",
-      "pattern": "Diamond Top",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.035Z",
-      "pair": "XAUUSD",
-      "timeframe": "15m",
-      "pattern": "Rectangle Top",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.035Z",
-      "pair": "XAUUSD",
-      "timeframe": "15m",
-      "pattern": "Diamond Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.035Z",
-      "pair": "XAUUSD",
-      "timeframe": "15m",
-      "pattern": "Rectangle Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.036Z",
-      "pair": "XAUUSD",
-      "timeframe": "30m",
-      "pattern": "Diamond Top",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.036Z",
-      "pair": "XAUUSD",
-      "timeframe": "30m",
-      "pattern": "Rectangle Top",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.037Z",
-      "pair": "XAUUSD",
-      "timeframe": "30m",
-      "pattern": "Diamond Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.037Z",
-      "pair": "XAUUSD",
-      "timeframe": "30m",
-      "pattern": "Rectangle Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.038Z",
-      "pair": "XAUUSD",
-      "timeframe": "1H",
-      "pattern": "Rectangle Top",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.043Z",
-      "pair": "XAUUSD",
-      "timeframe": "1H",
-      "pattern": "Rectangle Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.043Z",
-      "pair": "XAUUSD",
-      "timeframe": "1H",
-      "pattern": "Bullish Order Block",
-      "decision": "REJECTED",
-      "reason": "against higher-timeframe trend (SELL)"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.044Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Diamond Top",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.044Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Fair Value Gap (Bearish)",
-      "decision": "REJECTED",
-      "reason": "confidence 51% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.044Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Diamond Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.044Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Double Top",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.045Z",
-      "pair": "GBPJPY",
-      "timeframe": "5m",
-      "pattern": "Liquidity Sweep (Buy-Side)",
-      "decision": "REJECTED",
-      "reason": "confidence 66% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.045Z",
-      "pair": "GBPJPY",
-      "timeframe": "5m",
-      "pattern": "Diamond Top",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-08-29T14:50:45.045Z",
-      "pair": "GBPJPY",
-      "timeframe": "5m",
-      "pattern": "Diamond Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
       "timestamp": "2026-08-29T14:50:45.045Z",
       "pair": "GBPJPY",
       "timeframe": "5m",
@@ -15930,8 +15731,207 @@
       "timeframe": "4H",
       "decision": "NO_PATTERN",
       "reason": "analyzer returned zero patterns after detector and post-processing filters"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.623Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.623Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "pattern": "Symmetric Triangle",
+      "decision": "REJECTED",
+      "reason": "confidence 69% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.623Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "pattern": "Rectangle Top",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.630Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Diamond Top",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.630Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Rectangle Top",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.630Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.630Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.631Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "pattern": "Rectangle Top",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.631Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.632Z",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "pattern": "Rectangle Top",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.633Z",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.634Z",
+      "pair": "XAUUSD",
+      "timeframe": "4H",
+      "pattern": "Fair Value Gap (Bearish)",
+      "decision": "REJECTED",
+      "reason": "confidence 51% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.634Z",
+      "pair": "XAUUSD",
+      "timeframe": "4H",
+      "pattern": "Double Top",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.636Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Liquidity Sweep (Sell-Side)",
+      "decision": "REJECTED",
+      "reason": "confidence 55% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.636Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Fair Value Gap (Bearish)",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.636Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Rectangle Top",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.637Z",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "pattern": "Symmetric Triangle",
+      "decision": "REJECTED",
+      "reason": "confidence 69% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.637Z",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "pattern": "Fair Value Gap (Bearish)",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.637Z",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "pattern": "Rectangle Top",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.638Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.638Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.638Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Diamond Top",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.638Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Rectangle Top",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.639Z",
+      "pair": "GBPJPY",
+      "timeframe": "1H",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-08-29T21:55:33.640Z",
+      "pair": "GBPJPY",
+      "timeframe": "4H",
+      "decision": "NO_PATTERN",
+      "reason": "analyzer returned zero patterns after detector and post-processing filters"
     }
   ],
-  "updatedAt": "2026-08-29T21:50:40.641Z",
+  "updatedAt": "2026-08-29T21:55:33.669Z",
   "totalEntries": 2000
 }
