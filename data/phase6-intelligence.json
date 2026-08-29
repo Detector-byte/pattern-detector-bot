@@ -1,17 +1,39 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-29T07:05:32.749Z",
-  "lastRun": "2026-08-29T07:05:32.749Z",
-  "publishedSignalId": null,
+  "updatedAt": "2026-08-29T07:10:40.334Z",
+  "lastRun": "2026-08-29T07:10:40.334Z",
+  "publishedSignalId": "XAUUSD_1H_BEARISHORDERBLOCK_20260829",
   "portfolio": {
-    "openTrades": 0,
+    "openTrades": 1,
     "limits": {
       "maxOpenTrades": 4,
       "maxPairOpenTrades": 2,
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {},
-  "strategyPriorities": {},
+  "marketStates": {
+    "XAUUSD_1H": {
+      "state": "COMPRESSION",
+      "confidence": 80,
+      "features": {
+        "baseRegime": "BEARISH_TREND",
+        "directionalMove": -0.02573,
+        "rangeRatio": 0.02,
+        "bodyRatio": 0.59,
+        "volumeRatio": 1,
+        "breakout": false
+      }
+    }
+  },
+  "strategyPriorities": {
+    "XAUUSD_1H": {
+      "primary": "INTRADAY",
+      "scores": {
+        "INTRADAY": 70,
+        "SWING": 65,
+        "SCALPING": 60
+      }
+    }
+  },
   "optimizerRecommendations": []
 }

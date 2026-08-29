@@ -1,12 +1,12 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-29T07:05:32.747Z",
+  "generatedAt": "2026-08-29T07:10:40.333Z",
   "period": {
-    "start": "2026-08-22T07:05:32.746Z",
-    "end": "2026-08-29T07:05:32.746Z"
+    "start": "2026-08-22T07:10:40.333Z",
+    "end": "2026-08-29T07:10:40.333Z"
   },
   "metrics": {
-    "totalSignals": 6,
+    "totalSignals": 7,
     "resolvedSignals": 2,
     "overallWinRate": 50,
     "averageRiskReward": 1.5,
@@ -34,11 +34,19 @@
         "expired": 2,
         "winRate": 100,
         "averageRiskReward": 1.5
+      },
+      "Bearish Order Block": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 6,
+        "total": 7,
         "wins": 1,
         "losses": 1,
         "expired": 4,
@@ -48,7 +56,7 @@
     },
     "timeframeAccuracy": {
       "1H": {
-        "total": 4,
+        "total": 5,
         "wins": 1,
         "losses": 1,
         "expired": 2,
@@ -90,7 +98,7 @@
         "averageRiskReward": 1.5
       },
       "LONDON": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 1,
         "expired": 0,
@@ -108,7 +116,7 @@
     },
     "marketRegimeAccuracy": {
       "COMPRESSION": {
-        "total": 2,
+        "total": 3,
         "wins": 0,
         "losses": 0,
         "expired": 2,
@@ -142,7 +150,7 @@
     },
     "learningProgress": "improving",
     "bestPattern": "Break of Structure",
-    "worstPattern": "Liquidity Sweep (Sell-Side)",
+    "worstPattern": "Bearish Order Block",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []

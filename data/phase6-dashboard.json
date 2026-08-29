@@ -1,17 +1,17 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-29T07:05:32.747Z",
+  "updatedAt": "2026-08-29T07:10:40.333Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 23,
+      "70-79": 24,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
-      "60-69": 16,
+      "60-69": 17,
       "70-79": 7,
       "80-89": 0,
       "90-100": 0
@@ -28,7 +28,7 @@
         "averageRiskReward": 1.79
       },
       "INTRADAY": {
-        "total": 15,
+        "total": 16,
         "wins": 3,
         "losses": 4,
         "expired": 8,
@@ -46,7 +46,7 @@
     },
     "pair": {
       "XAUUSD": {
-        "total": 12,
+        "total": 13,
         "wins": 2,
         "losses": 5,
         "expired": 5,
@@ -72,12 +72,12 @@
         "averageRiskReward": 1.73
       },
       "COMPRESSION": {
-        "total": 5,
+        "total": 6,
         "wins": 0,
         "losses": 1,
         "expired": 4,
         "winRate": 0,
-        "averageRiskReward": 1.7
+        "averageRiskReward": 1.67
       },
       "BREAKOUT": {
         "total": 3,
@@ -138,12 +138,12 @@
         "averageRiskReward": 1.67
       },
       "LONDON": {
-        "total": 4,
+        "total": 5,
         "wins": 0,
         "losses": 4,
         "expired": 0,
         "winRate": 0,
-        "averageRiskReward": 1.63
+        "averageRiskReward": 1.6
       }
     },
     "patternRanking": {
@@ -194,22 +194,30 @@
         "expired": 2,
         "winRate": 100,
         "averageRiskReward": 1.5
+      },
+      "Bearish Order Block": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "improving"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 68.8,
+    "averageAIScore": 71.1,
     "recentWinRate": 27.3,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 129,
-    "analysisDurationMs": 37,
-    "learningDurationMs": 12,
-    "saveDurationMs": 12,
-    "totalRuntimeMs": 197
+    "fetchDurationMs": 3412,
+    "analysisDurationMs": 23,
+    "learningDurationMs": 6,
+    "saveDurationMs": 5,
+    "totalRuntimeMs": 3451
   }
 }
