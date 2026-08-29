@@ -1,24 +1,16 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-29T17:55:34.999Z",
+  "generatedAt": "2026-08-29T18:00:52.890Z",
   "period": {
-    "start": "2026-08-22T17:55:34.998Z",
-    "end": "2026-08-29T17:55:34.998Z"
+    "start": "2026-08-22T18:00:52.890Z",
+    "end": "2026-08-29T18:00:52.890Z"
   },
   "metrics": {
-    "totalSignals": 7,
+    "totalSignals": 6,
     "resolvedSignals": 2,
     "overallWinRate": 50,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Bullish Order Block": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Liquidity Sweep (Sell-Side)": {
         "total": 2,
         "wins": 0,
@@ -46,20 +38,20 @@
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 7,
+        "total": 6,
         "wins": 1,
         "losses": 1,
-        "expired": 5,
+        "expired": 4,
         "winRate": 50,
         "averageRiskReward": 1.5
       }
     },
     "timeframeAccuracy": {
       "1H": {
-        "total": 5,
+        "total": 4,
         "wins": 1,
         "losses": 1,
-        "expired": 3,
+        "expired": 2,
         "winRate": 50,
         "averageRiskReward": 1.5
       },
@@ -81,14 +73,6 @@
       }
     },
     "sessionAccuracy": {
-      "LONDON_NY_OVERLAP": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "ASIAN": {
         "total": 1,
         "wins": 0,
@@ -115,14 +99,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "COMPRESSION": {
-        "total": 3,
-        "wins": 0,
-        "losses": 0,
-        "expired": 3,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "RANGING": {
         "total": 2,
         "wins": 0,
@@ -144,6 +120,14 @@
         "wins": 0,
         "losses": 0,
         "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "COMPRESSION": {
+        "total": 2,
+        "wins": 0,
+        "losses": 0,
+        "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.5
       }
