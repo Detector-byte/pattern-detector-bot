@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-30T20:30:53.606Z",
+  "updatedAt": "2026-08-30T20:35:36.094Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -63,6 +63,14 @@
       }
     },
     "marketState": {
+      "EXPANSION": {
+        "total": 2,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "RANGING": {
         "total": 11,
         "wins": 0,
@@ -94,25 +102,9 @@
         "expired": 2,
         "winRate": 100,
         "averageRiskReward": 1.5
-      },
-      "EXPANSION": {
-        "total": 2,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
       }
     },
     "session": {
-      "LONDON_NY_OVERLAP": {
-        "total": 5,
-        "wins": 2,
-        "losses": 1,
-        "expired": 2,
-        "winRate": 66.7,
-        "averageRiskReward": 1.7
-      },
       "NEWYORK": {
         "total": 8,
         "wins": 1,
@@ -120,6 +112,14 @@
         "expired": 5,
         "winRate": 50,
         "averageRiskReward": 1.63
+      },
+      "LONDON_NY_OVERLAP": {
+        "total": 5,
+        "wins": 2,
+        "losses": 1,
+        "expired": 2,
+        "winRate": 66.7,
+        "averageRiskReward": 1.7
       },
       "OFF_HOURS": {
         "total": 1,
@@ -147,6 +147,14 @@
       }
     },
     "patternRanking": {
+      "Bearish Order Block": {
+        "total": 2,
+        "wins": 0,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -194,30 +202,22 @@
         "expired": 2,
         "winRate": 100,
         "averageRiskReward": 1.5
-      },
-      "Bearish Order Block": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "improving"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 1,
-    "averageConfidence": 69,
-    "averageAIScore": 71.3,
+    "signalsGenerated": 0,
+    "averageConfidence": 0,
+    "averageAIScore": 0,
     "recentWinRate": 27.3,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 386,
-    "analysisDurationMs": 30,
-    "learningDurationMs": 10,
-    "saveDurationMs": 8,
-    "totalRuntimeMs": 442
+    "fetchDurationMs": 256,
+    "analysisDurationMs": 34,
+    "learningDurationMs": 12,
+    "saveDurationMs": 9,
+    "totalRuntimeMs": 318
   }
 }
