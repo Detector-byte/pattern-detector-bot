@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-30T21:00:54.778Z",
+  "generatedAt": "2026-08-30T21:05:41.079Z",
   "period": {
-    "start": "2026-08-23T21:00:54.777Z",
-    "end": "2026-08-30T21:00:54.777Z"
+    "start": "2026-08-23T21:05:41.078Z",
+    "end": "2026-08-30T21:05:41.078Z"
   },
   "metrics": {
     "totalSignals": 7,
@@ -11,14 +11,6 @@
     "overallWinRate": 50,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Bearish Order Block": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Liquidity Sweep (Sell-Side)": {
         "total": 2,
         "wins": 0,
@@ -34,6 +26,14 @@
         "expired": 2,
         "winRate": 100,
         "averageRiskReward": 1.5
+      },
+      "Bearish Order Block": {
+        "total": 2,
+        "wins": 0,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "pairAccuracy": {
@@ -47,20 +47,20 @@
       }
     },
     "timeframeAccuracy": {
-      "5m": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "1H": {
         "total": 4,
         "wins": 1,
         "losses": 1,
         "expired": 2,
         "winRate": 50,
+        "averageRiskReward": 1.5
+      },
+      "5m": {
+        "total": 2,
+        "wins": 0,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "15m": {
@@ -73,14 +73,6 @@
       }
     },
     "sessionAccuracy": {
-      "NEWYORK": {
-        "total": 4,
-        "wins": 1,
-        "losses": 0,
-        "expired": 3,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "ASIAN": {
         "total": 1,
         "wins": 0,
@@ -96,17 +88,17 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "NEWYORK": {
+        "total": 4,
+        "wins": 1,
+        "losses": 0,
+        "expired": 3,
+        "winRate": 100,
+        "averageRiskReward": 1.5
       }
     },
     "marketRegimeAccuracy": {
-      "EXPANSION": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "RANGING": {
         "total": 2,
         "wins": 0,
@@ -138,11 +130,19 @@
         "expired": 2,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "EXPANSION": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "learningProgress": "improving",
     "bestPattern": "Break of Structure",
-    "worstPattern": "Liquidity Sweep (Sell-Side)",
+    "worstPattern": "Bearish Order Block",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []
