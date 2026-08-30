@@ -1,17 +1,17 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-30T20:25:34.436Z",
+  "updatedAt": "2026-08-30T20:30:53.606Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 24,
+      "70-79": 25,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
-      "60-69": 17,
+      "60-69": 18,
       "70-79": 7,
       "80-89": 0,
       "90-100": 0
@@ -20,12 +20,12 @@
   "performance": {
     "strategy": {
       "SCALPING": {
-        "total": 7,
+        "total": 8,
         "wins": 0,
         "losses": 4,
         "expired": 3,
         "winRate": 0,
-        "averageRiskReward": 1.79
+        "averageRiskReward": 1.75
       },
       "INTRADAY": {
         "total": 16,
@@ -46,12 +46,12 @@
     },
     "pair": {
       "XAUUSD": {
-        "total": 13,
+        "total": 14,
         "wins": 2,
         "losses": 5,
         "expired": 6,
         "winRate": 28.6,
-        "averageRiskReward": 1.58
+        "averageRiskReward": 1.57
       },
       "GBPJPY": {
         "total": 11,
@@ -96,7 +96,7 @@
         "averageRiskReward": 1.5
       },
       "EXPANSION": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 1,
         "expired": 0,
@@ -114,12 +114,12 @@
         "averageRiskReward": 1.7
       },
       "NEWYORK": {
-        "total": 7,
+        "total": 8,
         "wins": 1,
         "losses": 1,
         "expired": 5,
         "winRate": 50,
-        "averageRiskReward": 1.64
+        "averageRiskReward": 1.63
       },
       "OFF_HOURS": {
         "total": 1,
@@ -196,7 +196,7 @@
         "averageRiskReward": 1.5
       },
       "Bearish Order Block": {
-        "total": 1,
+        "total": 2,
         "wins": 0,
         "losses": 0,
         "expired": 1,
@@ -208,16 +208,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 69,
+    "averageAIScore": 71.3,
     "recentWinRate": 27.3,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 138,
-    "analysisDurationMs": 35,
-    "learningDurationMs": 7,
+    "fetchDurationMs": 386,
+    "analysisDurationMs": 30,
+    "learningDurationMs": 10,
     "saveDurationMs": 8,
-    "totalRuntimeMs": 197
+    "totalRuntimeMs": 442
   }
 }
