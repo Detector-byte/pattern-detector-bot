@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-31T14:05:39.800Z",
+  "updatedAt": "2026-08-31T14:10:39.714Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "SCALPING": {
-        "total": 8,
-        "wins": 0,
-        "losses": 4,
-        "expired": 4,
-        "winRate": 0,
-        "averageRiskReward": 1.75
-      },
       "INTRADAY": {
         "total": 18,
         "wins": 4,
@@ -34,6 +26,14 @@
         "expired": 9,
         "winRate": 50,
         "averageRiskReward": 1.61
+      },
+      "SCALPING": {
+        "total": 8,
+        "wins": 0,
+        "losses": 4,
+        "expired": 4,
+        "winRate": 0,
+        "averageRiskReward": 1.75
       },
       "SWING": {
         "total": 1,
@@ -63,6 +63,14 @@
       }
     },
     "marketState": {
+      "EXPANSION": {
+        "total": 3,
+        "wins": 0,
+        "losses": 1,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "RANGING": {
         "total": 11,
         "wins": 0,
@@ -93,14 +101,6 @@
         "losses": 0,
         "expired": 2,
         "winRate": 100,
-        "averageRiskReward": 1.5
-      },
-      "EXPANSION": {
-        "total": 3,
-        "wins": 0,
-        "losses": 1,
-        "expired": 1,
-        "winRate": 0,
         "averageRiskReward": 1.5
       }
     },
@@ -147,6 +147,14 @@
       }
     },
     "patternRanking": {
+      "Break of Structure": {
+        "total": 5,
+        "wins": 2,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 100,
+        "averageRiskReward": 1.5
+      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -187,14 +195,6 @@
         "winRate": 33.3,
         "averageRiskReward": 1.5
       },
-      "Break of Structure": {
-        "total": 5,
-        "wins": 2,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "Bearish Order Block": {
         "total": 2,
         "wins": 0,
@@ -208,16 +208,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 1,
-    "averageConfidence": 80.3,
-    "averageAIScore": 78.5,
+    "signalsGenerated": 0,
+    "averageConfidence": 0,
+    "averageAIScore": 0,
     "recentWinRate": 33.3,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 281,
-    "analysisDurationMs": 30,
+    "fetchDurationMs": 209,
+    "analysisDurationMs": 32,
     "learningDurationMs": 10,
     "saveDurationMs": 8,
-    "totalRuntimeMs": 337
+    "totalRuntimeMs": 268
   }
 }

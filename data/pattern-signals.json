@@ -88,7 +88,7 @@
       "expiresAt": "2026-08-31T16:05:39.767Z",
       "takeProfit": 4401.75554,
       "finalAIConfidence": 80.3,
-      "aiScore": 78.5,
+      "aiScore": 72.5,
       "qualityGrade": "B",
       "aiScoreComponents": {
         "patternStrength": 78,
@@ -239,12 +239,14 @@
       "portfolioRisk": {
         "approved": true,
         "hardReject": false,
-        "reasons": [],
-        "correlationPenalty": 0,
+        "reasons": [
+          "GOLD_USD same-direction exposure -6"
+        ],
+        "correlationPenalty": 6,
         "exposure": {
-          "totalOpen": 0,
-          "samePair": 0,
-          "samePairDirection": 0,
+          "totalOpen": 1,
+          "samePair": 1,
+          "samePairDirection": 1,
           "jpy": 0
         }
       },
@@ -254,7 +256,7 @@
         "whyConfidence": "Final AI Confidence 80.3% combines existing adaptive confidence with learning, historical accuracy, regime quality, session quality, risk/reward, pattern weight, trend alignment, freshness and volatility.",
         "whyStopLoss": "Stop loss 4431.48447 comes from the existing signal engine's market-structure and invalidation logic.",
         "whyTakeProfit": "Primary take profit 4401.75554 preserves the existing risk/reward calculation. Phase 6 validates its institutional quality without replacing it.",
-        "whyPatternSelected": "Break of Structure achieved AI Score 78.5/100 with Quality Grade B after portfolio and correlation review.",
+        "whyPatternSelected": "Break of Structure achieved AI Score 72.5/100 with Quality Grade B after portfolio and correlation review.",
         "whyRiskRewardAccepted": "Risk/reward 1.5 passed the existing signal engine and the institutional ranking threshold.",
         "marketState": {
           "state": "EXPANSION",
@@ -282,7 +284,7 @@
       "institutionalRank": 1,
       "signalId": "XAUUSD_30m_BREAKOFSTRUCTURE_20260831",
       "timestamp": "2026-08-31T14:05:39.780Z",
-      "version": 1,
+      "version": 2,
       "decisionAdaptiveConfidence": 85,
       "decisionSignalConfidence": 85,
       "decisionFinalAIConfidence": 80.3,
@@ -290,8 +292,8 @@
       "confidenceProvenance": "LOCKED_AT_PUBLICATION",
       "decisionConfidenceCapturedAt": "2026-08-31T14:05:39.780Z",
       "initialStopLoss": 4431.48447,
-      "lastUpdated": "2026-08-31T14:05:39.780Z",
-      "refreshCount": 1
+      "lastUpdated": "2026-08-31T14:10:39.693Z",
+      "refreshCount": 2
     },
     {
       "id": "XAUUSD-5m-BullishEngulfing-1786452033703-7mjvvf",
@@ -8171,7 +8173,7 @@
       }
     }
   ],
-  "updatedAt": "2026-08-31T14:05:39.792Z",
+  "updatedAt": "2026-08-31T14:10:39.705Z",
   "stale": {},
   "totalSignals": 27,
   "resolvedSignals": 12,
