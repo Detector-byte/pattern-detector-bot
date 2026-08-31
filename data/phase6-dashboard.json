@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-31T15:10:45.401Z",
+  "updatedAt": "2026-08-31T15:15:47.128Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "INTRADAY": {
-        "total": 18,
-        "wins": 4,
-        "losses": 5,
-        "expired": 9,
-        "winRate": 44.4,
-        "averageRiskReward": 1.61
-      },
       "SCALPING": {
         "total": 8,
         "wins": 0,
@@ -34,6 +26,14 @@
         "expired": 4,
         "winRate": 0,
         "averageRiskReward": 1.75
+      },
+      "INTRADAY": {
+        "total": 18,
+        "wins": 4,
+        "losses": 5,
+        "expired": 9,
+        "winRate": 44.4,
+        "averageRiskReward": 1.61
       },
       "SWING": {
         "total": 1,
@@ -63,14 +63,6 @@
       }
     },
     "marketState": {
-      "EXPANSION": {
-        "total": 3,
-        "wins": 0,
-        "losses": 2,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "RANGING": {
         "total": 11,
         "wins": 0,
@@ -101,6 +93,14 @@
         "losses": 0,
         "expired": 2,
         "winRate": 100,
+        "averageRiskReward": 1.5
+      },
+      "EXPANSION": {
+        "total": 3,
+        "wins": 0,
+        "losses": 2,
+        "expired": 1,
+        "winRate": 0,
         "averageRiskReward": 1.5
       }
     },
@@ -147,14 +147,6 @@
       }
     },
     "patternRanking": {
-      "Break of Structure": {
-        "total": 5,
-        "wins": 2,
-        "losses": 1,
-        "expired": 2,
-        "winRate": 66.7,
-        "averageRiskReward": 1.5
-      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -195,6 +187,14 @@
         "winRate": 33.3,
         "averageRiskReward": 1.5
       },
+      "Break of Structure": {
+        "total": 5,
+        "wins": 2,
+        "losses": 1,
+        "expired": 2,
+        "winRate": 66.7,
+        "averageRiskReward": 1.5
+      },
       "Bearish Order Block": {
         "total": 2,
         "wins": 0,
@@ -214,10 +214,10 @@
     "recentWinRate": 30.8,
     "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 315,
-    "analysisDurationMs": 24,
-    "learningDurationMs": 12,
-    "saveDurationMs": 8,
-    "totalRuntimeMs": 367
+    "fetchDurationMs": 233,
+    "analysisDurationMs": 20,
+    "learningDurationMs": 9,
+    "saveDurationMs": 9,
+    "totalRuntimeMs": 279
   }
 }
