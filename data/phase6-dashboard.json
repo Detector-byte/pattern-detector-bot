@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-08-31T03:00:55.310Z",
+  "updatedAt": "2026-08-31T03:05:34.708Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -21,10 +21,10 @@
     "strategy": {
       "INTRADAY": {
         "total": 17,
-        "wins": 3,
+        "wins": 4,
         "losses": 4,
         "expired": 9,
-        "winRate": 42.9,
+        "winRate": 50,
         "averageRiskReward": 1.62
       },
       "SCALPING": {
@@ -47,10 +47,10 @@
     "pair": {
       "XAUUSD": {
         "total": 15,
-        "wins": 2,
+        "wins": 3,
         "losses": 5,
         "expired": 7,
-        "winRate": 28.6,
+        "winRate": 37.5,
         "averageRiskReward": 1.57
       },
       "GBPJPY": {
@@ -65,10 +65,10 @@
     "marketState": {
       "BREAKOUT": {
         "total": 4,
-        "wins": 2,
+        "wins": 3,
         "losses": 1,
         "expired": 0,
-        "winRate": 66.7,
+        "winRate": 75,
         "averageRiskReward": 1.63
       },
       "RANGING": {
@@ -107,10 +107,10 @@
     "session": {
       "ASIAN": {
         "total": 7,
-        "wins": 0,
+        "wins": 1,
         "losses": 2,
         "expired": 4,
-        "winRate": 0,
+        "winRate": 33.3,
         "averageRiskReward": 1.64
       },
       "LONDON_NY_OVERLAP": {
@@ -149,7 +149,7 @@
     "patternRanking": {
       "Break of Structure": {
         "total": 4,
-        "wins": 1,
+        "wins": 2,
         "losses": 0,
         "expired": 2,
         "winRate": 100,
@@ -211,13 +211,13 @@
     "signalsGenerated": 0,
     "averageConfidence": 0,
     "averageAIScore": 0,
-    "recentWinRate": 27.3,
-    "openSignals": 1,
+    "recentWinRate": 33.3,
+    "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 330,
-    "analysisDurationMs": 41,
+    "fetchDurationMs": 1053,
+    "analysisDurationMs": 18,
     "learningDurationMs": 8,
-    "saveDurationMs": 10,
-    "totalRuntimeMs": 398
+    "saveDurationMs": 7,
+    "totalRuntimeMs": 1092
   }
 }

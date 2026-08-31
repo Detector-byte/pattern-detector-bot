@@ -1,19 +1,19 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-31T03:00:55.310Z",
+  "generatedAt": "2026-08-31T03:05:34.708Z",
   "period": {
-    "start": "2026-08-24T03:00:55.309Z",
-    "end": "2026-08-31T03:00:55.309Z"
+    "start": "2026-08-24T03:05:34.707Z",
+    "end": "2026-08-31T03:05:34.707Z"
   },
   "metrics": {
     "totalSignals": 8,
-    "resolvedSignals": 2,
-    "overallWinRate": 50,
+    "resolvedSignals": 3,
+    "overallWinRate": 66.7,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
       "Break of Structure": {
         "total": 4,
-        "wins": 1,
+        "wins": 2,
         "losses": 0,
         "expired": 2,
         "winRate": 100,
@@ -39,20 +39,20 @@
     "pairAccuracy": {
       "XAUUSD": {
         "total": 8,
-        "wins": 1,
+        "wins": 2,
         "losses": 1,
         "expired": 5,
-        "winRate": 50,
+        "winRate": 66.7,
         "averageRiskReward": 1.5
       }
     },
     "timeframeAccuracy": {
       "30m": {
         "total": 1,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 0,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "1H": {
@@ -83,10 +83,10 @@
     "sessionAccuracy": {
       "ASIAN": {
         "total": 2,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "LONDON": {
@@ -109,7 +109,7 @@
     "marketRegimeAccuracy": {
       "BREAKOUT": {
         "total": 2,
-        "wins": 1,
+        "wins": 2,
         "losses": 0,
         "expired": 0,
         "winRate": 100,
