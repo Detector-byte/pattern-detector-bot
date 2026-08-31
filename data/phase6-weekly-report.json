@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-08-31T03:05:34.708Z",
+  "generatedAt": "2026-08-31T03:10:40.227Z",
   "period": {
-    "start": "2026-08-24T03:05:34.707Z",
-    "end": "2026-08-31T03:05:34.707Z"
+    "start": "2026-08-24T03:10:40.227Z",
+    "end": "2026-08-31T03:10:40.227Z"
   },
   "metrics": {
     "totalSignals": 8,
@@ -11,20 +11,20 @@
     "overallWinRate": 66.7,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Break of Structure": {
-        "total": 4,
-        "wins": 2,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "Liquidity Sweep (Sell-Side)": {
         "total": 2,
         "wins": 0,
         "losses": 1,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "Break of Structure": {
+        "total": 4,
+        "wins": 2,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "Bearish Order Block": {
@@ -47,14 +47,6 @@
       }
     },
     "timeframeAccuracy": {
-      "30m": {
-        "total": 1,
-        "wins": 1,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "1H": {
         "total": 4,
         "wins": 1,
@@ -77,6 +69,14 @@
         "losses": 0,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "30m": {
+        "total": 1,
+        "wins": 1,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       }
     },
@@ -107,20 +107,20 @@
       }
     },
     "marketRegimeAccuracy": {
-      "BREAKOUT": {
-        "total": 2,
-        "wins": 2,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "RANGING": {
         "total": 2,
         "wins": 0,
         "losses": 1,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "BREAKOUT": {
+        "total": 2,
+        "wins": 2,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "TRENDING": {
