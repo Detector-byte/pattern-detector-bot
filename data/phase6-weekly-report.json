@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-01T09:10:41.189Z",
+  "generatedAt": "2026-09-01T09:15:42.588Z",
   "period": {
-    "start": "2026-08-25T09:10:41.188Z",
-    "end": "2026-09-01T09:10:41.188Z"
+    "start": "2026-08-25T09:15:42.587Z",
+    "end": "2026-09-01T09:15:42.587Z"
   },
   "metrics": {
     "totalSignals": 10,
@@ -11,20 +11,20 @@
     "overallWinRate": 60,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Break of Structure": {
-        "total": 6,
-        "wins": 3,
-        "losses": 1,
-        "expired": 2,
-        "winRate": 75,
-        "averageRiskReward": 1.5
-      },
       "Liquidity Sweep (Sell-Side)": {
         "total": 2,
         "wins": 0,
         "losses": 1,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "Break of Structure": {
+        "total": 6,
+        "wins": 3,
+        "losses": 1,
+        "expired": 2,
+        "winRate": 75,
         "averageRiskReward": 1.5
       },
       "Bearish Order Block": {
@@ -81,20 +81,20 @@
       }
     },
     "sessionAccuracy": {
-      "LONDON": {
-        "total": 3,
-        "wins": 1,
-        "losses": 1,
-        "expired": 1,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "ASIAN": {
         "total": 2,
         "wins": 1,
         "losses": 0,
         "expired": 1,
         "winRate": 100,
+        "averageRiskReward": 1.5
+      },
+      "LONDON": {
+        "total": 3,
+        "wins": 1,
+        "losses": 1,
+        "expired": 1,
+        "winRate": 50,
         "averageRiskReward": 1.5
       },
       "NEWYORK": {
