@@ -1,18 +1,18 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-09-01T08:00:55.656Z",
+  "updatedAt": "2026-09-01T08:05:37.081Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 27,
+      "70-79": 28,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
       "60-69": 18,
-      "70-79": 8,
+      "70-79": 9,
       "80-89": 1,
       "90-100": 0
     }
@@ -28,7 +28,7 @@
         "averageRiskReward": 1.75
       },
       "INTRADAY": {
-        "total": 18,
+        "total": 19,
         "wins": 4,
         "losses": 5,
         "expired": 9,
@@ -46,7 +46,7 @@
     },
     "pair": {
       "XAUUSD": {
-        "total": 16,
+        "total": 17,
         "wins": 3,
         "losses": 6,
         "expired": 7,
@@ -64,12 +64,12 @@
     },
     "marketState": {
       "RANGING": {
-        "total": 11,
+        "total": 12,
         "wins": 0,
         "losses": 5,
         "expired": 6,
         "winRate": 0,
-        "averageRiskReward": 1.73
+        "averageRiskReward": 1.71
       },
       "COMPRESSION": {
         "total": 6,
@@ -138,12 +138,12 @@
         "averageRiskReward": 1.64
       },
       "LONDON": {
-        "total": 5,
+        "total": 6,
         "wins": 0,
         "losses": 4,
         "expired": 1,
         "winRate": 0,
-        "averageRiskReward": 1.6
+        "averageRiskReward": 1.58
       }
     },
     "patternRanking": {
@@ -188,7 +188,7 @@
         "averageRiskReward": 1.5
       },
       "Break of Structure": {
-        "total": 5,
+        "total": 6,
         "wins": 2,
         "losses": 1,
         "expired": 2,
@@ -208,16 +208,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 75.1,
+    "averageAIScore": 73.6,
     "recentWinRate": 30.8,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 372,
-    "analysisDurationMs": 25,
-    "learningDurationMs": 9,
+    "fetchDurationMs": 350,
+    "analysisDurationMs": 32,
+    "learningDurationMs": 11,
     "saveDurationMs": 8,
-    "totalRuntimeMs": 421
+    "totalRuntimeMs": 409
   }
 }

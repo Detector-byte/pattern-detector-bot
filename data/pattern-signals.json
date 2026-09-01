@@ -1,6 +1,299 @@
 {
   "signals": [
     {
+      "id": "XAUUSD-1H-BreakofStructure-1788249937049-qkty1u",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "pattern": "Break of Structure",
+      "direction": "SELL",
+      "signal": "SELL",
+      "confidence": 75.1,
+      "adaptiveConfidence": 85,
+      "entry": 4417.88784,
+      "stopLoss": 4432.15497,
+      "takeProfit1": 4396.48715,
+      "takeProfit2": 4389.35358,
+      "takeProfit3": 4375.08645,
+      "riskReward": 1.5,
+      "riskRewardDetails": {
+        "pattern": "Break of Structure",
+        "risk": "14.2671",
+        "reward": "21.4007",
+        "ratio": "1.50",
+        "acceptable": true,
+        "quality": "Acceptable"
+      },
+      "qualityScore": 76,
+      "grade": "B",
+      "qualityRecommendation": "Good",
+      "patternWeight": 1,
+      "blacklisted": false,
+      "tradeDecision": {
+        "confidence": 85,
+        "execute": true,
+        "threshold": 70,
+        "patternBlacklisted": false,
+        "reason": "Confidence passed"
+      },
+      "status": "ACTIVE",
+      "description": "Price breaks a significant swing point in the direction of the prevailing trend. This confirms continuation and validates directional market structure.",
+      "psychology": "Price breaks a significant swing point in the direction of the prevailing trend. This confirms continuation and validates directional market structure.",
+      "timeframeContext": {
+        "duration": "1 hour",
+        "holdTime": "4 - 24 hours",
+        "tradingSession": "Daily intraday",
+        "riskLevel": "Medium-Low",
+        "volatility": "Medium",
+        "advice": "Reliable signals with improved risk-to-reward characteristics."
+      },
+      "marketRegime": "RANGING",
+      "marketStructure": {
+        "interpretation": "Bearish reversal or continuation",
+        "sentiment": "Sellers gaining control",
+        "momentum": "Downside momentum building",
+        "recommendedAction": "Look for short entries after confirmed bearish structure."
+      },
+      "riskManagement": {
+        "risk": 14.26713,
+        "stopDistance": 14.26713,
+        "profitTarget1": 21.40069,
+        "profitTarget2": 28.53426,
+        "profitTarget3": 42.80139,
+        "recommendation": "GOOD"
+      },
+      "tradingGuidance": "Entry: On retracement after confirmed structure break. Stop: Beyond the invalidation swing. On 1H, trade in the direction of established structure.",
+      "strength": 77,
+      "confirmationScore": 88,
+      "executionNotes": {
+        "confirmationRequired": true,
+        "volumeImportant": true,
+        "recommendedEntry": "Enter after confirmed breakout, breakdown or rejection.",
+        "riskLevel": "MEDIUM_LOW",
+        "liquidityRequired": true,
+        "marketRegime": "RANGING",
+        "bestSessions": "London and New York sessions",
+        "avoidTimes": "Avoid high-impact news windows and unusually poor liquidity.",
+        "notes": "Break of Structure is being evaluated on 1H. Combine it with higher-timeframe structure, liquidity and market-regime confirmation."
+      },
+      "metadata": {
+        "source": "PipSight Pro AI",
+        "phase": 4,
+        "patternVersion": null,
+        "strategy": null,
+        "strategyEvidence": null,
+        "evolvedThresholds": {},
+        "generatedBy": "SignalGenerator"
+      },
+      "createdAt": "2026-09-01T08:05:37.060Z",
+      "expiresAt": "2026-09-01T14:05:37.050Z",
+      "takeProfit": 4396.48715,
+      "finalAIConfidence": 75.1,
+      "aiScore": 73.6,
+      "qualityGrade": "B",
+      "aiScoreComponents": {
+        "patternStrength": 77,
+        "confirmationScore": 88,
+        "adaptiveConfidence": 85,
+        "historicalAccuracy": 100,
+        "riskReward": 49.99998831813988,
+        "marketRegime": 60,
+        "sessionQuality": 78.75,
+        "patternWeight": 50,
+        "trendAlignment": 65,
+        "learningScore": 76,
+        "patternEvolution": 50
+      },
+      "confidenceComponents": {
+        "adaptiveConfidence": 85,
+        "learningConfidence": 76,
+        "historicalAccuracy": 100,
+        "marketRegime": 60,
+        "sessionQuality": 78.75,
+        "riskReward": 49.99998831813988,
+        "patternWeight": 50,
+        "trendStrength": 65,
+        "freshness": 100,
+        "volatility": 75
+      },
+      "marketState": {
+        "state": "RANGING",
+        "confidence": 60,
+        "features": {
+          "baseRegime": "RANGING",
+          "directionalMove": -0.00085,
+          "rangeRatio": 1.28,
+          "bodyRatio": 0.51,
+          "volumeRatio": 1,
+          "breakout": false
+        }
+      },
+      "strategyPriority": {
+        "primary": "INTRADAY",
+        "scores": {
+          "INTRADAY": 70,
+          "SWING": 65,
+          "SCALPING": 60
+        }
+      },
+      "session": "LONDON",
+      "economicEdge": {
+        "eligible": true,
+        "status": "LIVE_BOOTSTRAP",
+        "reason": "economic edge requires 10 resolved R samples; 3 available",
+        "source": null,
+        "sampleSize": 3,
+        "requiredSamples": 10,
+        "expectancyR": null,
+        "decayedExpectancyR": null,
+        "profitFactor": null,
+        "profitFactorInfinite": false,
+        "context": {
+          "pattern": "Break of Structure",
+          "pair": "XAUUSD",
+          "timeframe": "1H",
+          "marketRegime": "RANGING",
+          "session": "LONDON"
+        }
+      },
+      "strategyAuthority": {
+        "eligible": true,
+        "status": "LIVE_STRATEGY_STATE_BOOTSTRAP",
+        "reason": "strategy-state authority requires 10 resolved R samples; 0 available",
+        "source": null,
+        "sampleSize": 0,
+        "requiredSamples": 10,
+        "expectancyR": null,
+        "decayedExpectancyR": null,
+        "profitFactor": null,
+        "profitFactorInfinite": false,
+        "context": {
+          "pattern": "Break of Structure",
+          "direction": "SELL",
+          "pair": "XAUUSD",
+          "timeframe": "1H",
+          "marketState": "RANGING",
+          "session": "LONDON"
+        }
+      },
+      "degradationAuthority": {
+        "eligible": true,
+        "status": "LIVE_DEGRADATION_BOOTSTRAP",
+        "reason": "degradation authority requires 10 baseline + 20 recent resolved R samples; 3 available",
+        "source": null,
+        "sampleSize": 3,
+        "requiredBaselineSamples": 10,
+        "requiredRecentSamples": 20,
+        "requiredTotalSamples": 30,
+        "baseline": null,
+        "recent": null,
+        "context": {
+          "pattern": "Break of Structure",
+          "direction": "SELL",
+          "pair": "XAUUSD",
+          "timeframe": "1H",
+          "marketState": "RANGING",
+          "session": "LONDON"
+        }
+      },
+      "sequentialOOSAuthority": {
+        "eligible": true,
+        "status": "LIVE_SEQUENTIAL_OOS_BOOTSTRAP",
+        "reason": "sequential OOS authority requires 10 prior + 20 OOS resolved R samples; 3 available",
+        "source": null,
+        "sampleSize": 3,
+        "priorSamples": 10,
+        "oosWindow": 20,
+        "foldSize": 10,
+        "foldCount": 2,
+        "requiredTotalSamples": 30,
+        "folds": [],
+        "context": {
+          "pattern": "Break of Structure",
+          "direction": "SELL",
+          "pair": "XAUUSD",
+          "timeframe": "1H",
+          "marketState": "RANGING",
+          "session": "LONDON"
+        }
+      },
+      "adaptiveConfidenceReliability": {
+        "eligible": true,
+        "status": "LIVE_CONFIDENCE_RELIABILITY_BOOTSTRAP",
+        "reason": "adaptive confidence bin 85 requires 10 locked decision-time outcomes; 4 available",
+        "stage": "ADAPTIVE",
+        "bin": 85,
+        "sampleSize": 4,
+        "requiredSamples": 10,
+        "minimumRequiredRate": 70
+      },
+      "finalConfidenceReliability": {
+        "eligible": true,
+        "status": "LIVE_CONFIDENCE_RELIABILITY_BOOTSTRAP",
+        "reason": "final confidence bin 75 requires 10 locked decision-time outcomes; 2 available",
+        "stage": "FINAL",
+        "bin": 75,
+        "sampleSize": 2,
+        "requiredSamples": 10,
+        "minimumRequiredRate": 70
+      },
+      "portfolioRisk": {
+        "approved": true,
+        "hardReject": false,
+        "reasons": [],
+        "correlationPenalty": 0,
+        "exposure": {
+          "totalOpen": 0,
+          "samePair": 0,
+          "samePairDirection": 0,
+          "jpy": 0
+        }
+      },
+      "explanation": {
+        "summary": "SELL selected because Break of Structure produced the strongest institutional score for XAUUSD 1H.",
+        "whyDirection": "sellers gained control with bearish pattern and confirmation alignment",
+        "whyConfidence": "Final AI Confidence 75.1% combines existing adaptive confidence with learning, historical accuracy, regime quality, session quality, risk/reward, pattern weight, trend alignment, freshness and volatility.",
+        "whyStopLoss": "Stop loss 4432.15497 comes from the existing signal engine's market-structure and invalidation logic.",
+        "whyTakeProfit": "Primary take profit 4396.48715 preserves the existing risk/reward calculation. Phase 6 validates its institutional quality without replacing it.",
+        "whyPatternSelected": "Break of Structure achieved AI Score 73.6/100 with Quality Grade B after portfolio and correlation review.",
+        "whyRiskRewardAccepted": "Risk/reward 1.5 passed the existing signal engine and the institutional ranking threshold.",
+        "marketState": {
+          "state": "RANGING",
+          "confidence": 60,
+          "features": {
+            "baseRegime": "RANGING",
+            "directionalMove": -0.00085,
+            "rangeRatio": 1.28,
+            "bodyRatio": 0.51,
+            "volumeRatio": 1,
+            "breakout": false
+          }
+        },
+        "strategy": {
+          "primary": "INTRADAY",
+          "scores": {
+            "INTRADAY": 70,
+            "SWING": 65,
+            "SCALPING": 60
+          }
+        },
+        "rejectedPatterns": []
+      },
+      "phase": 6,
+      "institutionalRank": 1,
+      "signalId": "XAUUSD_1H_BREAKOFSTRUCTURE_20260901",
+      "timestamp": "2026-09-01T08:05:37.060Z",
+      "version": 1,
+      "decisionAdaptiveConfidence": 85,
+      "decisionSignalConfidence": 85,
+      "decisionFinalAIConfidence": 75.1,
+      "decisionAIScore": 73.6,
+      "confidenceProvenance": "LOCKED_AT_PUBLICATION",
+      "decisionConfidenceCapturedAt": "2026-09-01T08:05:37.060Z",
+      "initialStopLoss": 4432.15497,
+      "lastUpdated": "2026-09-01T08:05:37.060Z",
+      "refreshCount": 1
+    },
+    {
       "id": "XAUUSD-5m-BullishEngulfing-1786452033703-7mjvvf",
       "pair": "XAUUSD",
       "timeframe": "5m",
@@ -8183,10 +8476,10 @@
       }
     }
   ],
-  "updatedAt": "2026-09-01T08:00:55.646Z",
+  "updatedAt": "2026-09-01T08:05:37.072Z",
   "stale": {},
-  "totalSignals": 27,
+  "totalSignals": 28,
   "resolvedSignals": 13,
   "expiredSignals": 14,
-  "pendingSignals": 0
+  "pendingSignals": 1
 }
