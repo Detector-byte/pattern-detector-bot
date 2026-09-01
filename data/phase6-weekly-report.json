@@ -1,24 +1,16 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-01T14:00:53.969Z",
+  "generatedAt": "2026-09-01T14:05:38.790Z",
   "period": {
-    "start": "2026-08-25T14:00:53.969Z",
-    "end": "2026-09-01T14:00:53.969Z"
+    "start": "2026-08-25T14:05:38.789Z",
+    "end": "2026-09-01T14:05:38.789Z"
   },
   "metrics": {
-    "totalSignals": 9,
-    "resolvedSignals": 5,
-    "overallWinRate": 60,
+    "totalSignals": 8,
+    "resolvedSignals": 4,
+    "overallWinRate": 75,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Liquidity Sweep (Sell-Side)": {
-        "total": 1,
-        "wins": 0,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Break of Structure": {
         "total": 6,
         "wins": 3,
@@ -38,21 +30,21 @@
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 9,
+        "total": 8,
         "wins": 3,
-        "losses": 2,
+        "losses": 1,
         "expired": 4,
-        "winRate": 60,
+        "winRate": 75,
         "averageRiskReward": 1.5
       }
     },
     "timeframeAccuracy": {
       "1H": {
-        "total": 4,
+        "total": 3,
         "wins": 2,
-        "losses": 1,
+        "losses": 0,
         "expired": 1,
-        "winRate": 66.7,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "5m": {
@@ -81,19 +73,19 @@
       }
     },
     "sessionAccuracy": {
-      "LONDON": {
-        "total": 3,
-        "wins": 1,
-        "losses": 1,
-        "expired": 1,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "NEWYORK": {
         "total": 4,
         "wins": 1,
         "losses": 0,
         "expired": 3,
+        "winRate": 100,
+        "averageRiskReward": 1.5
+      },
+      "LONDON": {
+        "total": 2,
+        "wins": 1,
+        "losses": 0,
+        "expired": 1,
         "winRate": 100,
         "averageRiskReward": 1.5
       },
@@ -115,14 +107,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "RANGING": {
-        "total": 2,
-        "wins": 1,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "BREAKOUT": {
         "total": 2,
         "wins": 2,
@@ -153,6 +137,14 @@
         "losses": 1,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "RANGING": {
+        "total": 1,
+        "wins": 1,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       }
     },
