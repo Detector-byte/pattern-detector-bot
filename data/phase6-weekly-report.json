@@ -1,22 +1,22 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-01T09:05:37.029Z",
+  "generatedAt": "2026-09-01T09:10:41.189Z",
   "period": {
-    "start": "2026-08-25T09:05:37.028Z",
-    "end": "2026-09-01T09:05:37.028Z"
+    "start": "2026-08-25T09:10:41.188Z",
+    "end": "2026-09-01T09:10:41.188Z"
   },
   "metrics": {
     "totalSignals": 10,
-    "resolvedSignals": 4,
-    "overallWinRate": 50,
+    "resolvedSignals": 5,
+    "overallWinRate": 60,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
       "Break of Structure": {
         "total": 6,
-        "wins": 2,
+        "wins": 3,
         "losses": 1,
         "expired": 2,
-        "winRate": 66.7,
+        "winRate": 75,
         "averageRiskReward": 1.5
       },
       "Liquidity Sweep (Sell-Side)": {
@@ -39,20 +39,20 @@
     "pairAccuracy": {
       "XAUUSD": {
         "total": 10,
-        "wins": 2,
+        "wins": 3,
         "losses": 2,
         "expired": 5,
-        "winRate": 50,
+        "winRate": 60,
         "averageRiskReward": 1.5
       }
     },
     "timeframeAccuracy": {
       "1H": {
         "total": 5,
-        "wins": 1,
+        "wins": 2,
         "losses": 1,
         "expired": 2,
-        "winRate": 50,
+        "winRate": 66.7,
         "averageRiskReward": 1.5
       },
       "5m": {
@@ -83,10 +83,10 @@
     "sessionAccuracy": {
       "LONDON": {
         "total": 3,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.5
       },
       "ASIAN": {
@@ -117,10 +117,10 @@
     "marketRegimeAccuracy": {
       "RANGING": {
         "total": 3,
-        "wins": 0,
+        "wins": 1,
         "losses": 1,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 50,
         "averageRiskReward": 1.5
       },
       "BREAKOUT": {
