@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-09-02T17:25:37.693Z",
+  "updatedAt": "2026-09-02T17:30:52.093Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -45,14 +45,6 @@
       }
     },
     "pair": {
-      "XAUUSD": {
-        "total": 18,
-        "wins": 5,
-        "losses": 6,
-        "expired": 7,
-        "winRate": 45.5,
-        "averageRiskReward": 1.56
-      },
       "GBPJPY": {
         "total": 12,
         "wins": 1,
@@ -60,17 +52,17 @@
         "expired": 7,
         "winRate": 25,
         "averageRiskReward": 1.75
+      },
+      "XAUUSD": {
+        "total": 18,
+        "wins": 5,
+        "losses": 6,
+        "expired": 7,
+        "winRate": 45.5,
+        "averageRiskReward": 1.56
       }
     },
     "marketState": {
-      "RANGING": {
-        "total": 12,
-        "wins": 1,
-        "losses": 5,
-        "expired": 6,
-        "winRate": 16.7,
-        "averageRiskReward": 1.71
-      },
       "COMPRESSION": {
         "total": 8,
         "wins": 1,
@@ -78,6 +70,14 @@
         "expired": 5,
         "winRate": 50,
         "averageRiskReward": 1.63
+      },
+      "RANGING": {
+        "total": 12,
+        "wins": 1,
+        "losses": 5,
+        "expired": 6,
+        "winRate": 16.7,
+        "averageRiskReward": 1.71
       },
       "BREAKOUT": {
         "total": 4,
@@ -105,14 +105,6 @@
       }
     },
     "session": {
-      "LONDON_NY_OVERLAP": {
-        "total": 6,
-        "wins": 2,
-        "losses": 2,
-        "expired": 2,
-        "winRate": 50,
-        "averageRiskReward": 1.67
-      },
       "NEWYORK": {
         "total": 9,
         "wins": 1,
@@ -120,6 +112,14 @@
         "expired": 6,
         "winRate": 50,
         "averageRiskReward": 1.61
+      },
+      "LONDON_NY_OVERLAP": {
+        "total": 6,
+        "wins": 2,
+        "losses": 2,
+        "expired": 2,
+        "winRate": 50,
+        "averageRiskReward": 1.67
       },
       "OFF_HOURS": {
         "total": 1,
@@ -147,6 +147,14 @@
       }
     },
     "patternRanking": {
+      "Bearish Order Block": {
+        "total": 3,
+        "wins": 0,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -194,30 +202,22 @@
         "expired": 2,
         "winRate": 80,
         "averageRiskReward": 1.5
-      },
-      "Bearish Order Block": {
-        "total": 3,
-        "wins": 0,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 1.5
       }
     },
     "learningGrowth": "improving"
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 1,
-    "averageConfidence": 68.3,
-    "averageAIScore": 70.2,
+    "signalsGenerated": 0,
+    "averageConfidence": 0,
+    "averageAIScore": 0,
     "recentWinRate": 40,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 266,
-    "analysisDurationMs": 23,
-    "learningDurationMs": 7,
-    "saveDurationMs": 5,
-    "totalRuntimeMs": 307
+    "fetchDurationMs": 245,
+    "analysisDurationMs": 29,
+    "learningDurationMs": 11,
+    "saveDurationMs": 8,
+    "totalRuntimeMs": 301
   }
 }

@@ -1,8 +1,8 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-09-02T17:25:37.693Z",
-  "lastRun": "2026-09-02T17:25:37.693Z",
-  "publishedSignalId": "GBPJPY_15m_BEARISHORDERBLOCK_20260902",
+  "updatedAt": "2026-09-02T17:30:52.094Z",
+  "lastRun": "2026-09-02T17:30:52.094Z",
+  "publishedSignalId": null,
   "portfolio": {
     "openTrades": 1,
     "limits": {
@@ -11,30 +11,8 @@
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {
-    "GBPJPY_15m": {
-      "state": "COMPRESSION",
-      "confidence": 80,
-      "features": {
-        "baseRegime": "RANGING",
-        "directionalMove": -0.00568,
-        "rangeRatio": 0.41,
-        "bodyRatio": 0.37,
-        "volumeRatio": 1,
-        "breakout": false
-      }
-    }
-  },
-  "strategyPriorities": {
-    "GBPJPY_15m": {
-      "primary": "SCALPING",
-      "scores": {
-        "SCALPING": 80,
-        "INTRADAY": 70,
-        "SWING": 45
-      }
-    }
-  },
+  "marketStates": {},
+  "strategyPriorities": {},
   "optimizerRecommendations": [
     {
       "type": "PATTERN_WEIGHT",
