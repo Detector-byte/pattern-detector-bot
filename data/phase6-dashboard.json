@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-09-02T01:05:43.694Z",
+  "updatedAt": "2026-09-02T01:10:40.093Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,13 +19,13 @@
   },
   "performance": {
     "strategy": {
-      "SWING": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
+      "INTRADAY": {
+        "total": 20,
+        "wins": 5,
+        "losses": 5,
+        "expired": 9,
+        "winRate": 50,
+        "averageRiskReward": 1.6
       },
       "SCALPING": {
         "total": 8,
@@ -35,13 +35,13 @@
         "winRate": 0,
         "averageRiskReward": 1.75
       },
-      "INTRADAY": {
-        "total": 19,
-        "wins": 5,
-        "losses": 5,
-        "expired": 9,
-        "winRate": 50,
-        "averageRiskReward": 1.61
+      "SWING": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "pair": {
@@ -63,13 +63,13 @@
       }
     },
     "marketState": {
-      "TRENDING": {
-        "total": 4,
-        "wins": 1,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 100,
-        "averageRiskReward": 1.5
+      "COMPRESSION": {
+        "total": 7,
+        "wins": 0,
+        "losses": 1,
+        "expired": 5,
+        "winRate": 0,
+        "averageRiskReward": 1.64
       },
       "RANGING": {
         "total": 12,
@@ -79,14 +79,6 @@
         "winRate": 16.7,
         "averageRiskReward": 1.71
       },
-      "COMPRESSION": {
-        "total": 6,
-        "wins": 0,
-        "losses": 1,
-        "expired": 5,
-        "winRate": 0,
-        "averageRiskReward": 1.67
-      },
       "BREAKOUT": {
         "total": 4,
         "wins": 3,
@@ -94,6 +86,14 @@
         "expired": 0,
         "winRate": 75,
         "averageRiskReward": 1.63
+      },
+      "TRENDING": {
+        "total": 3,
+        "wins": 1,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 100,
+        "averageRiskReward": 1.5
       },
       "EXPANSION": {
         "total": 3,
@@ -105,13 +105,13 @@
       }
     },
     "session": {
-      "NEWYORK": {
-        "total": 9,
+      "ASIAN": {
+        "total": 8,
         "wins": 1,
-        "losses": 1,
-        "expired": 6,
-        "winRate": 50,
-        "averageRiskReward": 1.61
+        "losses": 2,
+        "expired": 4,
+        "winRate": 33.3,
+        "averageRiskReward": 1.63
       },
       "LONDON_NY_OVERLAP": {
         "total": 6,
@@ -121,6 +121,14 @@
         "winRate": 50,
         "averageRiskReward": 1.67
       },
+      "NEWYORK": {
+        "total": 8,
+        "wins": 1,
+        "losses": 1,
+        "expired": 6,
+        "winRate": 50,
+        "averageRiskReward": 1.63
+      },
       "OFF_HOURS": {
         "total": 1,
         "wins": 0,
@@ -128,14 +136,6 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 2
-      },
-      "ASIAN": {
-        "total": 7,
-        "wins": 1,
-        "losses": 2,
-        "expired": 4,
-        "winRate": 33.3,
-        "averageRiskReward": 1.64
       },
       "LONDON": {
         "total": 6,
@@ -214,10 +214,10 @@
     "recentWinRate": 35.7,
     "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 131,
-    "analysisDurationMs": 24,
-    "learningDurationMs": 7,
-    "saveDurationMs": 6,
-    "totalRuntimeMs": 174
+    "fetchDurationMs": 302,
+    "analysisDurationMs": 37,
+    "learningDurationMs": 10,
+    "saveDurationMs": 8,
+    "totalRuntimeMs": 366
   }
 }
