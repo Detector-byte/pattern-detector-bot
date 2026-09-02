@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-02T02:05:37.525Z",
+  "generatedAt": "2026-09-02T02:10:45.315Z",
   "period": {
-    "start": "2026-08-26T02:05:37.524Z",
-    "end": "2026-09-02T02:05:37.524Z"
+    "start": "2026-08-26T02:10:45.314Z",
+    "end": "2026-09-02T02:10:45.314Z"
   },
   "metrics": {
     "totalSignals": 9,
@@ -73,14 +73,6 @@
       }
     },
     "sessionAccuracy": {
-      "ASIAN": {
-        "total": 2,
-        "wins": 2,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "NEWYORK": {
         "total": 4,
         "wins": 1,
@@ -97,6 +89,14 @@
         "winRate": 100,
         "averageRiskReward": 1.5
       },
+      "ASIAN": {
+        "total": 2,
+        "wins": 2,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
+        "averageRiskReward": 1.5
+      },
       "LONDON_NY_OVERLAP": {
         "total": 1,
         "wins": 0,
@@ -107,14 +107,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "COMPRESSION": {
-        "total": 3,
-        "wins": 1,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "BREAKOUT": {
         "total": 2,
         "wins": 2,
@@ -129,6 +121,14 @@
         "losses": 0,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "COMPRESSION": {
+        "total": 3,
+        "wins": 1,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "EXPANSION": {
