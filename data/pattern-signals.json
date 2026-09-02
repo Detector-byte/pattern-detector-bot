@@ -1,299 +1,6 @@
 {
   "signals": [
     {
-      "id": "GBPJPY-15m-BearishOrderBlock-1788369937674-19iqrj",
-      "pair": "GBPJPY",
-      "timeframe": "15m",
-      "pattern": "Bearish Order Block",
-      "direction": "SELL",
-      "signal": "SELL",
-      "confidence": 68.3,
-      "adaptiveConfidence": 72,
-      "entry": 214.354,
-      "stopLoss": 214.507,
-      "takeProfit1": 214.126,
-      "takeProfit2": 214.05,
-      "takeProfit3": 213.897,
-      "riskReward": 1.5,
-      "riskRewardDetails": {
-        "pattern": "Bearish Order Block",
-        "risk": "0.1524",
-        "reward": "0.2285",
-        "ratio": "1.50",
-        "acceptable": true,
-        "quality": "Acceptable"
-      },
-      "qualityScore": 60,
-      "grade": "C",
-      "qualityRecommendation": "Insufficient Data",
-      "patternWeight": 1,
-      "blacklisted": false,
-      "tradeDecision": {
-        "confidence": 72,
-        "execute": true,
-        "threshold": 70,
-        "patternBlacklisted": false,
-        "reason": "Confidence passed"
-      },
-      "status": "ACTIVE",
-      "description": "Pattern detected with confirmed signal.",
-      "psychology": "Pattern detected with confirmed signal.",
-      "timeframeContext": {
-        "duration": "15 minute",
-        "holdTime": "1 - 4 hours",
-        "tradingSession": "Short-term swing",
-        "riskLevel": "Medium-High",
-        "volatility": "Medium-High",
-        "advice": "Balance catching moves with avoiding false breaks. Suitable for day traders."
-      },
-      "marketRegime": "RANGING",
-      "marketStructure": {
-        "interpretation": "Bearish reversal or continuation",
-        "sentiment": "Sellers gaining control",
-        "momentum": "Downside momentum building",
-        "recommendedAction": "Look for short entries after confirmed bearish structure."
-      },
-      "riskManagement": {
-        "risk": 0.152,
-        "stopDistance": 0.152,
-        "profitTarget1": 0.229,
-        "profitTarget2": 0.305,
-        "profitTarget3": 0.457,
-        "recommendation": "GOOD"
-      },
-      "tradingGuidance": "Monitor the pattern on 15m. Enter only after confirmed directional movement with acceptable risk-to-reward.",
-      "strength": 94,
-      "confirmationScore": 83,
-      "executionNotes": {
-        "confirmationRequired": true,
-        "volumeImportant": true,
-        "recommendedEntry": "Enter after confirmed breakout, breakdown or rejection.",
-        "riskLevel": "HIGH",
-        "liquidityRequired": true,
-        "marketRegime": "RANGING",
-        "bestSessions": "London-New York overlap and major session openings",
-        "avoidTimes": "Avoid high-impact news windows and unusually poor liquidity.",
-        "notes": "Bearish Order Block is being evaluated on 15m. Combine it with higher-timeframe structure, liquidity and market-regime confirmation."
-      },
-      "metadata": {
-        "source": "PipSight Pro AI",
-        "phase": 4,
-        "patternVersion": null,
-        "strategy": null,
-        "strategyEvidence": null,
-        "evolvedThresholds": {},
-        "generatedBy": "SignalGenerator"
-      },
-      "createdAt": "2026-09-02T17:25:37.679Z",
-      "expiresAt": "2026-09-02T18:25:37.675Z",
-      "takeProfit": 214.126,
-      "finalAIConfidence": 68.3,
-      "aiScore": 70.2,
-      "qualityGrade": "C",
-      "aiScoreComponents": {
-        "patternStrength": 94,
-        "confirmationScore": 83,
-        "adaptiveConfidence": 72,
-        "historicalAccuracy": 50,
-        "riskReward": 49.6732026143837,
-        "marketRegime": 80,
-        "sessionQuality": 78.75,
-        "patternWeight": 50,
-        "trendAlignment": 95,
-        "learningScore": 60,
-        "patternEvolution": 50
-      },
-      "confidenceComponents": {
-        "adaptiveConfidence": 72,
-        "learningConfidence": 60,
-        "historicalAccuracy": 50,
-        "marketRegime": 80,
-        "sessionQuality": 78.75,
-        "riskReward": 49.6732026143837,
-        "patternWeight": 50,
-        "trendStrength": 95,
-        "freshness": 100,
-        "volatility": 75
-      },
-      "marketState": {
-        "state": "COMPRESSION",
-        "confidence": 80,
-        "features": {
-          "baseRegime": "RANGING",
-          "directionalMove": -0.00568,
-          "rangeRatio": 0.41,
-          "bodyRatio": 0.37,
-          "volumeRatio": 1,
-          "breakout": false
-        }
-      },
-      "strategyPriority": {
-        "primary": "SCALPING",
-        "scores": {
-          "SCALPING": 80,
-          "INTRADAY": 70,
-          "SWING": 45
-        }
-      },
-      "session": "NEWYORK",
-      "economicEdge": {
-        "eligible": true,
-        "status": "LIVE_BOOTSTRAP",
-        "reason": "economic edge requires 10 resolved R samples; 0 available",
-        "source": null,
-        "sampleSize": 0,
-        "requiredSamples": 10,
-        "expectancyR": null,
-        "decayedExpectancyR": null,
-        "profitFactor": null,
-        "profitFactorInfinite": false,
-        "context": {
-          "pattern": "Bearish Order Block",
-          "pair": "GBPJPY",
-          "timeframe": "15m",
-          "marketRegime": "RANGING",
-          "session": "NEWYORK"
-        }
-      },
-      "strategyAuthority": {
-        "eligible": true,
-        "status": "LIVE_STRATEGY_STATE_BOOTSTRAP",
-        "reason": "strategy-state authority requires 10 resolved R samples; 0 available",
-        "source": null,
-        "sampleSize": 0,
-        "requiredSamples": 10,
-        "expectancyR": null,
-        "decayedExpectancyR": null,
-        "profitFactor": null,
-        "profitFactorInfinite": false,
-        "context": {
-          "pattern": "Bearish Order Block",
-          "direction": "SELL",
-          "pair": "GBPJPY",
-          "timeframe": "15m",
-          "marketState": "COMPRESSION",
-          "session": "NEWYORK"
-        }
-      },
-      "degradationAuthority": {
-        "eligible": true,
-        "status": "LIVE_DEGRADATION_BOOTSTRAP",
-        "reason": "degradation authority requires 10 baseline + 20 recent resolved R samples; 0 available",
-        "source": null,
-        "sampleSize": 0,
-        "requiredBaselineSamples": 10,
-        "requiredRecentSamples": 20,
-        "requiredTotalSamples": 30,
-        "baseline": null,
-        "recent": null,
-        "context": {
-          "pattern": "Bearish Order Block",
-          "direction": "SELL",
-          "pair": "GBPJPY",
-          "timeframe": "15m",
-          "marketState": "COMPRESSION",
-          "session": "NEWYORK"
-        }
-      },
-      "sequentialOOSAuthority": {
-        "eligible": true,
-        "status": "LIVE_SEQUENTIAL_OOS_BOOTSTRAP",
-        "reason": "sequential OOS authority requires 10 prior + 20 OOS resolved R samples; 0 available",
-        "source": null,
-        "sampleSize": 0,
-        "priorSamples": 10,
-        "oosWindow": 20,
-        "foldSize": 10,
-        "foldCount": 2,
-        "requiredTotalSamples": 30,
-        "folds": [],
-        "context": {
-          "pattern": "Bearish Order Block",
-          "direction": "SELL",
-          "pair": "GBPJPY",
-          "timeframe": "15m",
-          "marketState": "COMPRESSION",
-          "session": "NEWYORK"
-        }
-      },
-      "adaptiveConfidenceReliability": {
-        "eligible": true,
-        "status": "LIVE_CONFIDENCE_RELIABILITY_BOOTSTRAP",
-        "reason": "adaptive confidence bin 70 requires 10 locked decision-time outcomes; 2 available",
-        "stage": "ADAPTIVE",
-        "bin": 70,
-        "sampleSize": 2,
-        "requiredSamples": 10,
-        "minimumRequiredRate": 70
-      },
-      "finalConfidenceReliability": {
-        "eligible": true,
-        "status": "LIVE_CONFIDENCE_RELIABILITY_BOOTSTRAP",
-        "reason": "final confidence bin 70 requires 10 locked decision-time outcomes; 9 available",
-        "stage": "FINAL",
-        "bin": 70,
-        "sampleSize": 9,
-        "requiredSamples": 10,
-        "minimumRequiredRate": 70
-      },
-      "portfolioRisk": {
-        "approved": true,
-        "hardReject": false,
-        "reasons": [],
-        "correlationPenalty": 0,
-        "exposure": {
-          "totalOpen": 0,
-          "samePair": 0,
-          "samePairDirection": 0,
-          "jpy": 0
-        }
-      },
-      "explanation": {
-        "summary": "SELL selected because Bearish Order Block produced the strongest institutional score for GBPJPY 15m.",
-        "whyDirection": "sellers gained control with bearish pattern and confirmation alignment",
-        "whyConfidence": "Final AI Confidence 68.3% combines existing adaptive confidence with learning, historical accuracy, regime quality, session quality, risk/reward, pattern weight, trend alignment, freshness and volatility.",
-        "whyStopLoss": "Stop loss 214.507 comes from the existing signal engine's market-structure and invalidation logic.",
-        "whyTakeProfit": "Primary take profit 214.126 preserves the existing risk/reward calculation. Phase 6 validates its institutional quality without replacing it.",
-        "whyPatternSelected": "Bearish Order Block achieved AI Score 70.2/100 with Quality Grade C after portfolio and correlation review.",
-        "whyRiskRewardAccepted": "Risk/reward 1.49 passed the existing signal engine and the institutional ranking threshold.",
-        "marketState": {
-          "state": "COMPRESSION",
-          "confidence": 80,
-          "features": {
-            "baseRegime": "RANGING",
-            "directionalMove": -0.00568,
-            "rangeRatio": 0.41,
-            "bodyRatio": 0.37,
-            "volumeRatio": 1,
-            "breakout": false
-          }
-        },
-        "strategy": {
-          "primary": "SCALPING",
-          "scores": {
-            "SCALPING": 80,
-            "INTRADAY": 70,
-            "SWING": 45
-          }
-        },
-        "rejectedPatterns": []
-      },
-      "phase": 6,
-      "institutionalRank": 1,
-      "signalId": "GBPJPY_15m_BEARISHORDERBLOCK_20260902",
-      "timestamp": "2026-09-02T17:25:37.679Z",
-      "version": 1,
-      "decisionAdaptiveConfidence": 72,
-      "decisionSignalConfidence": 72,
-      "decisionFinalAIConfidence": 68.3,
-      "decisionAIScore": 70.2,
-      "confidenceProvenance": "LOCKED_AT_PUBLICATION",
-      "decisionConfidenceCapturedAt": "2026-09-02T17:25:37.679Z",
-      "initialStopLoss": 214.507,
-      "lastUpdated": "2026-09-02T17:25:37.679Z",
-      "refreshCount": 1
-    },
-    {
       "id": "XAUUSD-5m-BullishEngulfing-1786452033703-7mjvvf",
       "pair": "XAUUSD",
       "timeframe": "5m",
@@ -9087,12 +8794,307 @@
         "realizedMove": 32.05799999999999,
         "realizedR": 1.5
       }
+    },
+    {
+      "id": "GBPJPY-15m-BearishOrderBlock-1788369937674-19iqrj",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "pattern": "Bearish Order Block",
+      "direction": "SELL",
+      "signal": "SELL",
+      "confidence": 68.3,
+      "adaptiveConfidence": 72,
+      "entry": 214.354,
+      "stopLoss": 214.507,
+      "takeProfit1": 214.126,
+      "takeProfit2": 214.05,
+      "takeProfit3": 213.897,
+      "riskReward": 1.5,
+      "riskRewardDetails": {
+        "pattern": "Bearish Order Block",
+        "risk": "0.1524",
+        "reward": "0.2285",
+        "ratio": "1.50",
+        "acceptable": true,
+        "quality": "Acceptable"
+      },
+      "qualityScore": 60,
+      "grade": "C",
+      "qualityRecommendation": "Insufficient Data",
+      "patternWeight": 1,
+      "blacklisted": false,
+      "tradeDecision": {
+        "confidence": 72,
+        "execute": true,
+        "threshold": 70,
+        "patternBlacklisted": false,
+        "reason": "Confidence passed"
+      },
+      "status": "EXPIRED",
+      "description": "Pattern detected with confirmed signal.",
+      "psychology": "Pattern detected with confirmed signal.",
+      "timeframeContext": {
+        "duration": "15 minute",
+        "holdTime": "1 - 4 hours",
+        "tradingSession": "Short-term swing",
+        "riskLevel": "Medium-High",
+        "volatility": "Medium-High",
+        "advice": "Balance catching moves with avoiding false breaks. Suitable for day traders."
+      },
+      "marketRegime": "RANGING",
+      "marketStructure": {
+        "interpretation": "Bearish reversal or continuation",
+        "sentiment": "Sellers gaining control",
+        "momentum": "Downside momentum building",
+        "recommendedAction": "Look for short entries after confirmed bearish structure."
+      },
+      "riskManagement": {
+        "risk": 0.152,
+        "stopDistance": 0.152,
+        "profitTarget1": 0.229,
+        "profitTarget2": 0.305,
+        "profitTarget3": 0.457,
+        "recommendation": "GOOD"
+      },
+      "tradingGuidance": "Monitor the pattern on 15m. Enter only after confirmed directional movement with acceptable risk-to-reward.",
+      "strength": 94,
+      "confirmationScore": 83,
+      "executionNotes": {
+        "confirmationRequired": true,
+        "volumeImportant": true,
+        "recommendedEntry": "Enter after confirmed breakout, breakdown or rejection.",
+        "riskLevel": "HIGH",
+        "liquidityRequired": true,
+        "marketRegime": "RANGING",
+        "bestSessions": "London-New York overlap and major session openings",
+        "avoidTimes": "Avoid high-impact news windows and unusually poor liquidity.",
+        "notes": "Bearish Order Block is being evaluated on 15m. Combine it with higher-timeframe structure, liquidity and market-regime confirmation."
+      },
+      "metadata": {
+        "source": "PipSight Pro AI",
+        "phase": 4,
+        "patternVersion": null,
+        "strategy": null,
+        "strategyEvidence": null,
+        "evolvedThresholds": {},
+        "generatedBy": "SignalGenerator"
+      },
+      "createdAt": "2026-09-02T17:25:37.679Z",
+      "expiresAt": "2026-09-02T18:25:37.675Z",
+      "takeProfit": 214.126,
+      "finalAIConfidence": 68.3,
+      "aiScore": 70.2,
+      "qualityGrade": "C",
+      "aiScoreComponents": {
+        "patternStrength": 94,
+        "confirmationScore": 83,
+        "adaptiveConfidence": 72,
+        "historicalAccuracy": 50,
+        "riskReward": 49.6732026143837,
+        "marketRegime": 80,
+        "sessionQuality": 78.75,
+        "patternWeight": 50,
+        "trendAlignment": 95,
+        "learningScore": 60,
+        "patternEvolution": 50
+      },
+      "confidenceComponents": {
+        "adaptiveConfidence": 72,
+        "learningConfidence": 60,
+        "historicalAccuracy": 50,
+        "marketRegime": 80,
+        "sessionQuality": 78.75,
+        "riskReward": 49.6732026143837,
+        "patternWeight": 50,
+        "trendStrength": 95,
+        "freshness": 100,
+        "volatility": 75
+      },
+      "marketState": {
+        "state": "COMPRESSION",
+        "confidence": 80,
+        "features": {
+          "baseRegime": "RANGING",
+          "directionalMove": -0.00568,
+          "rangeRatio": 0.41,
+          "bodyRatio": 0.37,
+          "volumeRatio": 1,
+          "breakout": false
+        }
+      },
+      "strategyPriority": {
+        "primary": "SCALPING",
+        "scores": {
+          "SCALPING": 80,
+          "INTRADAY": 70,
+          "SWING": 45
+        }
+      },
+      "session": "NEWYORK",
+      "economicEdge": {
+        "eligible": true,
+        "status": "LIVE_BOOTSTRAP",
+        "reason": "economic edge requires 10 resolved R samples; 0 available",
+        "source": null,
+        "sampleSize": 0,
+        "requiredSamples": 10,
+        "expectancyR": null,
+        "decayedExpectancyR": null,
+        "profitFactor": null,
+        "profitFactorInfinite": false,
+        "context": {
+          "pattern": "Bearish Order Block",
+          "pair": "GBPJPY",
+          "timeframe": "15m",
+          "marketRegime": "RANGING",
+          "session": "NEWYORK"
+        }
+      },
+      "strategyAuthority": {
+        "eligible": true,
+        "status": "LIVE_STRATEGY_STATE_BOOTSTRAP",
+        "reason": "strategy-state authority requires 10 resolved R samples; 0 available",
+        "source": null,
+        "sampleSize": 0,
+        "requiredSamples": 10,
+        "expectancyR": null,
+        "decayedExpectancyR": null,
+        "profitFactor": null,
+        "profitFactorInfinite": false,
+        "context": {
+          "pattern": "Bearish Order Block",
+          "direction": "SELL",
+          "pair": "GBPJPY",
+          "timeframe": "15m",
+          "marketState": "COMPRESSION",
+          "session": "NEWYORK"
+        }
+      },
+      "degradationAuthority": {
+        "eligible": true,
+        "status": "LIVE_DEGRADATION_BOOTSTRAP",
+        "reason": "degradation authority requires 10 baseline + 20 recent resolved R samples; 0 available",
+        "source": null,
+        "sampleSize": 0,
+        "requiredBaselineSamples": 10,
+        "requiredRecentSamples": 20,
+        "requiredTotalSamples": 30,
+        "baseline": null,
+        "recent": null,
+        "context": {
+          "pattern": "Bearish Order Block",
+          "direction": "SELL",
+          "pair": "GBPJPY",
+          "timeframe": "15m",
+          "marketState": "COMPRESSION",
+          "session": "NEWYORK"
+        }
+      },
+      "sequentialOOSAuthority": {
+        "eligible": true,
+        "status": "LIVE_SEQUENTIAL_OOS_BOOTSTRAP",
+        "reason": "sequential OOS authority requires 10 prior + 20 OOS resolved R samples; 0 available",
+        "source": null,
+        "sampleSize": 0,
+        "priorSamples": 10,
+        "oosWindow": 20,
+        "foldSize": 10,
+        "foldCount": 2,
+        "requiredTotalSamples": 30,
+        "folds": [],
+        "context": {
+          "pattern": "Bearish Order Block",
+          "direction": "SELL",
+          "pair": "GBPJPY",
+          "timeframe": "15m",
+          "marketState": "COMPRESSION",
+          "session": "NEWYORK"
+        }
+      },
+      "adaptiveConfidenceReliability": {
+        "eligible": true,
+        "status": "LIVE_CONFIDENCE_RELIABILITY_BOOTSTRAP",
+        "reason": "adaptive confidence bin 70 requires 10 locked decision-time outcomes; 2 available",
+        "stage": "ADAPTIVE",
+        "bin": 70,
+        "sampleSize": 2,
+        "requiredSamples": 10,
+        "minimumRequiredRate": 70
+      },
+      "finalConfidenceReliability": {
+        "eligible": true,
+        "status": "LIVE_CONFIDENCE_RELIABILITY_BOOTSTRAP",
+        "reason": "final confidence bin 70 requires 10 locked decision-time outcomes; 9 available",
+        "stage": "FINAL",
+        "bin": 70,
+        "sampleSize": 9,
+        "requiredSamples": 10,
+        "minimumRequiredRate": 70
+      },
+      "portfolioRisk": {
+        "approved": true,
+        "hardReject": false,
+        "reasons": [],
+        "correlationPenalty": 0,
+        "exposure": {
+          "totalOpen": 0,
+          "samePair": 0,
+          "samePairDirection": 0,
+          "jpy": 0
+        }
+      },
+      "explanation": {
+        "summary": "SELL selected because Bearish Order Block produced the strongest institutional score for GBPJPY 15m.",
+        "whyDirection": "sellers gained control with bearish pattern and confirmation alignment",
+        "whyConfidence": "Final AI Confidence 68.3% combines existing adaptive confidence with learning, historical accuracy, regime quality, session quality, risk/reward, pattern weight, trend alignment, freshness and volatility.",
+        "whyStopLoss": "Stop loss 214.507 comes from the existing signal engine's market-structure and invalidation logic.",
+        "whyTakeProfit": "Primary take profit 214.126 preserves the existing risk/reward calculation. Phase 6 validates its institutional quality without replacing it.",
+        "whyPatternSelected": "Bearish Order Block achieved AI Score 70.2/100 with Quality Grade C after portfolio and correlation review.",
+        "whyRiskRewardAccepted": "Risk/reward 1.49 passed the existing signal engine and the institutional ranking threshold.",
+        "marketState": {
+          "state": "COMPRESSION",
+          "confidence": 80,
+          "features": {
+            "baseRegime": "RANGING",
+            "directionalMove": -0.00568,
+            "rangeRatio": 0.41,
+            "bodyRatio": 0.37,
+            "volumeRatio": 1,
+            "breakout": false
+          }
+        },
+        "strategy": {
+          "primary": "SCALPING",
+          "scores": {
+            "SCALPING": 80,
+            "INTRADAY": 70,
+            "SWING": 45
+          }
+        },
+        "rejectedPatterns": []
+      },
+      "phase": 6,
+      "institutionalRank": 1,
+      "signalId": "GBPJPY_15m_BEARISHORDERBLOCK_20260902",
+      "timestamp": "2026-09-02T17:25:37.679Z",
+      "version": 1,
+      "decisionAdaptiveConfidence": 72,
+      "decisionSignalConfidence": 72,
+      "decisionFinalAIConfidence": 68.3,
+      "decisionAIScore": 70.2,
+      "confidenceProvenance": "LOCKED_AT_PUBLICATION",
+      "decisionConfidenceCapturedAt": "2026-09-02T17:25:37.679Z",
+      "initialStopLoss": 214.507,
+      "lastUpdated": "2026-09-02T18:30:49.689Z",
+      "refreshCount": 1,
+      "outcome": "EXPIRED",
+      "expiredAt": "2026-09-02T18:25:37.675Z"
     }
   ],
-  "updatedAt": "2026-09-02T18:25:36.730Z",
+  "updatedAt": "2026-09-02T18:30:49.699Z",
   "stale": {},
   "totalSignals": 30,
   "resolvedSignals": 15,
-  "expiredSignals": 14,
-  "pendingSignals": 1
+  "expiredSignals": 15,
+  "pendingSignals": 0
 }
