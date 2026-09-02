@@ -1,17 +1,17 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-09-02T17:20:45.537Z",
+  "updatedAt": "2026-09-02T17:25:37.693Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 29,
+      "70-79": 30,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
-      "60-69": 18,
+      "60-69": 19,
       "70-79": 10,
       "80-89": 1,
       "90-100": 0
@@ -20,12 +20,12 @@
   "performance": {
     "strategy": {
       "SCALPING": {
-        "total": 8,
+        "total": 9,
         "wins": 0,
         "losses": 4,
         "expired": 4,
         "winRate": 0,
-        "averageRiskReward": 1.75
+        "averageRiskReward": 1.72
       },
       "INTRADAY": {
         "total": 20,
@@ -54,12 +54,12 @@
         "averageRiskReward": 1.56
       },
       "GBPJPY": {
-        "total": 11,
+        "total": 12,
         "wins": 1,
         "losses": 3,
         "expired": 7,
         "winRate": 25,
-        "averageRiskReward": 1.77
+        "averageRiskReward": 1.75
       }
     },
     "marketState": {
@@ -72,12 +72,12 @@
         "averageRiskReward": 1.71
       },
       "COMPRESSION": {
-        "total": 7,
+        "total": 8,
         "wins": 1,
         "losses": 1,
         "expired": 5,
         "winRate": 50,
-        "averageRiskReward": 1.64
+        "averageRiskReward": 1.63
       },
       "BREAKOUT": {
         "total": 4,
@@ -114,12 +114,12 @@
         "averageRiskReward": 1.67
       },
       "NEWYORK": {
-        "total": 8,
+        "total": 9,
         "wins": 1,
         "losses": 1,
         "expired": 6,
         "winRate": 50,
-        "averageRiskReward": 1.63
+        "averageRiskReward": 1.61
       },
       "OFF_HOURS": {
         "total": 1,
@@ -196,7 +196,7 @@
         "averageRiskReward": 1.5
       },
       "Bearish Order Block": {
-        "total": 2,
+        "total": 3,
         "wins": 0,
         "losses": 0,
         "expired": 2,
@@ -208,16 +208,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 68.3,
+    "averageAIScore": 70.2,
     "recentWinRate": 40,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 137,
-    "analysisDurationMs": 28,
-    "learningDurationMs": 12,
-    "saveDurationMs": 14,
-    "totalRuntimeMs": 199
+    "fetchDurationMs": 266,
+    "analysisDurationMs": 23,
+    "learningDurationMs": 7,
+    "saveDurationMs": 5,
+    "totalRuntimeMs": 307
   }
 }
