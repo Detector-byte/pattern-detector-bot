@@ -278,13 +278,18 @@
             "SCALPING": 60
           }
         },
-        "rejectedPatterns": []
+        "rejectedPatterns": [
+          {
+            "pattern": "Break of Structure",
+            "reason": "AI score 63.4 below 70"
+          }
+        ]
       },
       "phase": 6,
       "institutionalRank": 1,
       "signalId": "XAUUSD_1H_BREAKOFSTRUCTURE_20260901",
       "timestamp": "2026-09-01T20:20:44.046Z",
-      "version": 14,
+      "version": 15,
       "decisionAdaptiveConfidence": 83,
       "decisionSignalConfidence": 83,
       "decisionFinalAIConfidence": 79.1,
@@ -292,8 +297,8 @@
       "confidenceProvenance": "LOCKED_AT_PUBLICATION",
       "decisionConfidenceCapturedAt": "2026-09-01T20:20:44.046Z",
       "initialStopLoss": 4347.1107,
-      "lastUpdated": "2026-09-02T01:35:32.162Z",
-      "refreshCount": 14
+      "lastUpdated": "2026-09-02T01:40:37.998Z",
+      "refreshCount": 15
     },
     {
       "id": "XAUUSD-5m-BullishEngulfing-1786452033703-7mjvvf",
@@ -8781,7 +8786,7 @@
       }
     }
   ],
-  "updatedAt": "2026-09-02T01:35:32.173Z",
+  "updatedAt": "2026-09-02T01:40:38.009Z",
   "stale": {},
   "totalSignals": 29,
   "resolvedSignals": 14,
