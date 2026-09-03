@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-09-03T13:05:40.802Z",
+  "updatedAt": "2026-09-03T13:10:42.016Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -19,14 +19,6 @@
   },
   "performance": {
     "strategy": {
-      "SWING": {
-        "total": 2,
-        "wins": 1,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "SCALPING": {
         "total": 9,
         "wins": 0,
@@ -42,6 +34,14 @@
         "expired": 9,
         "winRate": 54.5,
         "averageRiskReward": 1.6
+      },
+      "SWING": {
+        "total": 2,
+        "wins": 1,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 100,
+        "averageRiskReward": 1.5
       }
     },
     "pair": {
@@ -63,14 +63,6 @@
       }
     },
     "marketState": {
-      "TRENDING": {
-        "total": 4,
-        "wins": 2,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "RANGING": {
         "total": 12,
         "wins": 1,
@@ -94,6 +86,14 @@
         "expired": 0,
         "winRate": 75,
         "averageRiskReward": 1.63
+      },
+      "TRENDING": {
+        "total": 4,
+        "wins": 2,
+        "losses": 0,
+        "expired": 2,
+        "winRate": 100,
+        "averageRiskReward": 1.5
       },
       "EXPANSION": {
         "total": 3,
@@ -147,14 +147,6 @@
       }
     },
     "patternRanking": {
-      "Break of Structure": {
-        "total": 8,
-        "wins": 5,
-        "losses": 1,
-        "expired": 2,
-        "winRate": 83.3,
-        "averageRiskReward": 1.5
-      },
       "Bullish Engulfing": {
         "total": 7,
         "wins": 1,
@@ -195,6 +187,14 @@
         "winRate": 33.3,
         "averageRiskReward": 1.5
       },
+      "Break of Structure": {
+        "total": 8,
+        "wins": 5,
+        "losses": 1,
+        "expired": 2,
+        "winRate": 83.3,
+        "averageRiskReward": 1.5
+      },
       "Bearish Order Block": {
         "total": 3,
         "wins": 0,
@@ -214,10 +214,10 @@
     "recentWinRate": 43.8,
     "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 638,
-    "analysisDurationMs": 15,
-    "learningDurationMs": 8,
-    "saveDurationMs": 6,
-    "totalRuntimeMs": 673
+    "fetchDurationMs": 231,
+    "analysisDurationMs": 23,
+    "learningDurationMs": 10,
+    "saveDurationMs": 11,
+    "totalRuntimeMs": 283
   }
 }
