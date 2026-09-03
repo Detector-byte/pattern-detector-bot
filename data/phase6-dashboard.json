@@ -1,6 +1,6 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-09-03T13:01:09.417Z",
+  "updatedAt": "2026-09-03T13:05:40.802Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
@@ -21,10 +21,10 @@
     "strategy": {
       "SWING": {
         "total": 2,
-        "wins": 0,
+        "wins": 1,
         "losses": 0,
         "expired": 1,
-        "winRate": 0,
+        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "SCALPING": {
@@ -47,10 +47,10 @@
     "pair": {
       "XAUUSD": {
         "total": 19,
-        "wins": 5,
+        "wins": 6,
         "losses": 6,
         "expired": 7,
-        "winRate": 45.5,
+        "winRate": 50,
         "averageRiskReward": 1.55
       },
       "GBPJPY": {
@@ -65,7 +65,7 @@
     "marketState": {
       "TRENDING": {
         "total": 4,
-        "wins": 1,
+        "wins": 2,
         "losses": 0,
         "expired": 2,
         "winRate": 100,
@@ -107,10 +107,10 @@
     "session": {
       "LONDON_NY_OVERLAP": {
         "total": 7,
-        "wins": 2,
+        "wins": 3,
         "losses": 2,
         "expired": 2,
-        "winRate": 50,
+        "winRate": 60,
         "averageRiskReward": 1.64
       },
       "NEWYORK": {
@@ -149,10 +149,10 @@
     "patternRanking": {
       "Break of Structure": {
         "total": 8,
-        "wins": 4,
+        "wins": 5,
         "losses": 1,
         "expired": 2,
-        "winRate": 80,
+        "winRate": 83.3,
         "averageRiskReward": 1.5
       },
       "Bullish Engulfing": {
@@ -211,13 +211,13 @@
     "signalsGenerated": 0,
     "averageConfidence": 0,
     "averageAIScore": 0,
-    "recentWinRate": 40,
-    "openSignals": 1,
+    "recentWinRate": 43.8,
+    "openSignals": 0,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 152,
-    "analysisDurationMs": 39,
-    "learningDurationMs": 11,
-    "saveDurationMs": 8,
-    "totalRuntimeMs": 218
+    "fetchDurationMs": 638,
+    "analysisDurationMs": 15,
+    "learningDurationMs": 8,
+    "saveDurationMs": 6,
+    "totalRuntimeMs": 673
   }
 }
