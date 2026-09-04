@@ -1,22 +1,22 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-04T17:15:40.810Z",
+  "generatedAt": "2026-09-04T17:20:46.711Z",
   "period": {
-    "start": "2026-08-28T17:15:40.810Z",
-    "end": "2026-09-04T17:15:40.810Z"
+    "start": "2026-08-28T17:20:46.710Z",
+    "end": "2026-09-04T17:20:46.710Z"
   },
   "metrics": {
-    "totalSignals": 12,
-    "resolvedSignals": 7,
-    "overallWinRate": 71.4,
+    "totalSignals": 11,
+    "resolvedSignals": 6,
+    "overallWinRate": 66.7,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
       "Break of Structure": {
-        "total": 9,
-        "wins": 5,
+        "total": 8,
+        "wins": 4,
         "losses": 2,
         "expired": 2,
-        "winRate": 71.4,
+        "winRate": 66.7,
         "averageRiskReward": 1.5
       },
       "Bearish Order Block": {
@@ -30,11 +30,11 @@
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 11,
-        "wins": 5,
+        "total": 10,
+        "wins": 4,
         "losses": 2,
         "expired": 4,
-        "winRate": 71.4,
+        "winRate": 66.7,
         "averageRiskReward": 1.5
       },
       "GBPJPY": {
@@ -47,14 +47,6 @@
       }
     },
     "timeframeAccuracy": {
-      "1H": {
-        "total": 6,
-        "wins": 4,
-        "losses": 1,
-        "expired": 1,
-        "winRate": 80,
-        "averageRiskReward": 1.5
-      },
       "5m": {
         "total": 2,
         "wins": 0,
@@ -71,6 +63,14 @@
         "winRate": 0,
         "averageRiskReward": 1.5
       },
+      "1H": {
+        "total": 5,
+        "wins": 3,
+        "losses": 1,
+        "expired": 1,
+        "winRate": 75,
+        "averageRiskReward": 1.5
+      },
       "30m": {
         "total": 2,
         "wins": 1,
@@ -82,11 +82,11 @@
     },
     "sessionAccuracy": {
       "NEWYORK": {
-        "total": 5,
-        "wins": 1,
+        "total": 4,
+        "wins": 0,
         "losses": 0,
         "expired": 4,
-        "winRate": 100,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "LONDON": {
@@ -115,14 +115,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "BREAKOUT": {
-        "total": 2,
-        "wins": 2,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "TRENDING": {
         "total": 2,
         "wins": 1,
@@ -147,6 +139,14 @@
         "winRate": 0,
         "averageRiskReward": 1.5
       },
+      "BREAKOUT": {
+        "total": 1,
+        "wins": 1,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
+        "averageRiskReward": 1.5
+      },
       "RANGING": {
         "total": 2,
         "wins": 1,
@@ -167,7 +167,7 @@
         "pattern": "Break of Structure",
         "action": "INCREASE",
         "suggestedChange": 0.05,
-        "reason": "win rate 71.4%",
+        "reason": "win rate 66.7%",
         "applyAutomatically": false
       }
     ]
@@ -178,7 +178,7 @@
       "pattern": "Break of Structure",
       "action": "INCREASE",
       "suggestedChange": 0.05,
-      "reason": "win rate 71.4%",
+      "reason": "win rate 66.7%",
       "applyAutomatically": false
     }
   ]
