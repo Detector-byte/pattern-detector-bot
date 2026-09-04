@@ -1,22 +1,22 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-04T08:35:45.356Z",
+  "generatedAt": "2026-09-04T08:40:42.376Z",
   "period": {
-    "start": "2026-08-28T08:35:45.355Z",
-    "end": "2026-09-04T08:35:45.355Z"
+    "start": "2026-08-28T08:40:42.375Z",
+    "end": "2026-09-04T08:40:42.375Z"
   },
   "metrics": {
     "totalSignals": 12,
-    "resolvedSignals": 6,
-    "overallWinRate": 83.3,
+    "resolvedSignals": 7,
+    "overallWinRate": 71.4,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
       "Break of Structure": {
         "total": 9,
         "wins": 5,
-        "losses": 1,
+        "losses": 2,
         "expired": 2,
-        "winRate": 83.3,
+        "winRate": 71.4,
         "averageRiskReward": 1.5
       },
       "Bearish Order Block": {
@@ -32,9 +32,9 @@
       "XAUUSD": {
         "total": 11,
         "wins": 5,
-        "losses": 1,
+        "losses": 2,
         "expired": 4,
-        "winRate": 83.3,
+        "winRate": 71.4,
         "averageRiskReward": 1.5
       },
       "GBPJPY": {
@@ -50,9 +50,9 @@
       "1H": {
         "total": 6,
         "wins": 4,
-        "losses": 0,
+        "losses": 1,
         "expired": 1,
-        "winRate": 100,
+        "winRate": 80,
         "averageRiskReward": 1.5
       },
       "5m": {
@@ -84,9 +84,9 @@
       "LONDON": {
         "total": 3,
         "wins": 1,
-        "losses": 0,
+        "losses": 1,
         "expired": 1,
-        "winRate": 100,
+        "winRate": 50,
         "averageRiskReward": 1.5
       },
       "NEWYORK": {
@@ -118,9 +118,9 @@
       "RANGING": {
         "total": 2,
         "wins": 1,
-        "losses": 0,
+        "losses": 1,
         "expired": 0,
-        "winRate": 100,
+        "winRate": 50,
         "averageRiskReward": 1.5
       },
       "BREAKOUT": {
@@ -167,7 +167,7 @@
         "pattern": "Break of Structure",
         "action": "INCREASE",
         "suggestedChange": 0.05,
-        "reason": "win rate 83.3%",
+        "reason": "win rate 71.4%",
         "applyAutomatically": false
       }
     ]
@@ -178,7 +178,7 @@
       "pattern": "Break of Structure",
       "action": "INCREASE",
       "suggestedChange": 0.05,
-      "reason": "win rate 83.3%",
+      "reason": "win rate 71.4%",
       "applyAutomatically": false
     }
   ]
