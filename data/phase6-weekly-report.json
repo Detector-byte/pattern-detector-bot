@@ -1,12 +1,12 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-05T02:05:33.424Z",
+  "generatedAt": "2026-09-05T02:10:42.224Z",
   "period": {
-    "start": "2026-08-29T02:05:33.424Z",
-    "end": "2026-09-05T02:05:33.424Z"
+    "start": "2026-08-29T02:10:42.223Z",
+    "end": "2026-09-05T02:10:42.223Z"
   },
   "metrics": {
-    "totalSignals": 9,
+    "totalSignals": 10,
     "resolvedSignals": 6,
     "overallWinRate": 66.7,
     "averageRiskReward": 1.5,
@@ -26,11 +26,19 @@
         "expired": 0,
         "winRate": 66.7,
         "averageRiskReward": 1.5
+      },
+      "Bullish Order Block": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 8,
+        "total": 9,
         "wins": 4,
         "losses": 2,
         "expired": 2,
@@ -64,7 +72,7 @@
         "averageRiskReward": 1.5
       },
       "30m": {
-        "total": 2,
+        "total": 3,
         "wins": 1,
         "losses": 1,
         "expired": 0,
@@ -98,7 +106,7 @@
         "averageRiskReward": 1.5
       },
       "ASIAN": {
-        "total": 2,
+        "total": 3,
         "wins": 2,
         "losses": 0,
         "expired": 0,
@@ -116,7 +124,7 @@
     },
     "marketRegimeAccuracy": {
       "COMPRESSION": {
-        "total": 3,
+        "total": 4,
         "wins": 1,
         "losses": 0,
         "expired": 2,
@@ -158,7 +166,7 @@
     },
     "learningProgress": "improving",
     "bestPattern": "Break of Structure",
-    "worstPattern": "Bearish Order Block",
+    "worstPattern": "Bullish Order Block",
     "mostImprovedPattern": "Break of Structure",
     "blacklistedPatterns": [],
     "optimizationSuggestions": [
