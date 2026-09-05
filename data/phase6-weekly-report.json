@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-05T02:10:42.224Z",
+  "generatedAt": "2026-09-05T02:15:44.126Z",
   "period": {
-    "start": "2026-08-29T02:10:42.223Z",
-    "end": "2026-09-05T02:10:42.223Z"
+    "start": "2026-08-29T02:15:44.125Z",
+    "end": "2026-09-05T02:15:44.125Z"
   },
   "metrics": {
     "totalSignals": 10,
@@ -11,6 +11,14 @@
     "overallWinRate": 66.7,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
+      "Bullish Order Block": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
       "Bearish Order Block": {
         "total": 3,
         "wins": 0,
@@ -25,14 +33,6 @@
         "losses": 2,
         "expired": 0,
         "winRate": 66.7,
-        "averageRiskReward": 1.5
-      },
-      "Bullish Order Block": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 0,
         "averageRiskReward": 1.5
       }
     },
@@ -55,6 +55,14 @@
       }
     },
     "timeframeAccuracy": {
+      "30m": {
+        "total": 3,
+        "wins": 1,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 50,
+        "averageRiskReward": 1.5
+      },
       "1H": {
         "total": 5,
         "wins": 3,
@@ -71,14 +79,6 @@
         "winRate": 0,
         "averageRiskReward": 1.5
       },
-      "30m": {
-        "total": 3,
-        "wins": 1,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "15m": {
         "total": 1,
         "wins": 0,
@@ -89,6 +89,14 @@
       }
     },
     "sessionAccuracy": {
+      "ASIAN": {
+        "total": 3,
+        "wins": 2,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 100,
+        "averageRiskReward": 1.5
+      },
       "LONDON": {
         "total": 3,
         "wins": 1,
@@ -103,14 +111,6 @@
         "losses": 0,
         "expired": 2,
         "winRate": 0,
-        "averageRiskReward": 1.5
-      },
-      "ASIAN": {
-        "total": 3,
-        "wins": 2,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
         "averageRiskReward": 1.5
       },
       "LONDON_NY_OVERLAP": {
@@ -166,7 +166,7 @@
     },
     "learningProgress": "improving",
     "bestPattern": "Break of Structure",
-    "worstPattern": "Bullish Order Block",
+    "worstPattern": "Bearish Order Block",
     "mostImprovedPattern": "Break of Structure",
     "blacklistedPatterns": [],
     "optimizationSuggestions": [
