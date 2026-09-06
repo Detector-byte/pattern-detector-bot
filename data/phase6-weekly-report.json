@@ -1,30 +1,30 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-06T20:55:45.196Z",
+  "generatedAt": "2026-09-06T21:00:55.804Z",
   "period": {
-    "start": "2026-08-30T20:55:45.196Z",
-    "end": "2026-09-06T20:55:45.196Z"
+    "start": "2026-08-30T21:00:55.803Z",
+    "end": "2026-09-06T21:00:55.803Z"
   },
   "metrics": {
-    "totalSignals": 9,
+    "totalSignals": 8,
     "resolvedSignals": 6,
     "overallWinRate": 66.7,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Bearish Order Block": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Break of Structure": {
         "total": 6,
         "wins": 4,
         "losses": 2,
         "expired": 0,
         "winRate": 66.7,
+        "averageRiskReward": 1.5
+      },
+      "Bearish Order Block": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "Bullish Order Block": {
@@ -38,10 +38,10 @@
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 8,
+        "total": 7,
         "wins": 4,
         "losses": 2,
-        "expired": 2,
+        "expired": 1,
         "winRate": 66.7,
         "averageRiskReward": 1.5
       },
@@ -55,14 +55,6 @@
       }
     },
     "timeframeAccuracy": {
-      "5m": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "30m": {
         "total": 3,
         "wins": 1,
@@ -89,14 +81,6 @@
       }
     },
     "sessionAccuracy": {
-      "NEWYORK": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "ASIAN": {
         "total": 3,
         "wins": 2,
@@ -120,23 +104,31 @@
         "expired": 0,
         "winRate": 50,
         "averageRiskReward": 1.5
-      }
-    },
-    "marketRegimeAccuracy": {
-      "EXPANSION": {
-        "total": 2,
+      },
+      "NEWYORK": {
+        "total": 1,
         "wins": 0,
-        "losses": 1,
+        "losses": 0,
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
-      },
+      }
+    },
+    "marketRegimeAccuracy": {
       "BREAKOUT": {
         "total": 1,
         "wins": 1,
         "losses": 0,
         "expired": 0,
         "winRate": 100,
+        "averageRiskReward": 1.5
+      },
+      "EXPANSION": {
+        "total": 1,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "RANGING": {
