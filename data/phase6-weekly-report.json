@@ -1,22 +1,22 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-07T03:00:54.814Z",
+  "generatedAt": "2026-09-07T03:05:51.737Z",
   "period": {
-    "start": "2026-08-31T03:00:54.814Z",
-    "end": "2026-09-07T03:00:54.814Z"
+    "start": "2026-08-31T03:05:51.737Z",
+    "end": "2026-09-07T03:05:51.737Z"
   },
   "metrics": {
-    "totalSignals": 8,
-    "resolvedSignals": 6,
-    "overallWinRate": 66.7,
+    "totalSignals": 7,
+    "resolvedSignals": 5,
+    "overallWinRate": 60,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
       "Break of Structure": {
-        "total": 6,
-        "wins": 4,
+        "total": 5,
+        "wins": 3,
         "losses": 2,
         "expired": 0,
-        "winRate": 66.7,
+        "winRate": 60,
         "averageRiskReward": 1.5
       },
       "Bearish Order Block": {
@@ -38,11 +38,11 @@
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 7,
-        "wins": 4,
+        "total": 6,
+        "wins": 3,
         "losses": 2,
         "expired": 1,
-        "winRate": 66.7,
+        "winRate": 60,
         "averageRiskReward": 1.5
       },
       "GBPJPY": {
@@ -56,11 +56,11 @@
     },
     "timeframeAccuracy": {
       "30m": {
-        "total": 3,
-        "wins": 1,
+        "total": 2,
+        "wins": 0,
         "losses": 1,
         "expired": 1,
-        "winRate": 50,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "1H": {
@@ -81,14 +81,6 @@
       }
     },
     "sessionAccuracy": {
-      "ASIAN": {
-        "total": 3,
-        "wins": 2,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "LONDON_NY_OVERLAP": {
         "total": 2,
         "wins": 1,
@@ -105,6 +97,14 @@
         "winRate": 50,
         "averageRiskReward": 1.5
       },
+      "ASIAN": {
+        "total": 2,
+        "wins": 1,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 100,
+        "averageRiskReward": 1.5
+      },
       "NEWYORK": {
         "total": 1,
         "wins": 0,
@@ -115,14 +115,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "BREAKOUT": {
-        "total": 1,
-        "wins": 1,
-        "losses": 0,
-        "expired": 0,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "EXPANSION": {
         "total": 1,
         "wins": 0,
@@ -159,27 +151,9 @@
     "learningProgress": "improving",
     "bestPattern": "Break of Structure",
     "worstPattern": "Bullish Order Block",
-    "mostImprovedPattern": "Break of Structure",
+    "mostImprovedPattern": null,
     "blacklistedPatterns": [],
-    "optimizationSuggestions": [
-      {
-        "type": "PATTERN_WEIGHT",
-        "pattern": "Break of Structure",
-        "action": "INCREASE",
-        "suggestedChange": 0.05,
-        "reason": "win rate 66.7%",
-        "applyAutomatically": false
-      }
-    ]
+    "optimizationSuggestions": []
   },
-  "recommendations": [
-    {
-      "type": "PATTERN_WEIGHT",
-      "pattern": "Break of Structure",
-      "action": "INCREASE",
-      "suggestedChange": 0.05,
-      "reason": "win rate 66.7%",
-      "applyAutomatically": false
-    }
-  ]
+  "recommendations": []
 }
