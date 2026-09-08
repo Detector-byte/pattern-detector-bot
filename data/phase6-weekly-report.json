@@ -1,22 +1,22 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-08T09:05:39.081Z",
+  "generatedAt": "2026-09-08T09:10:49.530Z",
   "period": {
-    "start": "2026-09-01T09:05:39.081Z",
-    "end": "2026-09-08T09:05:39.081Z"
+    "start": "2026-09-01T09:10:49.529Z",
+    "end": "2026-09-08T09:10:49.529Z"
   },
   "metrics": {
-    "totalSignals": 7,
-    "resolvedSignals": 4,
-    "overallWinRate": 75,
+    "totalSignals": 6,
+    "resolvedSignals": 3,
+    "overallWinRate": 66.7,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
       "Break of Structure": {
-        "total": 5,
-        "wins": 3,
+        "total": 4,
+        "wins": 2,
         "losses": 1,
         "expired": 0,
-        "winRate": 75,
+        "winRate": 66.7,
         "averageRiskReward": 1.5
       },
       "Bearish Order Block": {
@@ -38,11 +38,11 @@
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 6,
-        "wins": 3,
+        "total": 5,
+        "wins": 2,
         "losses": 1,
         "expired": 1,
-        "winRate": 75,
+        "winRate": 66.7,
         "averageRiskReward": 1.5
       },
       "GBPJPY": {
@@ -56,11 +56,11 @@
     },
     "timeframeAccuracy": {
       "1H": {
-        "total": 5,
-        "wins": 3,
+        "total": 4,
+        "wins": 2,
         "losses": 1,
         "expired": 0,
-        "winRate": 75,
+        "winRate": 66.7,
         "averageRiskReward": 1.5
       },
       "15m": {
@@ -82,11 +82,11 @@
     },
     "sessionAccuracy": {
       "LONDON": {
-        "total": 3,
-        "wins": 1,
+        "total": 2,
+        "wins": 0,
         "losses": 1,
         "expired": 0,
-        "winRate": 50,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "ASIAN": {
@@ -123,14 +123,6 @@
         "winRate": 0,
         "averageRiskReward": 1.5
       },
-      "RANGING": {
-        "total": 2,
-        "wins": 1,
-        "losses": 1,
-        "expired": 0,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "COMPRESSION": {
         "total": 3,
         "wins": 1,
@@ -145,6 +137,14 @@
         "losses": 0,
         "expired": 0,
         "winRate": 100,
+        "averageRiskReward": 1.5
+      },
+      "RANGING": {
+        "total": 1,
+        "wins": 0,
+        "losses": 1,
+        "expired": 0,
+        "winRate": 0,
         "averageRiskReward": 1.5
       }
     },
