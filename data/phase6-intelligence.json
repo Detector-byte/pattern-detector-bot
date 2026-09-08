@@ -1,8 +1,8 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-09-08T08:05:34.051Z",
-  "lastRun": "2026-09-08T08:05:34.051Z",
-  "publishedSignalId": "XAUUSD_1H_BREAKOFSTRUCTURE_20260908",
+  "updatedAt": "2026-09-08T08:10:52.111Z",
+  "lastRun": "2026-09-08T08:10:52.111Z",
+  "publishedSignalId": null,
   "portfolio": {
     "openTrades": 1,
     "limits": {
@@ -11,30 +11,8 @@
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {
-    "XAUUSD_1H": {
-      "state": "EXPANSION",
-      "confidence": 82,
-      "features": {
-        "baseRegime": "RANGING",
-        "directionalMove": -0.00416,
-        "rangeRatio": 1.62,
-        "bodyRatio": 0.54,
-        "volumeRatio": 1,
-        "breakout": false
-      }
-    }
-  },
-  "strategyPriorities": {
-    "XAUUSD_1H": {
-      "primary": "INTRADAY",
-      "scores": {
-        "INTRADAY": 85,
-        "SCALPING": 60,
-        "SWING": 50
-      }
-    }
-  },
+  "marketStates": {},
+  "strategyPriorities": {},
   "optimizerRecommendations": [
     {
       "type": "PATTERN_WEIGHT",
