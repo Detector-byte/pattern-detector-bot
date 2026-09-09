@@ -1,24 +1,16 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-09T18:20:53.680Z",
+  "generatedAt": "2026-09-09T18:25:41.869Z",
   "period": {
-    "start": "2026-09-02T18:20:53.679Z",
-    "end": "2026-09-09T18:20:53.679Z"
+    "start": "2026-09-02T18:25:41.869Z",
+    "end": "2026-09-09T18:25:41.869Z"
   },
   "metrics": {
-    "totalSignals": 5,
+    "totalSignals": 4,
     "resolvedSignals": 3,
     "overallWinRate": 33.3,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Bearish Order Block": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Break of Structure": {
         "total": 3,
         "wins": 1,
@@ -37,14 +29,6 @@
       }
     },
     "pairAccuracy": {
-      "GBPJPY": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "XAUUSD": {
         "total": 4,
         "wins": 1,
@@ -55,14 +39,6 @@
       }
     },
     "timeframeAccuracy": {
-      "15m": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "1H": {
         "total": 3,
         "wins": 1,
@@ -81,14 +57,6 @@
       }
     },
     "sessionAccuracy": {
-      "NEWYORK": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "LONDON_NY_OVERLAP": {
         "total": 1,
         "wins": 1,
@@ -115,14 +83,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "COMPRESSION": {
-        "total": 2,
-        "wins": 0,
-        "losses": 0,
-        "expired": 2,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "TRENDING": {
         "total": 1,
         "wins": 1,
@@ -136,6 +96,14 @@
         "wins": 0,
         "losses": 1,
         "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "COMPRESSION": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
       },
