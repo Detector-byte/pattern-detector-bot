@@ -1,30 +1,30 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-09T02:01:00.767Z",
+  "generatedAt": "2026-09-09T02:05:52.312Z",
   "period": {
-    "start": "2026-09-02T02:01:00.766Z",
-    "end": "2026-09-09T02:01:00.766Z"
+    "start": "2026-09-02T02:05:52.312Z",
+    "end": "2026-09-09T02:05:52.312Z"
   },
   "metrics": {
-    "totalSignals": 6,
-    "resolvedSignals": 4,
-    "overallWinRate": 50,
+    "totalSignals": 5,
+    "resolvedSignals": 3,
+    "overallWinRate": 33.3,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Break of Structure": {
-        "total": 4,
-        "wins": 2,
-        "losses": 2,
-        "expired": 0,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "Bearish Order Block": {
         "total": 1,
         "wins": 0,
         "losses": 0,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "Break of Structure": {
+        "total": 3,
+        "wins": 1,
+        "losses": 2,
+        "expired": 0,
+        "winRate": 33.3,
         "averageRiskReward": 1.5
       },
       "Bullish Order Block": {
@@ -37,14 +37,6 @@
       }
     },
     "pairAccuracy": {
-      "XAUUSD": {
-        "total": 5,
-        "wins": 2,
-        "losses": 2,
-        "expired": 1,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "GBPJPY": {
         "total": 1,
         "wins": 0,
@@ -52,23 +44,31 @@
         "expired": 1,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "XAUUSD": {
+        "total": 4,
+        "wins": 1,
+        "losses": 2,
+        "expired": 1,
+        "winRate": 33.3,
+        "averageRiskReward": 1.5
       }
     },
     "timeframeAccuracy": {
-      "1H": {
-        "total": 4,
-        "wins": 2,
-        "losses": 2,
-        "expired": 0,
-        "winRate": 50,
-        "averageRiskReward": 1.5
-      },
       "15m": {
         "total": 1,
         "wins": 0,
         "losses": 0,
         "expired": 1,
         "winRate": 0,
+        "averageRiskReward": 1.5
+      },
+      "1H": {
+        "total": 3,
+        "wins": 1,
+        "losses": 2,
+        "expired": 0,
+        "winRate": 33.3,
         "averageRiskReward": 1.5
       },
       "30m": {
@@ -81,14 +81,6 @@
       }
     },
     "sessionAccuracy": {
-      "ASIAN": {
-        "total": 2,
-        "wins": 1,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 100,
-        "averageRiskReward": 1.5
-      },
       "NEWYORK": {
         "total": 1,
         "wins": 0,
@@ -112,15 +104,23 @@
         "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
+      },
+      "ASIAN": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 1,
+        "winRate": 0,
+        "averageRiskReward": 1.5
       }
     },
     "marketRegimeAccuracy": {
       "COMPRESSION": {
-        "total": 3,
-        "wins": 1,
+        "total": 2,
+        "wins": 0,
         "losses": 0,
         "expired": 2,
-        "winRate": 100,
+        "winRate": 0,
         "averageRiskReward": 1.5
       },
       "TRENDING": {
