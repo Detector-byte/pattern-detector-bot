@@ -1,24 +1,16 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-09-12T04:05:41.384Z",
+  "generatedAt": "2026-09-12T04:10:44.341Z",
   "period": {
-    "start": "2026-09-05T04:05:41.384Z",
-    "end": "2026-09-12T04:05:41.384Z"
+    "start": "2026-09-05T04:10:44.341Z",
+    "end": "2026-09-12T04:10:44.341Z"
   },
   "metrics": {
-    "totalSignals": 2,
+    "totalSignals": 1,
     "resolvedSignals": 1,
     "overallWinRate": 0,
     "averageRiskReward": 1.5,
     "patternAccuracy": {
-      "Bullish Order Block": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "Break of Structure": {
         "total": 1,
         "wins": 0,
@@ -30,23 +22,15 @@
     },
     "pairAccuracy": {
       "XAUUSD": {
-        "total": 2,
+        "total": 1,
         "wins": 0,
         "losses": 1,
-        "expired": 1,
+        "expired": 0,
         "winRate": 0,
         "averageRiskReward": 1.5
       }
     },
     "timeframeAccuracy": {
-      "30m": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "1H": {
         "total": 1,
         "wins": 0,
@@ -57,14 +41,6 @@
       }
     },
     "sessionAccuracy": {
-      "ASIAN": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "LONDON": {
         "total": 1,
         "wins": 0,
@@ -75,14 +51,6 @@
       }
     },
     "marketRegimeAccuracy": {
-      "COMPRESSION": {
-        "total": 1,
-        "wins": 0,
-        "losses": 0,
-        "expired": 1,
-        "winRate": 0,
-        "averageRiskReward": 1.5
-      },
       "EXPANSION": {
         "total": 1,
         "wins": 0,
@@ -93,7 +61,7 @@
       }
     },
     "learningProgress": "improving",
-    "bestPattern": "Bullish Order Block",
+    "bestPattern": "Break of Structure",
     "worstPattern": "Break of Structure",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
