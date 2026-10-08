@@ -1,45 +1,49 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-10-08T10:25:51.521Z",
+  "updatedAt": "2026-10-08T10:31:11.300Z",
   "pairs": {
     "XAUUSD": {
       "5m": {
         "pair": "XAUUSD",
         "timeframe": "5m",
-        "updatedAt": "2026-10-08T10:25:51.488Z",
+        "updatedAt": "2026-10-08T10:31:11.267Z",
         "candleCount": 1500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
-        "reason": "breakoutBuy: 1, breakoutSell: 1",
-        "atr": 2.971075,
-        "atrPercent": 0.00072003,
+        "reason": "breakoutBuy: 1",
+        "atr": 2.87641571,
+        "atrPercent": 0.00069804,
         "minimumATRPercent": 0.00005,
-        "rawCandidates": 3,
-        "acceptedPatterns": 1,
-        "returnedPatterns": 1,
+        "rawCandidates": 8,
+        "acceptedPatterns": 7,
+        "returnedPatterns": 5,
         "returnedPatternNames": [
-          "Fair Value Gap (Bullish)"
+          "Risk-Adjusted Trend Momentum",
+          "Liquidity Sweep (Sell-Side)",
+          "Diamond Bottom",
+          "Fair Value Gap (Bullish)",
+          "Diamond Top"
         ],
         "institutionalSequence": {
-          "stage": "SEARCHING_LIQUIDITY",
-          "score": 20,
+          "stage": "RETEST_IN_PROGRESS",
+          "score": 45,
           "valid": false,
           "direction": "SELL",
-          "completedStages": 1,
-          "missingStages": 4,
-          "conflicts": 0
+          "completedStages": 2,
+          "missingStages": 3,
+          "conflicts": 1
         }
       },
       "15m": {
         "pair": "XAUUSD",
         "timeframe": "15m",
-        "updatedAt": "2026-10-08T10:25:51.493Z",
+        "updatedAt": "2026-10-08T10:31:11.272Z",
         "candleCount": 499,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "breakoutBuy: 1, breakoutSell: 1",
-        "atr": 5.94423286,
-        "atrPercent": 0.00144167,
+        "atr": 5.53481643,
+        "atrPercent": 0.00134276,
         "minimumATRPercent": 0.00005,
         "rawCandidates": 6,
         "acceptedPatterns": 4,
@@ -63,7 +67,7 @@
       "30m": {
         "pair": "XAUUSD",
         "timeframe": "30m",
-        "updatedAt": "2026-10-08T10:25:51.495Z",
+        "updatedAt": "2026-10-08T10:31:11.273Z",
         "candleCount": 249,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -93,7 +97,7 @@
       "1H": {
         "pair": "XAUUSD",
         "timeframe": "1H",
-        "updatedAt": "2026-10-08T10:25:51.495Z",
+        "updatedAt": "2026-10-08T10:31:11.276Z",
         "candleCount": 124,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -120,7 +124,7 @@
       "4H": {
         "pair": "XAUUSD",
         "timeframe": "4H",
-        "updatedAt": "2026-10-08T10:25:51.496Z",
+        "updatedAt": "2026-10-08T10:31:11.276Z",
         "candleCount": 30,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -149,28 +153,28 @@
       "5m": {
         "pair": "GBPJPY",
         "timeframe": "5m",
-        "updatedAt": "2026-10-08T10:25:51.500Z",
+        "updatedAt": "2026-10-08T10:31:11.279Z",
         "candleCount": 1500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
-        "reason": "breakoutBuy: 1, breakoutSell: 1",
-        "atr": 0.07325857,
-        "atrPercent": 0.00035088,
+        "reason": "breakoutBuy: 1",
+        "atr": 0.06979571,
+        "atrPercent": 0.00033443,
         "minimumATRPercent": 0.00005,
-        "rawCandidates": 6,
+        "rawCandidates": 5,
         "acceptedPatterns": 4,
         "returnedPatterns": 4,
         "returnedPatternNames": [
-          "Diamond Top",
+          "Liquidity Sweep (Sell-Side)",
           "Fair Value Gap (Bearish)",
-          "Bullish Engulfing",
-          "Diamond Bottom"
+          "Rectangle Top",
+          "Double Top"
         ],
         "institutionalSequence": {
-          "stage": "SEARCHING_LIQUIDITY",
-          "score": 10,
+          "stage": "LIQUIDITY_SWEPT",
+          "score": 35,
           "valid": false,
-          "direction": "NEUTRAL",
+          "direction": "BUY",
           "completedStages": 1,
           "missingStages": 4,
           "conflicts": 0
@@ -179,21 +183,23 @@
       "15m": {
         "pair": "GBPJPY",
         "timeframe": "15m",
-        "updatedAt": "2026-10-08T10:25:51.501Z",
+        "updatedAt": "2026-10-08T10:31:11.280Z",
         "candleCount": 499,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "breakoutBuy: 1",
-        "atr": 0.14412,
-        "atrPercent": 0.0006904,
+        "atr": 0.14238857,
+        "atrPercent": 0.00068219,
         "minimumATRPercent": 0.00005,
-        "rawCandidates": 4,
-        "acceptedPatterns": 3,
-        "returnedPatterns": 3,
+        "rawCandidates": 6,
+        "acceptedPatterns": 5,
+        "returnedPatterns": 5,
         "returnedPatternNames": [
+          "Diamond Top",
           "Bearish Order Block",
           "Fair Value Gap (Bearish)",
-          "Rectangle Top"
+          "Rectangle Top",
+          "Diamond Bottom"
         ],
         "institutionalSequence": {
           "stage": "WAITING_FOR_RETEST",
@@ -208,7 +214,7 @@
       "30m": {
         "pair": "GBPJPY",
         "timeframe": "30m",
-        "updatedAt": "2026-10-08T10:25:51.501Z",
+        "updatedAt": "2026-10-08T10:31:11.281Z",
         "candleCount": 249,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -236,7 +242,7 @@
       "1H": {
         "pair": "GBPJPY",
         "timeframe": "1H",
-        "updatedAt": "2026-10-08T10:25:51.502Z",
+        "updatedAt": "2026-10-08T10:31:11.281Z",
         "candleCount": 124,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
@@ -265,7 +271,7 @@
       "4H": {
         "pair": "GBPJPY",
         "timeframe": "4H",
-        "updatedAt": "2026-10-08T10:25:51.503Z",
+        "updatedAt": "2026-10-08T10:31:11.282Z",
         "candleCount": 30,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
