@@ -1,25 +1,26 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-11-20T01:16:07.141Z",
+  "updatedAt": "2026-11-20T01:21:08.168Z",
   "pairs": {
     "XAUUSD": {
       "5m": {
         "pair": "XAUUSD",
         "timeframe": "5m",
-        "updatedAt": "2026-11-20T01:16:07.117Z",
+        "updatedAt": "2026-11-20T01:21:08.135Z",
         "candleCount": 1500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
-        "reason": null,
-        "atr": 8.88106929,
-        "atrPercent": 0.00246994,
+        "reason": "breakoutSell: 1",
+        "atr": 10.22510857,
+        "atrPercent": 0.00283345,
         "minimumATRPercent": 0.00005,
-        "rawCandidates": 2,
-        "acceptedPatterns": 2,
-        "returnedPatterns": 2,
+        "rawCandidates": 4,
+        "acceptedPatterns": 3,
+        "returnedPatterns": 3,
         "returnedPatternNames": [
+          "Diamond Top",
           "Fair Value Gap (Bearish)",
-          "Double Top"
+          "Diamond Bottom"
         ],
         "institutionalSequence": {
           "stage": "SEARCHING_LIQUIDITY",
@@ -34,20 +35,21 @@
       "15m": {
         "pair": "XAUUSD",
         "timeframe": "15m",
-        "updatedAt": "2026-11-20T01:16:07.119Z",
+        "updatedAt": "2026-11-20T01:21:08.139Z",
         "candleCount": 500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": null,
-        "atr": 12.59699214,
-        "atrPercent": 0.00350338,
+        "atr": 13.57445214,
+        "atrPercent": 0.00376158,
         "minimumATRPercent": 0.00005,
-        "rawCandidates": 2,
-        "acceptedPatterns": 2,
-        "returnedPatterns": 2,
+        "rawCandidates": 3,
+        "acceptedPatterns": 3,
+        "returnedPatterns": 3,
         "returnedPatternNames": [
           "Fair Value Gap (Bearish)",
-          "Bearish Order Block"
+          "Bearish Order Block",
+          "Bullish Engulfing"
         ],
         "institutionalSequence": {
           "stage": "RETEST_IN_PROGRESS",
@@ -62,8 +64,8 @@
       "30m": {
         "pair": "XAUUSD",
         "timeframe": "30m",
-        "updatedAt": "2026-11-20T01:16:07.120Z",
-        "candleCount": 250,
+        "updatedAt": "2026-11-20T01:21:08.140Z",
+        "candleCount": 249,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": null,
@@ -91,8 +93,8 @@
       "1H": {
         "pair": "XAUUSD",
         "timeframe": "1H",
-        "updatedAt": "2026-11-20T01:16:07.121Z",
-        "candleCount": 125,
+        "updatedAt": "2026-11-20T01:21:08.141Z",
+        "candleCount": 124,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "patternAge: 1",
@@ -118,8 +120,8 @@
       "4H": {
         "pair": "XAUUSD",
         "timeframe": "4H",
-        "updatedAt": "2026-11-20T01:16:07.123Z",
-        "candleCount": 31,
+        "updatedAt": "2026-11-20T01:21:08.143Z",
+        "candleCount": 30,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": null,
@@ -148,21 +150,20 @@
       "5m": {
         "pair": "GBPJPY",
         "timeframe": "5m",
-        "updatedAt": "2026-11-20T01:16:07.124Z",
+        "updatedAt": "2026-11-20T01:21:08.144Z",
         "candleCount": 1500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
-        "reason": "breakoutBuy: 1",
-        "atr": 0.09820929,
-        "atrPercent": 0.0004705,
+        "reason": "patternAge: 1, breakoutBuy: 1",
+        "atr": 0.11662357,
+        "atrPercent": 0.00055879,
         "minimumATRPercent": 0.00005,
         "rawCandidates": 4,
-        "acceptedPatterns": 3,
-        "returnedPatterns": 3,
+        "acceptedPatterns": 2,
+        "returnedPatterns": 2,
         "returnedPatternNames": [
           "Fair Value Gap (Bearish)",
-          "Rectangle Top",
-          "Double Top"
+          "Rectangle Top"
         ],
         "institutionalSequence": {
           "stage": "SEARCHING_LIQUIDITY",
@@ -177,38 +178,39 @@
       "15m": {
         "pair": "GBPJPY",
         "timeframe": "15m",
-        "updatedAt": "2026-11-20T01:16:07.125Z",
+        "updatedAt": "2026-11-20T01:21:08.145Z",
         "candleCount": 500,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "breakoutBuy: 1",
-        "atr": 0.15768,
-        "atrPercent": 0.00075541,
+        "atr": 0.17187714,
+        "atrPercent": 0.00082353,
         "minimumATRPercent": 0.00005,
-        "rawCandidates": 5,
-        "acceptedPatterns": 4,
-        "returnedPatterns": 4,
+        "rawCandidates": 7,
+        "acceptedPatterns": 6,
+        "returnedPatterns": 5,
         "returnedPatternNames": [
-          "Break of Structure",
           "Bearish Order Block",
+          "Diamond Top",
           "Fair Value Gap (Bearish)",
-          "Rectangle Top"
+          "Rectangle Top",
+          "Diamond Bottom"
         ],
         "institutionalSequence": {
           "stage": "WAITING_FOR_RETEST",
-          "score": 60,
+          "score": 40,
           "valid": false,
           "direction": "SELL",
-          "completedStages": 3,
-          "missingStages": 2,
+          "completedStages": 2,
+          "missingStages": 3,
           "conflicts": 0
         }
       },
       "30m": {
         "pair": "GBPJPY",
         "timeframe": "30m",
-        "updatedAt": "2026-11-20T01:16:07.125Z",
-        "candleCount": 250,
+        "updatedAt": "2026-11-20T01:21:08.146Z",
+        "candleCount": 249,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "breakoutBuy: 1",
@@ -236,8 +238,8 @@
       "1H": {
         "pair": "GBPJPY",
         "timeframe": "1H",
-        "updatedAt": "2026-11-20T01:16:07.126Z",
-        "candleCount": 125,
+        "updatedAt": "2026-11-20T01:21:08.147Z",
+        "candleCount": 124,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "breakoutBuy: 1",
@@ -264,8 +266,8 @@
       "4H": {
         "pair": "GBPJPY",
         "timeframe": "4H",
-        "updatedAt": "2026-11-20T01:16:07.126Z",
-        "candleCount": 31,
+        "updatedAt": "2026-11-20T01:21:08.148Z",
+        "candleCount": 30,
         "analyzerStatus": "COMPLETED",
         "rejectionStage": null,
         "reason": "breakoutBuy: 1",
