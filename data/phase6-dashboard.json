@@ -1,17 +1,17 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-11-22T22:06:11.022Z",
+  "updatedAt": "2026-11-22T22:11:12.634Z",
   "distributions": {
     "aiScore": {
       "0-59": 0,
       "60-69": 0,
-      "70-79": 35,
+      "70-79": 36,
       "80-89": 0,
       "90-100": 0
     },
     "confidence": {
       "0-59": 0,
-      "60-69": 21,
+      "60-69": 22,
       "70-79": 13,
       "80-89": 1,
       "90-100": 0
@@ -28,12 +28,12 @@
         "averageRiskReward": 1.7
       },
       "INTRADAY": {
-        "total": 23,
+        "total": 24,
         "wins": 6,
         "losses": 7,
         "expired": 10,
         "winRate": 46.2,
-        "averageRiskReward": 1.59
+        "averageRiskReward": 1.58
       },
       "SWING": {
         "total": 2,
@@ -46,7 +46,7 @@
     },
     "pair": {
       "XAUUSD": {
-        "total": 23,
+        "total": 24,
         "wins": 6,
         "losses": 8,
         "expired": 9,
@@ -72,12 +72,12 @@
         "averageRiskReward": 1.69
       },
       "COMPRESSION": {
-        "total": 10,
+        "total": 11,
         "wins": 1,
         "losses": 1,
         "expired": 8,
         "winRate": 50,
-        "averageRiskReward": 1.6
+        "averageRiskReward": 1.59
       },
       "BREAKOUT": {
         "total": 4,
@@ -122,12 +122,12 @@
         "averageRiskReward": 1.61
       },
       "OFF_HOURS": {
-        "total": 2,
+        "total": 3,
         "wins": 0,
         "losses": 0,
         "expired": 2,
         "winRate": 0,
-        "averageRiskReward": 1.75
+        "averageRiskReward": 1.67
       },
       "ASIAN": {
         "total": 9,
@@ -196,7 +196,7 @@
         "averageRiskReward": 1.5
       },
       "Bearish Order Block": {
-        "total": 4,
+        "total": 5,
         "wins": 0,
         "losses": 0,
         "expired": 4,
@@ -208,16 +208,16 @@
   },
   "health": {
     "status": "ONLINE",
-    "signalsGenerated": 0,
-    "averageConfidence": 0,
-    "averageAIScore": 0,
+    "signalsGenerated": 1,
+    "averageConfidence": 67.3,
+    "averageAIScore": 70,
     "recentWinRate": 38.9,
-    "openSignals": 0,
+    "openSignals": 1,
     "blacklistedPatterns": 0,
-    "fetchDurationMs": 229,
+    "fetchDurationMs": 268,
     "analysisDurationMs": 23,
-    "learningDurationMs": 8,
-    "saveDurationMs": 7,
-    "totalRuntimeMs": 274
+    "learningDurationMs": 10,
+    "saveDurationMs": 8,
+    "totalRuntimeMs": 315
   }
 }
