@@ -1,23 +1,68 @@
 {
   "version": "6.0.0",
-  "generatedAt": "2026-11-22T20:56:18.837Z",
+  "generatedAt": "2026-11-22T21:01:23.244Z",
   "period": {
-    "start": "2026-11-15T20:56:18.837Z",
-    "end": "2026-11-22T20:56:18.837Z"
+    "start": "2026-11-15T21:01:23.244Z",
+    "end": "2026-11-22T21:01:23.244Z"
   },
   "metrics": {
-    "totalSignals": 0,
+    "totalSignals": 1,
     "resolvedSignals": 0,
     "overallWinRate": 0,
-    "averageRiskReward": 0,
-    "patternAccuracy": {},
-    "pairAccuracy": {},
-    "timeframeAccuracy": {},
-    "sessionAccuracy": {},
-    "marketRegimeAccuracy": {},
+    "averageRiskReward": 1.5,
+    "patternAccuracy": {
+      "Bearish Order Block": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      }
+    },
+    "pairAccuracy": {
+      "XAUUSD": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      }
+    },
+    "timeframeAccuracy": {
+      "15m": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      }
+    },
+    "sessionAccuracy": {
+      "OFF_HOURS": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      }
+    },
+    "marketRegimeAccuracy": {
+      "COMPRESSION": {
+        "total": 1,
+        "wins": 0,
+        "losses": 0,
+        "expired": 0,
+        "winRate": 0,
+        "averageRiskReward": 1.5
+      }
+    },
     "learningProgress": "improving",
-    "bestPattern": null,
-    "worstPattern": null,
+    "bestPattern": "Bearish Order Block",
+    "worstPattern": "Bearish Order Block",
     "mostImprovedPattern": null,
     "blacklistedPatterns": [],
     "optimizationSuggestions": []
