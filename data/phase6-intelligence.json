@@ -1,8 +1,8 @@
 {
   "version": "6.0.0",
-  "updatedAt": "2026-11-22T21:01:23.245Z",
-  "lastRun": "2026-11-22T21:01:23.245Z",
-  "publishedSignalId": "XAUUSD_15m_BEARISHORDERBLOCK_20261122",
+  "updatedAt": "2026-11-22T21:06:19.907Z",
+  "lastRun": "2026-11-22T21:06:19.907Z",
+  "publishedSignalId": null,
   "portfolio": {
     "openTrades": 1,
     "limits": {
@@ -11,29 +11,7 @@
       "maxJPYExposure": 2
     }
   },
-  "marketStates": {
-    "XAUUSD_15m": {
-      "state": "COMPRESSION",
-      "confidence": 80,
-      "features": {
-        "baseRegime": "RANGING",
-        "directionalMove": -0.00126,
-        "rangeRatio": 0.22,
-        "bodyRatio": 0.55,
-        "volumeRatio": 1,
-        "breakout": false
-      }
-    }
-  },
-  "strategyPriorities": {
-    "XAUUSD_15m": {
-      "primary": "SCALPING",
-      "scores": {
-        "SCALPING": 80,
-        "INTRADAY": 70,
-        "SWING": 45
-      }
-    }
-  },
+  "marketStates": {},
+  "strategyPriorities": {},
   "optimizerRecommendations": []
 }
