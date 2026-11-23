@@ -1,292 +1,6 @@
 {
   "entries": [
     {
-      "timestamp": "2026-11-23T01:11:02.953Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Diamond Top",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:11:02.953Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Bearish Order Block",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:11:02.953Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Fair Value Gap (Bearish)",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:11:02.953Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Diamond Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:11:02.954Z",
-      "pair": "XAUUSD",
-      "timeframe": "1H",
-      "pattern": "Bearish Order Block",
-      "decision": "PHASE6_REJECTED",
-      "aiScore": 71.4,
-      "reason": "final confidence bin 70 statistically failed: 4/10 wins, 95% Wilson upper 68.73% below live 70.00% floor"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.341Z",
-      "pair": "XAUUSD",
-      "timeframe": "5m",
-      "pattern": "Fair Value Gap (Bullish)",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.341Z",
-      "pair": "XAUUSD",
-      "timeframe": "5m",
-      "pattern": "Bearish Order Block",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.341Z",
-      "pair": "XAUUSD",
-      "timeframe": "15m",
-      "decision": "REJECTED",
-      "reason": "extreme volatility: current 17.20554, average 4.27146"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.341Z",
-      "pair": "XAUUSD",
-      "timeframe": "30m",
-      "decision": "REJECTED",
-      "reason": "extreme volatility: current 64.53579, average 0.82163"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.348Z",
-      "pair": "XAUUSD",
-      "timeframe": "1H",
-      "pattern": "Fair Value Gap (Bearish)",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.349Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Liquidity Sweep (Buy-Side)",
-      "decision": "REJECTED",
-      "reason": "confidence 67% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.349Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Diamond Top",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.349Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Bearish Order Block",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.349Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Diamond Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.350Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Fair Value Gap (Bullish)",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.353Z",
-      "pair": "GBPJPY",
-      "timeframe": "5m",
-      "pattern": "Bullish Order Block",
-      "decision": "REJECTED",
-      "reason": "confidence 52% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.353Z",
-      "pair": "GBPJPY",
-      "timeframe": "5m",
-      "pattern": "Fair Value Gap (Bullish)",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.354Z",
-      "pair": "GBPJPY",
-      "timeframe": "5m",
-      "pattern": "Rectangle Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.354Z",
-      "pair": "GBPJPY",
-      "timeframe": "15m",
-      "pattern": "Fair Value Gap (Bullish)",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.354Z",
-      "pair": "GBPJPY",
-      "timeframe": "15m",
-      "pattern": "Rectangle Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.354Z",
-      "pair": "GBPJPY",
-      "timeframe": "15m",
-      "pattern": "Double Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 53% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.355Z",
-      "pair": "GBPJPY",
-      "timeframe": "30m",
-      "pattern": "Break of Structure",
-      "decision": "REJECTED",
-      "reason": "confidence 69% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.355Z",
-      "pair": "GBPJPY",
-      "timeframe": "30m",
-      "pattern": "Fair Value Gap (Bullish)",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.355Z",
-      "pair": "GBPJPY",
-      "timeframe": "30m",
-      "pattern": "Rectangle Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.356Z",
-      "pair": "GBPJPY",
-      "timeframe": "1H",
-      "pattern": "Rectangle Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.356Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Diamond Top",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.356Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Bearish Order Block",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.356Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Fair Value Gap (Bearish)",
-      "decision": "REJECTED",
-      "reason": "confidence 60% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.356Z",
-      "pair": "GBPJPY",
-      "timeframe": "4H",
-      "pattern": "Diamond Bottom",
-      "decision": "REJECTED",
-      "reason": "confidence 65% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:16:25.357Z",
-      "pair": "XAUUSD",
-      "timeframe": "1H",
-      "pattern": "Bearish Order Block",
-      "decision": "PHASE6_REJECTED",
-      "aiScore": 71.4,
-      "reason": "final confidence bin 70 statistically failed: 4/10 wins, 95% Wilson upper 68.73% below live 70.00% floor"
-    },
-    {
-      "timestamp": "2026-11-23T01:21:23.615Z",
-      "pair": "XAUUSD",
-      "timeframe": "5m",
-      "pattern": "Fair Value Gap (Bullish)",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:21:23.616Z",
-      "pair": "XAUUSD",
-      "timeframe": "5m",
-      "pattern": "Bearish Order Block",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:21:23.616Z",
-      "pair": "XAUUSD",
-      "timeframe": "15m",
-      "decision": "REJECTED",
-      "reason": "extreme volatility: current 17.20554, average 4.27146"
-    },
-    {
-      "timestamp": "2026-11-23T01:21:23.616Z",
-      "pair": "XAUUSD",
-      "timeframe": "30m",
-      "decision": "REJECTED",
-      "reason": "extreme volatility: current 64.53579, average 0.82163"
-    },
-    {
-      "timestamp": "2026-11-23T01:21:23.624Z",
-      "pair": "XAUUSD",
-      "timeframe": "1H",
-      "pattern": "Fair Value Gap (Bearish)",
-      "decision": "REJECTED",
-      "reason": "confidence 50% below 70% threshold"
-    },
-    {
-      "timestamp": "2026-11-23T01:21:23.627Z",
-      "pair": "XAUUSD",
-      "timeframe": "4H",
-      "pattern": "Liquidity Sweep (Buy-Side)",
-      "decision": "REJECTED",
-      "reason": "confidence 67% below 70% threshold"
-    },
-    {
       "timestamp": "2026-11-23T01:21:23.627Z",
       "pair": "XAUUSD",
       "timeframe": "4H",
@@ -15905,8 +15619,295 @@
       "pattern": "Double Bottom",
       "decision": "REJECTED",
       "reason": "confidence 54% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.945Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "pattern": "Risk-Adjusted Trend Momentum",
+      "decision": "REJECTED",
+      "reason": "confidence 51% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.945Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.945Z",
+      "pair": "XAUUSD",
+      "timeframe": "5m",
+      "pattern": "Fair Value Gap (Bearish)",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.948Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.948Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Bullish Order Block",
+      "decision": "REJECTED",
+      "reason": "confidence 55% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.948Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.948Z",
+      "pair": "XAUUSD",
+      "timeframe": "15m",
+      "pattern": "Diamond Top",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.949Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.949Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.949Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "pattern": "Bullish Order Block",
+      "decision": "REJECTED",
+      "reason": "confidence 54% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.950Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "pattern": "Diamond Top",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.950Z",
+      "pair": "XAUUSD",
+      "timeframe": "30m",
+      "pattern": "Inverse Head and Shoulders",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.952Z",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.952Z",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "pattern": "Bullish Order Block",
+      "decision": "REJECTED",
+      "reason": "confidence 51% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.952Z",
+      "pair": "XAUUSD",
+      "timeframe": "1H",
+      "pattern": "Double Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.952Z",
+      "pair": "XAUUSD",
+      "timeframe": "4H",
+      "decision": "REJECTED",
+      "reason": "extreme volatility: current 62.45943, average 12.25720"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.954Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.954Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.954Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Bullish Order Block",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.954Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Double Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 54% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.954Z",
+      "pair": "GBPJPY",
+      "timeframe": "5m",
+      "pattern": "Inverse Head and Shoulders",
+      "decision": "REJECTED",
+      "reason": "confidence 54% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.955Z",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "pattern": "Break of Structure",
+      "decision": "REJECTED",
+      "reason": "confidence 68% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.955Z",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.955Z",
+      "pair": "GBPJPY",
+      "timeframe": "15m",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.955Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Break of Structure",
+      "decision": "REJECTED",
+      "reason": "confidence 68% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.956Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.956Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.956Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.956Z",
+      "pair": "GBPJPY",
+      "timeframe": "30m",
+      "pattern": "Diamond Top",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.956Z",
+      "pair": "GBPJPY",
+      "timeframe": "1H",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.957Z",
+      "pair": "GBPJPY",
+      "timeframe": "1H",
+      "pattern": "Rectangle Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 60% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.957Z",
+      "pair": "GBPJPY",
+      "timeframe": "4H",
+      "pattern": "Diamond Top",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.957Z",
+      "pair": "GBPJPY",
+      "timeframe": "4H",
+      "pattern": "Bearish Order Block",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.957Z",
+      "pair": "GBPJPY",
+      "timeframe": "4H",
+      "pattern": "Diamond Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 65% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.958Z",
+      "pair": "GBPJPY",
+      "timeframe": "4H",
+      "pattern": "Fair Value Gap (Bullish)",
+      "decision": "REJECTED",
+      "reason": "confidence 50% below 70% threshold"
+    },
+    {
+      "timestamp": "2026-11-23T06:41:24.958Z",
+      "pair": "GBPJPY",
+      "timeframe": "4H",
+      "pattern": "Double Bottom",
+      "decision": "REJECTED",
+      "reason": "confidence 54% below 70% threshold"
     }
   ],
-  "updatedAt": "2026-11-23T06:36:18.561Z",
+  "updatedAt": "2026-11-23T06:41:24.983Z",
   "totalEntries": 2000
 }
